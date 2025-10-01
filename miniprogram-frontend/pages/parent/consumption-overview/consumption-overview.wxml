@@ -1,0 +1,58 @@
+<!--pages/parent/consumption-overview/consumption-overview.wxml-->
+<view class="income-overview-container">
+  <!-- 页面内容 -->
+  <view class="content-wrapper" >
+    
+    <!-- 顶部余额概览区域：仅中间展示余额 + 下方充值按钮 -->
+    <view class="total-income-section">
+      <view class="total-income-header">
+        <text class="total-income-title">账户余额</text>
+      </view>
+      <view class="balance-center">
+        <text class="balance-amount">{{totalIncomeData.month}}</text>
+        <view class="recharge-btn" bindtap="onRecharge">
+          <image class="recharge-icon" src="/images/chongzhi.png" mode="widthFix"></image>
+          <text class="recharge-text">充值</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 年月选择器 -->
+    <view class="date-filter-section">
+      <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange" fields="month">
+        <view class="date-picker">
+          <text class="date-text">{{selectedYearMonth}}</text>
+          <image class="dropdown-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 消费明细列表（与教师端相同结构） -->
+    <view class="income-details-section">
+      <scroll-view class="income-list" scroll-y="true">
+        <!-- 按月分组显示 -->
+        <view class="month-group" wx:for="{{incomeGroups}}" wx:key="month">
+          <view class="month-header">
+            <text class="month-title">{{item.month}}</text>
+          </view>
+          
+          <!-- 本月的消费明细 -->
+          <view class="income-item" wx:for="{{item.records}}" wx:key="id" wx:for-item="record">
+            <view class="income-info">
+              <view class="income-type">{{record.type || record.title}}</view>
+              <view class="income-time">{{record.time}}</view>
+            </view>
+            <view class="income-amount negative">-{{record.amount}}</view>
+          </view>
+        </view>
+
+        <!-- 无数据提示 -->
+        <view class="no-data" wx:if="{{incomeGroups.length === 0}}">
+          <text class="no-data-text">暂无消费记录</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</view>
+
+

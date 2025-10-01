@@ -1,0 +1,162 @@
+/* pages/teacher/income-overview/income-overview.wxss */
+
+.income-overview-container {
+  min-height: 100vh;
+  background-color: #f8f8f8;
+}
+
+/* 顶部总收入区域 */
+.total-income-section {
+  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  padding: 40rpx;
+  color: #fff;
+}
+
+.total-income-header {
+  margin-bottom: 40rpx;
+}
+
+.total-income-title {
+  font-size: 32rpx;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.total-income-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.income-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.income-amount {
+  font-size: 60rpx;
+  font-weight: 600;
+  line-height: 1;
+}
+
+
+.income-label {
+  font-size: 28rpx;
+  opacity: 0.8;
+}
+
+/* 年月选择器 */
+.date-filter-section {
+  padding: 32rpx 40rpx;
+  background-color: #fff;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.date-picker {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 16rpx 24rpx;
+  background-color: #f8f9fa;
+  border-radius: 24rpx;
+  border: 1rpx solid #e9ecef;
+}
+
+.date-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.dropdown-icon {
+  width: 20rpx;
+  height: 20rpx;
+  transform: rotate(90deg);
+}
+
+/* 收入明细列表 */
+.income-details-section {
+  flex: 1;
+  background-color: #fff;
+  margin-top: 16rpx;
+}
+
+.income-list {
+  height: calc(100vh - 400rpx);
+  padding: 0 40rpx;
+  width: calc(100% - 80rpx);
+}
+
+/* 月份分组 */
+.month-group {
+  margin-bottom: 48rpx;
+}
+
+.month-header {
+  padding: 32rpx 0 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.month-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 收入明细项 */
+.income-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx 0;
+  border-bottom: 1rpx solid #f8f8f8;
+}
+
+.income-item:last-child {
+  border-bottom: none;
+}
+
+.income-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.income-type {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.income-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.income-amount {
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.income-amount.positive {
+  color: #4CAF50;
+}
+
+.income-amount.negative {
+  color: #F44336;
+}
+
+/* 无数据提示 */
+.no-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400rpx;
+}
+
+.no-data-text {
+  font-size: 28rpx;
+  color: #999;
+}

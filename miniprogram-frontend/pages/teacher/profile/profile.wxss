@@ -1,0 +1,385 @@
+/* pages/teacher/profile/profile.wxss */
+
+.profile-container {
+  min-height: 100vh;
+  background: #f8f8f8;
+  padding-bottom: 140rpx; /* 为底部导航留出空间 */
+  position: relative;
+}
+
+/* 背景渐变 */
+.background-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 500rpx;
+  background: linear-gradient(180deg, #7ED321 0%, #4CAF50 30%, rgba(255, 255, 255, 0) 100%);
+  z-index: 0;
+}
+
+/* 背景图片 */
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* 顶部操作区域 */
+.header-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 80rpx 40rpx 0;
+}
+
+.menu-icon {
+  padding: 20rpx;
+}
+
+.menu-dots {
+  display: flex;
+  gap: 8rpx;
+}
+
+.dot {
+  width: 8rpx;
+  height: 8rpx;
+  background: #333;
+  border-radius: 50%;
+}
+
+.switch-identity {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  color: #333;
+  font-size: 28rpx;
+}
+
+.arrow-right {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 用户信息区域 */
+.user-profile-section {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  padding: 40rpx;
+  gap: 32rpx;
+}
+
+.user-avatar {
+  flex-shrink: 0;
+}
+
+.avatar-image {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  border: 4rpx solid #fff;
+}
+
+.avatar-placeholder {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: #e0e0e0;
+  border: 4rpx solid #fff;
+  /* 预留位置：用户头像图片 */
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.user-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.user-name {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+.gender-icon {
+  width: 32rpx;
+  height: 32rpx;
+  background: #ff69b4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gender-symbol {
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: bold;
+}
+
+.user-tags {
+  display: flex;
+  gap: 16rpx;
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #fff;
+}
+
+.teacher-tag {
+  border:2rpx solid #4CAF50;
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+.examiner-tag {
+  border:2rpx solid #2196F3;
+  color: #2196F3;
+  font-weight: 600;
+}
+
+.subjects-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.subjects-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.subjects-list {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.stats-row {
+  display: flex;
+  gap: 48rpx;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.stat-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.stat-number {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 600;
+}
+
+/* 用户简介 */
+.bio-section {
+  position: relative;
+  z-index: 1;
+  margin: 0 40rpx 32rpx;
+  padding: 32rpx;
+  /* background: #fff; */
+  border-radius: 0;
+}
+
+.bio-text {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* 收入概览 */
+.income-overview {
+  position: relative;
+  z-index: 1;
+  margin: 0 40rpx 32rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  color: #fff;
+}
+
+/* 收入概览背景图 */
+.income-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* 收入概览内容 */
+.income-content {
+  position: relative;
+  padding: 32rpx;
+  z-index: 2;
+}
+
+.income-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.income-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.view-more {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+.next-icon {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.income-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.income-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.income-amount {
+  font-size: 48rpx;
+  font-weight: 700;
+  line-height: 1;
+}
+
+
+
+.income-label {
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+/* 功能区域 */
+.my-functions-section,
+.teacher-services-section {
+  position: relative;
+  z-index: 1;
+  margin: 0 40rpx 40rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.title-bar {
+  width: 8rpx;
+  height: 32rpx;
+  background: #4CAF50;
+  border-radius: 4rpx;
+}
+
+.title-text {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.functions-grid {
+  display: flex;
+  gap: 80rpx;
+  justify-content: flex-start;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40rpx 20rpx;
+}
+
+.function-item,
+.service-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx;
+}
+
+/* 功能图标和服务图标样式 */
+.function-icon,
+.service-icon {
+  width: 80rpx;
+  height: 80rpx;
+}
+
+/* 服务图标包装器 */
+.service-icon-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.function-name,
+.service-name {
+  font-size: 24rpx;
+  color: #333;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* 退出登录 */
+.logout-section {
+  position: relative;
+  z-index: 1;
+  margin: 40rpx;
+  margin-bottom: 80rpx;
+}
+
+.logout-btn {
+  width: 100%;
+  height: 88rpx;
+  background: #f5f5f5;
+  color: #666;
+  border: none;
+  border-radius: 24rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+}
+
+.logout-btn::after {
+  border: none;
+}

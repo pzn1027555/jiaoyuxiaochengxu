@@ -1,0 +1,107 @@
+<!--pages/role-select/role-select.wxml-->
+<view class="role-select-container">
+  <!-- 顶部标题区域 -->
+  <view class="header">
+    <view class="subtitle">选择你的身份</view>
+    <view class="description">以帮助我们更精准的为你推荐内容</view>
+  </view>
+
+  <!-- 角色选择区域 -->
+  <view class="role-list">
+    <!-- 学生角色 -->
+    <view 
+      class="role-item {{selectedRole === 'student' ? 'selected' : ''}}"
+      bindtap="selectRole"
+      data-role="student"
+    >
+      <view class="role-content">
+        <view class="role-avatar">
+          <image class="role-image" src="/images/login/student.png" mode="aspectFit"></image>
+        </view>
+        <view class="role-info">
+          <view class="role-title">学生</view>
+          <view class="role-subtitle">Students</view>
+        </view>
+        <view class="role-check">
+          <view class="check-icon {{selectedRole === 'student' ? 'active' : ''}}">
+            <text class="checkmark" wx:if="{{selectedRole === 'student'}}">✓</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 家长角色 -->
+    <view 
+      class="role-item {{selectedRole === 'parent' ? 'selected' : ''}}"
+      bindtap="selectRole"
+      data-role="parent"
+    >
+      <view class="role-content">
+        <view class="role-avatar">
+          <image class="role-image" src="/images/login/parent.png" mode="aspectFit"></image>
+        </view>
+        <view class="role-info">
+          <view class="role-title">家长</view>
+          <view class="role-subtitle">Parents</view>
+        </view>
+        <view class="role-check">
+          <view class="check-icon {{selectedRole === 'parent' ? 'active' : ''}}">
+            <text class="checkmark" wx:if="{{selectedRole === 'parent'}}">✓</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 教师角色 -->
+    <view 
+      class="role-item {{selectedRole === 'teacher' ? 'selected' : ''}}"
+      bindtap="selectRole"
+      data-role="teacher"
+    >
+      <view class="role-content">
+        <view class="role-avatar">
+          <image class="role-image" src="/images/login/teacher.png" mode="aspectFit"></image>
+        </view>
+        <view class="role-info">
+          <view class="role-title">老师</view>
+          <view class="role-subtitle">Teachers</view>
+        </view>
+        <view class="role-check">
+          <view class="check-icon {{selectedRole === 'teacher' ? 'active' : ''}}">
+            <text class="checkmark" wx:if="{{selectedRole === 'teacher'}}">✓</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="footer">
+    <button 
+      class="next-btn {{selectedRole ? '' : 'disabled'}}"
+      bindtap="confirmRole"
+      disabled="{{!selectedRole}}"
+      loading="{{loading}}"
+    >
+      下一步
+    </button>
+  </view>
+
+  <!-- 角色权益说明弹窗 -->
+  <view class="modal-overlay {{showRoleInfo ? 'show' : ''}}" bindtap="hideRoleInfo">
+    <view class="modal-content" catchtap="preventClose">
+      <view class="modal-header">
+        <text class="modal-title">{{roleInfoTitle}}</text>
+        <text class="modal-close" bindtap="hideRoleInfo">×</text>
+      </view>
+      <scroll-view class="modal-body" scroll-y>
+        <view class="role-benefits">
+          <view class="benefit-item" wx:for="{{roleInfoBenefits}}" wx:key="index">
+            <text class="benefit-icon">{{item.icon}}</text>
+            <text class="benefit-text">{{item.text}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</view>

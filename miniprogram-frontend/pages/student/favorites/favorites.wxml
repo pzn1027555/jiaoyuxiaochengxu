@@ -1,0 +1,143 @@
+<view class="favorites-page">
+  <!-- 标签页切换 -->
+  <view class="tab-container">
+    <view class="tab-bar">
+      <view 
+        class="tab-item {{currentTab === index ? 'active' : ''}}"
+        wx:for="{{tabs}}" 
+        wx:key="*this"
+        data-tab="{{index}}"
+        bindtap="switchTab">
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 收藏教师列表 -->
+  <view class="content-container" wx:if="{{currentTab === 0}}">
+    <view class="teacher-list" wx:if="{{teachers.length > 0}}">
+      <view 
+        class="teacher-card"
+        wx:for="{{teachers}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onTeacherTap">
+        <view class="card-row">
+          <image 
+            class="avatar" 
+            src="{{item.avatar || '/images/workspace/default-avatar.png'}}" 
+            mode="aspectFill" />
+          <view class="content-right">
+            <view class="title-row">
+              <text class="name">{{item.teacherName || item.name}}</text>
+              <image 
+                class="gender-icon" 
+                wx:if="{{item.gender}}"
+                src="{{item.gender === 2 ? '/images/student/female.png' : '/images/student/male.png'}}" 
+                mode="widthFix" />
+              <text class="district" wx:if="{{item.city || item.district}}">{{item.district || item.city}}</text>
+            </view>
+            <view class="tag-row">
+              <!-- <text class="badge" wx:if="{{item.teacherLevel}}">
+                {{item.teacherLevel === 'junior' ? '初级' : 
+                  item.teacherLevel === 'intermediate' ? '中级' : 
+                  item.teacherLevel === 'senior' ? '高级' : 
+                  item.teacherLevel === 'expert' ? '专家' : '普通'}}教师
+              </text> -->
+              <view class="tag-row">
+                <text class="badge" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
+              </view>
+            </view>
+            <view class="subjects">所授科目：<text class="subjects-strong">{{item.subjectsText || '暂无'}}</text></view>
+            <view class="desc">{{item.introduction || '暂无介绍'}}</view>
+            <!-- <view class="price-row">
+              <text class="price"><text class="price-num">¥ {{item.hourlyRate || item.price || 600}}</text><text class="price-unit"> /小时</text></text>
+            </view> -->
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 教师列表空状态 -->
+    <view class="empty-state" wx:if="{{!teachersLoading && teachers.length === 0}}">
+      <image class="empty-icon" src="/images/student/smileface.png" mode="aspectFit" />
+      <text class="empty-text">还没有收藏任何教师</text>
+      <view class="empty-btn" bindtap="goToTeacherList">
+        去看看优秀的教师
+      </view>
+    </view>
+
+    <!-- 教师列表加载状态 -->
+    <view class="load-more" wx:if="{{teachersLoading}}">加载中...</view>
+    <view class="load-end" wx:if="{{!teachersLoading && teachers.length > 0 && teachersNoMore}}">没有更多了</view>
+  </view>
+
+  <!-- 点赞帖子列表 -->
+  <view class="content-container" wx:if="{{currentTab === 1}}">
+    <view class="post-list" wx:if="{{posts.length > 0}}">
+      <view 
+        class="post-card"
+        wx:for="{{posts}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onPostTap">
+        <view class="post-header">
+          <image 
+            class="avatar" 
+            src="{{item.authorAvatar || '/images/workspace/default-avatar.png'}}" 
+            mode="aspectFill" />
+          <view class="meta">
+            <view class="name-row">
+              <text class="author">{{item.authorName}}</text>
+              <image 
+                class="gender" 
+                wx:if="{{item.authorGender}}" 
+                src="{{item.authorGender === 2 ? '/images/student/female.png' : '/images/student/male.png'}}" 
+                mode="widthFix" />
+            </view>
+            <view class="sub">{{item.authorGrade || ''}}</view>
+          </view>
+        </view>
+        <view class="post-text">{{item.content}}</view>
+        <view class="media-row" wx:if="{{item.media && item.media.length}}">
+          <image 
+            wx:for="{{item.media}}" 
+            wx:for-item="media"
+            wx:key="url"
+            wx:if="{{media.type === 'image'}}" 
+            class="media-img" 
+            src="{{media.url}}" 
+            mode="aspectFill" />
+        </view>
+        <view class="post-footer">
+          <text class="time">{{item.relativeTime}}</text>
+          <view class="actions">
+            <view class="act liked">
+              <image class="small-icon" src="/images/student/likeChecked.png" />
+              {{item.likeCount || 0}}
+            </view>
+            <view class="act">
+              <image class="small-icon" src="/images/student/comment.png" />
+              {{item.commentCount || 0}}
+            </view>
+          </view>
+        </view>
+        <view class="like-date">点赞于 {{item.likeDate}}</view>
+      </view>
+    </view>
+
+    <!-- 帖子列表空状态 -->
+    <view class="empty-state" wx:if="{{!postsLoading && posts.length === 0}}">
+      <image class="empty-icon" src="/images/student/smileface.png" mode="aspectFit" />
+      <text class="empty-text">还没有点赞任何帖子</text>
+      <view class="empty-btn" bindtap="goToCommunity">
+        去社区看看
+      </view>
+    </view>
+
+    <!-- 帖子列表加载状态 -->
+    <view class="load-more" wx:if="{{postsLoading}}">加载中...</view>
+    <view class="load-end" wx:if="{{!postsLoading && posts.length > 0 && postsNoMore}}">没有更多了</view>
+  </view>
+</view>
+

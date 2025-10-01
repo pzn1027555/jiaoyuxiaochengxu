@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.parent.mapper.ParentWalletMapper">
+
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.parent.entity.ParentWallet">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="balance" column="balance"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="findByParentId" resultMap="BaseResultMap">
+        SELECT * FROM parent_wallet WHERE parent_id = #{parentId}
+    </select>
+
+    <insert id="insert" parameterType="com.education.admin.modules.parent.entity.ParentWallet" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO parent_wallet (parent_id, balance, create_time, update_time)
+        VALUES (#{parentId}, #{balance}, NOW(), NOW())
+    </insert>
+
+    <update id="updateBalance">
+        UPDATE parent_wallet 
+        SET balance = #{balance}, update_time = NOW()
+        WHERE parent_id = #{parentId}
+    </update>
+
+    <update id="addBalance">
+        UPDATE parent_wallet 
+        SET balance = balance + #{amount}, update_time = NOW()
+        WHERE parent_id = #{parentId}
+    </update>
+
+    <update id="subtractBalance">
+        UPDATE parent_wallet 
+        SET balance = balance - #{amount}, update_time = NOW()
+        WHERE parent_id = #{parentId} AND balance >= #{amount}
+    </update>
+
+</mapper>

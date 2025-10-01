@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.UserInviteCodeMapper">
+
+  <select id="findByUser" resultType="map">
+    SELECT id, user_id AS userId, user_type AS userType, code_type AS codeType, code, create_time AS createTime
+    FROM user_invite_code
+    WHERE user_id = #{userId} AND user_type = #{userType} AND code_type = #{codeType}
+    LIMIT 1
+  </select>
+
+  <insert id="insert">
+    INSERT INTO user_invite_code(user_id, user_type, code_type, code, create_time, update_time)
+    VALUES(#{userId}, #{userType}, #{codeType}, #{code}, NOW(), NOW())
+  </insert>
+
+  <select id="findByCode" resultType="map">
+    SELECT id, user_id AS userId, user_type AS userType, code_type AS codeType, code
+    FROM user_invite_code
+    WHERE code = #{code}
+    LIMIT 1
+  </select>
+
+</mapper>
+
+

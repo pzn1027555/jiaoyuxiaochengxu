@@ -1,0 +1,94 @@
+<!--pages/teacher/my-students/my-students.wxml-->
+<view class="my-students-container">
+  <!-- 自定义头部 -->
+  <custom-header 
+    title="我的学生" 
+    show-back="{{true}}"
+    bind:headerReady="onHeaderReady"
+  ></custom-header>
+  
+  <!-- 页面内容 -->
+  <view class="content-wrapper" style="padding-top: {{headerHeight}}px;">
+    
+    <!-- 筛选栏 -->
+    <view class="filter-section">
+      <view class="filter-container">
+        <!-- 学生姓名筛选 -->
+        <view class="name-filter-box">
+          <input class="name-filter-input" 
+                 placeholder="请输入学生姓名" 
+                 value="{{studentNameFilter}}"
+                 bindinput="onStudentNameInput" />
+        </view>
+        
+        <!-- 科目筛选 -->
+        <picker range="{{subjectOptions}}" value="{{selectedSubjectIndex}}" bindchange="onSubjectFilterChange">
+          <view class="subject-filter-picker">
+            <text class="filter-text">{{subjectOptions[selectedSubjectIndex]}}</text>
+            <image class="dropdown-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+          </view>
+        </picker>
+        
+        <!-- 查询按钮 -->
+        <view class="search-btn" bindtap="onSearchTap">
+          <text class="search-btn-text">查询</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 学生列表：三列表格 -->
+    <view class="students-section">
+      <view class="table">
+        <view class="thead">
+          <text class="th col-name">学生</text>
+          <text class="th col-subject">科目</text>
+          <text class="th col-progress">课时进度</text>
+        </view>
+        <scroll-view class="tbody" scroll-y="true" bindscrolltolower="onReachBottom">
+          <view class="tr" wx:for="{{filteredStudents}}" wx:key="studentId" bindtap="onStudentTap" data-student="{{item}}">
+            <view class="td col-name">
+              <image class="avatar" src="{{item.avatar || '/images/workspace/default-avatar.png'}}" mode="aspectFill"></image>
+              <view class="meta">
+                <text class="name">{{item.studentName}}
+                  <text wx:if="{{item.studentLevelLabel}}" style="margin-left: 12rpx; font-size: 22rpx; color: #ff9800; background: #fff3e0; padding: 2rpx 8rpx; border-radius: 8rpx;">{{item.studentLevelLabel}}</text>
+                </text>
+                <text class="grade">{{item.grade}}</text>
+              </view>
+            </view>
+            <view class="td col-subject">
+              <text>{{(item.courses && item.courses.length>0 && item.courses[0].subject) || ''}}</text>
+            </view>
+            <view class="td col-progress">
+              <text>{{(item.courses && item.courses.length>0 && item.courses[0].progress) || ''}}</text>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+        <!-- 无数据提示 -->
+        <view class="no-data" wx:if="{{filteredStudents.length === 0 && !loading}}">
+          <image class="no-data-icon" src="/images/profile/default-avatar.png" mode="aspectFit" style="opacity: 0.3;"></image>
+          <text class="no-data-text">暂无学生数据</text>
+        </view>
+      
+      <!-- 加载更多 -->
+      <view class="loading-more" wx:if="{{loading}}">
+        <text class="loading-text">加载中...</text>
+      </view>
+    </view>
+
+    <!-- 底部统计信息 -->
+    <view class="bottom-statistics">
+      <view class="statistics-content">
+        <view class="stat-item">
+          <text class="stat-label">学生总数：</text>
+          <text class="stat-value">{{statistics.totalStudents || 0}}人</text>
+        </view>
+        <view class="stat-separator">|</view>
+        <view class="stat-item">
+          <text class="stat-label">当月总课时：</text>
+          <text class="stat-value">{{statistics.monthlyHours || 0}}课时</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

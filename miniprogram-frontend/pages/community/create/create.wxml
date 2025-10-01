@@ -1,0 +1,33 @@
+<view class="create-page">
+  <!-- 科目选择使用picker组件 -->
+  <picker range="{{subjects}}" range-key="name" value="{{subjectPickerIndex}}" bindchange="onSubjectPickerChange">
+    <view class="cell">
+      <text class="label">发布科目</text>
+      <view class="value">{{form.categoryName || '请选择科目'}}<text class="arrow">›</text></view>
+    </view>
+  </picker>
+  <view class="cell" bindtap="onPickType">
+    <text class="label">选择类型</text>
+    <view class="value">{{form.post_type_label || '请选择'}}<text class="arrow">›</text></view>
+  </view>
+
+  <view class="field">
+    <input class="title-input" placeholder="写一段标题" maxlength="50" value="{{form.post_title}}" bindinput="onTitleInput" />
+  </view>
+  <view class="field">
+    <textarea class="content-input" placeholder="试试说点什么" auto-height value="{{form.post_content}}" bindinput="onContentInput" />
+  </view>
+
+  <view class="uploader">
+    <view class="add" bindtap="onChooseImage" wx:if="{{images.length < 3}}">+</view>
+    <block wx:for="{{images}}" wx:key="*this">
+      <view class="image-item">
+        <image class="thumb" src="{{item.url}}" mode="aspectFill" data-index="{{index}}" bindtap="onPreview" />
+        <view class="delete-btn" data-index="{{index}}" bindtap="onDeleteImage">×</view>
+      </view>
+    </block>
+  </view>
+
+  <button class="submit" bindtap="onSubmit">发布</button>
+</view>
+

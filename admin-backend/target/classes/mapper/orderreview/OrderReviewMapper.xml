@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.orderreview.mapper.OrderReviewMapper">
+
+  <resultMap id="BaseResultMap" type="com.education.admin.modules.orderreview.entity.OrderReview">
+    <id column="id" property="id"/>
+    <result column="order_id" property="orderId"/>
+    <result column="student_id" property="studentId"/>
+    <result column="teacher_id" property="teacherId"/>
+    <result column="star_rating" property="starRating"/>
+    <result column="review_content" property="reviewContent"/>
+    <result column="review_images" property="reviewImages" jdbcType="VARCHAR" typeHandler="com.education.admin.config.JsonTypeHandler"/>
+    <result column="is_anonymous" property="isAnonymous"/>
+    <result column="status" property="status"/>
+    <result column="create_time" property="createTime"/>
+    <result column="update_time" property="updateTime"/>
+  </resultMap>
+
+  <select id="findByStudentAndOrder" resultMap="BaseResultMap">
+    SELECT * FROM order_review
+    WHERE student_id = #{studentId} AND order_id = #{orderId}
+    LIMIT 1
+  </select>
+
+  <insert id="insert" parameterType="com.education.admin.modules.orderreview.entity.OrderReview" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO order_review(
+      order_id, student_id, teacher_id, star_rating, review_content, review_images, is_anonymous, status, create_time, update_time
+    ) VALUES (
+      #{orderId}, #{studentId}, #{teacherId}, #{starRating}, #{reviewContent},
+      #{reviewImages, jdbcType=VARCHAR, typeHandler=com.education.admin.config.JsonTypeHandler}, #{isAnonymous}, COALESCE(#{status},1), NOW(), NOW()
+    )
+  </insert>
+
+</mapper>
+
+

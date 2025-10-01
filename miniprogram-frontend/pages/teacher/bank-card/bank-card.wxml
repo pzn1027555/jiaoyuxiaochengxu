@@ -1,0 +1,52 @@
+<view class="bank-card-page">
+  <!-- 自定义导航栏 -->
+  <custom-header 
+    title="银行卡" 
+    show-back="{{true}}" 
+    bind:headerReady="onHeaderReady"
+  />
+  
+  <!-- 页面内容 -->
+  <view class="content-wrapper" style="padding-top: {{headerHeight}}px;">
+    
+    <!-- 银行卡信息表单 -->
+    <view class="form-container">
+      
+      <!-- 银行卡号 -->
+      <view class="form-item">
+        <view class="form-label">银行卡</view>
+        <view class="input-container">
+          <input 
+            class="form-input" 
+            placeholder="请填写准确银行卡" 
+            value="{{formData.bankCard}}"
+            bindinput="onBankCardInput"
+            type="text"
+          />
+        </view>
+      </view>
+      
+      <!-- 开户行 -->
+      <view class="form-item">
+        <view class="form-label">开户行</view>
+        <view class="input-container">
+          <input 
+            class="form-input" 
+            placeholder="请填写开户行" 
+            value="{{formData.bankName}}"
+            bindinput="onBankNameInput"
+          />
+        </view>
+      </view>
+      
+    </view>
+    
+  </view>
+  
+  <!-- 底部保存按钮 -->
+  <view class="bottom-container">
+    <view class="save-btn" bindtap="onSave">
+      <text class="save-btn-text">保存</text>
+    </view>
+  </view>
+</view>

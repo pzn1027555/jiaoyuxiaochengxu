@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "教研活动详情",
+  "usingComponents": {
+    "post-detail": "/components/post-detail/post-detail"
+  }
+}
+
+

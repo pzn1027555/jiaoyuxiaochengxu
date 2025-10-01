@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.TeacherScheduleFeedbackMapper">
+
+  <resultMap id="BaseMap" type="com.education.admin.modules.miniprogram.entity.TeacherScheduleFeedback">
+    <id column="id" property="id" />
+    <result column="schedule_id" property="scheduleId" />
+    <result column="teacher_id" property="teacherId" />
+    <result column="student_id" property="studentId" />
+    <result column="role_type" property="roleType" />
+    <result column="star_rating" property="starRating" />
+    <result column="content" property="content" />
+    <result column="create_time" property="createTime" />
+    <result column="update_time" property="updateTime" />
+  </resultMap>
+
+  <select id="findByScheduleId" parameterType="long" resultMap="BaseMap">
+    SELECT id, schedule_id, teacher_id, student_id, role_type, star_rating, content, create_time, update_time
+    FROM teacher_schedule_feedback
+    WHERE schedule_id = #{scheduleId}
+    LIMIT 1
+  </select>
+
+  <select id="findByScheduleIdAndRoleType" parameterType="map" resultMap="BaseMap">
+    SELECT id, schedule_id, teacher_id, student_id, role_type, star_rating, content, create_time, update_time
+    FROM teacher_schedule_feedback
+    WHERE schedule_id = #{scheduleId} AND role_type = #{roleType}
+    LIMIT 1
+  </select>
+
+  <insert id="insert" parameterType="com.education.admin.modules.miniprogram.entity.TeacherScheduleFeedback" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO teacher_schedule_feedback(schedule_id, teacher_id, student_id, role_type, star_rating, content, create_time, update_time)
+    VALUES(#{scheduleId}, #{teacherId}, #{studentId}, #{roleType}, #{starRating}, #{content}, NOW(), NOW())
+  </insert>
+
+  <update id="update" parameterType="com.education.admin.modules.miniprogram.entity.TeacherScheduleFeedback">
+    UPDATE teacher_schedule_feedback
+    SET star_rating = #{starRating}, content = #{content}, update_time = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <!-- 管理端分页联表：按角色类型筛选，可选教师/学生姓名关键字 -->
+  <select id="adminList" resultType="map">
+    SELECT f.id,
+           f.role_type AS roleType,
+           f.star_rating AS starRating,
+           f.content AS reviewContent,
+           f.create_time AS createTime,
+           t.teacher_name AS teacherName,
+           t.teacher_level AS teacherLevel,
+           s.student_name AS studentName,
+           s.student_no AS studentNo,
+           sch.title AS courseName
+    FROM teacher_schedule_feedback f
+    LEFT JOIN teacher_info t ON f.teacher_id = t.id
+    LEFT JOIN student_info s ON f.student_id = s.id
+    LEFT JOIN teacher_schedule sch ON f.schedule_id = sch.id
+    <where>
+      <if test="roleType != null and roleType != ''"> f.role_type = #{roleType} </if>
+      <if test="teacherName != null and teacherName != ''"> AND t.teacher_name LIKE CONCAT('%', #{teacherName}, '%') </if>
+      <if test="studentName != null and studentName != ''"> AND s.student_name LIKE CONCAT('%', #{studentName}, '%') </if>
+    </where>
+    ORDER BY f.create_time DESC
+    <if test="pageSize != null and offset != null"> LIMIT #{pageSize} OFFSET #{offset} </if>
+  </select>
+
+  <select id="adminCount" resultType="int">
+    SELECT COUNT(1)
+    FROM teacher_schedule_feedback f
+    LEFT JOIN teacher_info t ON f.teacher_id = t.id
+    LEFT JOIN student_info s ON f.student_id = s.id
+    <where>
+      <if test="roleType != null and roleType != ''"> f.role_type = #{roleType} </if>
+      <if test="teacherName != null and teacherName != ''"> AND t.teacher_name LIKE CONCAT('%', #{teacherName}, '%') </if>
+      <if test="studentName != null and studentName != ''"> AND s.student_name LIKE CONCAT('%', #{studentName}, '%') </if>
+    </where>
+  </select>
+
+</mapper>
+
+

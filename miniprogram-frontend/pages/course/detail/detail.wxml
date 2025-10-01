@@ -1,0 +1,45 @@
+<view class="course-detail">
+  <view class="cover-wrap">
+    <image class="cover" src="{{course.coverFullUrl}}" mode="aspectFill"></image>
+  </view>
+
+  <view class="card first-card">
+    <view class="title-row">
+      <text class="title">{{course.title}}</text>
+      <text class="badge" >班课</text>
+    </view>
+    <view class="intro">{{course.intro}}</view>
+  </view>
+
+  <view class="card">
+    <view class="section-hd">讲课老师</view>
+    <view class="teacher-row" bindtap="goTeacher" wx:if="{{teacher}}">
+      <image class="avatar" src="{{teacher.avatarFull}}" mode="aspectFill"></image>
+      <view class="t-info">
+        <view class="t-name">{{teacher.name}}<image class="gender-icon" wx:if="{{teacher.genderSymbol}}" src="{{teacher.genderSymbol=='♀' ? '/images/student/female.png' : '/images/student/male.png'}}" mode="widthFix"></image></view>
+        <view class="t-tags">
+          <text class="t-tag" wx:for="{{teacher.tags}}" wx:key="*this" wx:if="{{index<3}}">{{item}}</text>
+        </view>
+        <view class="t-subjects"><text class="label">所授科目：</text><text class="value">{{teacher.subjectsText}}</text></view>
+      </view>
+      <view class="go">老师主页</view>
+    </view>
+    <view class="t-brief">{{teacher.brief}}</view>
+  </view>
+
+  <view class="card">
+    <view class="section-hd">开课时间</view>
+    <view class="time">{{course.startTime}}</view>
+  </view>
+
+  <!-- <view class="card">
+    <view class="section-hd">剩余席位</view>
+    <view class="remain">{{course.remainText}}</view>
+  </view> -->
+
+  <view class="footer">
+    <button class="buy-btn" bindtap="buy">购买</button>
+  </view>
+</view>
+
+

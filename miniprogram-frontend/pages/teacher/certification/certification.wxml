@@ -1,0 +1,287 @@
+<!--pages/teacher/certification/certification.wxml-->
+<view class="certification-container">
+  <!-- 自定义导航栏 -->
+  <custom-header 
+    title="教师认证" 
+    show-back="{{true}}"
+    bind:headerReady="onHeaderReady"
+  >
+    <!-- 通知图标 -->
+    <view slot="right" class="notification-icon" bindtap="toggleNotifications">
+      <image src="/images/common/notification.png" class="notification-img"></image>
+      <view class="notification-badge" wx:if="{{unreadCount > 0}}">{{unreadCount}}</view>
+    </view>
+  </custom-header>
+  
+  <!-- 页面内容 -->
+  <view class="content-wrapper" style="padding-top: {{headerHeight}}px;">
+    
+    <!-- 通知列表 -->
+    <view class="notification-panel" wx:if="{{showNotifications}}">
+      <view class="notification-header">
+        <text class="notification-title">认证通知</text>
+        <text class="mark-all-read" bindtap="markAllAsRead" wx:if="{{unreadCount > 0}}">全部已读</text>
+      </view>
+      <scroll-view class="notification-list" scroll-y="true">
+        <view class="notification-item {{!item.isRead ? 'unread' : ''}}" 
+              wx:for="{{notifications}}" 
+              wx:key="id"
+              data-notification-id="{{item.id}}"
+              bindtap="markNotificationAsRead">
+          <view class="notification-content">
+            <view class="notification-type">{{item.typeText}}</view>
+            <view class="notification-text">{{item.title}}</view>
+            <view class="notification-desc">{{item.content}}</view>
+            <view class="notification-time">{{item.createTime}}</view>
+          </view>
+          <view class="unread-dot" wx:if="{{!item.isRead}}"></view>
+        </view>
+        <view class="no-notifications" wx:if="{{notifications.length === 0}}">
+          暂无通知
+        </view>
+      </scroll-view>
+    </view>
+    
+    <!-- 认证状态提示 -->
+    <view class="status-section" wx:if="{{certificationStatus !== null}}">
+      <view class="status-card">
+        <text class="status-label">认证状态：</text>
+        <text class="status-text {{isEditable ? 'editable' : 'readonly'}}">{{certificationStatusText}}</text>
+        <!-- 面试时间显示 -->
+        <view class="interview-time-info" wx:if="{{certificationStatus === 3 && formattedInterviewTime}}">
+          <text class="interview-label">面试时间：</text>
+          <text class="interview-time">{{formattedInterviewTime}}</text>
+        </view>
+        <!-- 评级信息显示 -->
+        <view class="grade-info" wx:if="{{certificationStatus === 4 && gradeInfo.teacherLevel}}">
+          <text class="grade-label">认证等级：</text>
+          <text class="grade-level">{{gradeInfo.teacherLevelText}}</text>
+          <text class="grade-rate" wx:if="{{gradeInfo.hourlyRate !== null && gradeInfo.hourlyRate !== undefined}}">（¥{{gradeInfo.hourlyRate}}/课时）</text>
+          <view class="grade-details" wx:if="{{gradeInfo.gradeTime}}">
+            <text class="grade-time">评级时间：{{gradeInfo.formattedGradeTime}}</text>
+            <text class="grade-reason" wx:if="{{gradeInfo.gradeReason}}">评级说明：{{gradeInfo.gradeReason}}</text>
+          </view>
+        </view>
+        <!-- 合同签署按钮：当后台已发送合同且未签署时显示 -->
+        <view class="contract-section" wx:if="{{contractStatus === 1}}">
+          <button class="contract-btn" bindtap="onOpenContract">查看合同</button>
+          <button class="contract-btn primary" style="margin-left: 12rpx;" bindtap="onSignContract">签署合同</button>
+        </view>
+        <text class="status-desc" wx:if="{{!isEditable}}">当前状态不可编辑</text>
+        <text class="status-desc" wx:else>您可以编辑认证信息</text>
+      </view>
+    </view>
+    
+    <!-- 表单区域 -->
+    <view class="form-section">
+      
+      <!-- 真实姓名 -->
+      <view class="form-item" bindtap="onRealNameTap">
+        <view class="item-left">
+          <text class="required-star">*</text>
+          <text class="item-label">真实姓名</text>
+        </view>
+        <view class="item-right">
+          <text class="item-value">{{formData.realName || ''}}</text>
+          <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+        </view>
+      </view>
+      
+      <!-- 性别 -->
+      <view class="form-item" bindtap="onGenderTap">
+        <view class="item-left">
+          <text class="required-star">*</text>
+          <text class="item-label">性别</text>
+        </view>
+        <view class="item-right">
+          <text class="item-value">{{formData.genderText || ''}}</text>
+          <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+        </view>
+      </view>
+      
+      <!-- 身份证 -->
+      <view class="form-item">
+        <view class="item-left">
+          <text class="required-star">*</text>
+          <text class="item-label">身份证</text>
+        </view>
+      </view>
+      <view class="id-card-upload">
+        <view class="upload-group">
+          <view class="upload-item" bindtap="onUploadIdCardFront">
+            <view class="upload-box">
+              <image wx:if="{{displayMedia.idCardFront}}" 
+                     class="uploaded-image" 
+                     src="{{displayMedia.idCardFront}}" 
+                     mode="aspectFill"></image>
+              <view wx:else class="upload-placeholder">
+                <text class="plus-icon">+</text>
+                <text class="upload-text">点击上传身份证人像面</text>
+              </view>
+            </view>
+          </view>
+          <view class="upload-item" bindtap="onUploadIdCardBack">
+            <view class="upload-box">
+              <image wx:if="{{displayMedia.idCardBack}}" 
+                     class="uploaded-image" 
+                     src="{{displayMedia.idCardBack}}" 
+                     mode="aspectFill"></image>
+              <view wx:else class="upload-placeholder">
+                <text class="plus-icon">+</text>
+                <text class="upload-text">点击上传身份证国徽面</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 毕业院校 -->
+      <view class="form-item" bindtap="onSchoolTap">
+        <view class="item-left">
+          <text class="required-star">*</text>
+          <text class="item-label">毕业院校</text>
+        </view>
+        <view class="item-right">
+          <text class="item-value">{{formData.graduateSchool || ''}}</text>
+          <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+        </view>
+      </view>
+      
+      <!-- 学历 -->
+      <view class="form-item" bindtap="onEducationTap">
+        <view class="item-left">
+          <text class="required-star">*</text>
+          <text class="item-label">学历</text>
+        </view>
+        <view class="item-right">
+          <text class="item-value">{{formData.education || ''}}</text>
+          <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+        </view>
+      </view>
+      <view class="education-tip">
+        <text class="tip-text">学历证明需要上传高学历毕业证书及学位证书</text>
+      </view>
+      
+      <!-- 学历证明 -->
+      <!-- <view class="form-item">
+        <view class="item-left">
+          <text class="required-star">*</text>
+          <text class="item-label">学历证明</text>
+        </view>
+      </view> -->
+      <view class="certificate-upload">
+        <view class="upload-grid">
+          <!-- 已上传的证书 -->
+          <view wx:for="{{displayMedia.diplomaCerts}}" wx:key="index" class="upload-item">
+            <view class="upload-box">
+              <image class="uploaded-image" src="{{item}}" mode="aspectFill" bindtap="onPreviewDiploma" data-index="{{index}}"></image>
+              <view class="remove-btn" bindtap="onRemoveDiploma" data-index="{{index}}">×</view>
+            </view>
+          </view>
+          <!-- 上传按钮 -->
+          <view class="upload-item" bindtap="onUploadDiploma">
+            <view class="upload-box">
+              <view class="upload-placeholder">
+                <text class="plus-icon">+</text>
+                <text class="upload-text">点击上传学历证书</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 教师资格证 -->
+      <view class="form-item">
+        <view class="item-left">
+          <text class="required-star">*</text>
+          <text class="item-label">教师资格证</text>
+        </view>
+      </view>
+      <view class="certificate-upload">
+        <view class="upload-grid">
+          <!-- 已上传的证书 -->
+          <view wx:for="{{displayMedia.teacherCerts}}" wx:key="index" class="upload-item">
+            <view class="upload-box">
+              <image class="uploaded-image" src="{{item}}" mode="aspectFill" bindtap="onPreviewTeacherCert" data-index="{{index}}"></image>
+              <view class="remove-btn" bindtap="onRemoveTeacherCert" data-index="{{index}}">×</view>
+            </view>
+          </view>
+          <!-- 上传按钮 -->
+          <view class="upload-item" bindtap="onUploadTeacherCert">
+            <view class="upload-box">
+              <view class="upload-placeholder">
+                <text class="plus-icon">+</text>
+                <text class="upload-text">点击上传教师资格证</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 国际学科认证及获奖认证 -->
+      <view class="form-item">
+        <view class="item-left">
+          <text class="item-label">国际学科认证及获奖认证</text>
+        </view>
+      </view>
+      <view class="certificate-upload">
+        <view class="upload-grid">
+          <!-- 已上传的证书 -->
+          <view wx:for="{{displayMedia.awardCerts}}" wx:key="index" class="upload-item">
+            <view class="upload-box">
+              <image class="uploaded-image" src="{{item}}" mode="aspectFill" bindtap="onPreviewAwardCert" data-index="{{index}}"></image>
+              <view class="remove-btn" bindtap="onRemoveAwardCert" data-index="{{index}}">×</view>
+            </view>
+          </view>
+          <!-- 上传按钮 -->
+          <view class="upload-item" bindtap="onUploadAward">
+            <view class="upload-box">
+              <view class="upload-placeholder">
+                <text class="plus-icon">+</text>
+                <text class="upload-text">点击上传证书</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 银行卡 -->
+      <view class="form-item" bindtap="onBankCardTap">
+        <view class="item-left">
+          <text class="item-label">银行卡</text>
+        </view>
+        <view class="item-right">
+          <view class="bank-info">
+            <text class="item-value">{{displayBankCard || '请填写银行卡号'}}</text>
+            <text wx:if="{{formData.bankName}}" class="bank-name">{{formData.bankName}}</text>
+          </view>
+          <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+        </view>
+      </view>
+      <view class="bank-tip">
+        <text class="tip-text">请填写准确的银行卡号，以便我们能将您在平台获得的收入准确的打入您的银行账号。</text>
+      </view>
+      
+    </view>
+    
+    <!-- 底部提交按钮 -->
+    <view class="submit-section">
+      <button class="submit-btn {{isEditable ? 'editable' : 'disabled'}}" bindtap="onSubmit">{{submitButtonText}}</button>
+    </view>
+  </view>
+  
+  <!-- 性别选择弹窗 -->
+  <view class="picker-modal" wx:if="{{showGenderPicker}}" bindtap="hideGenderPicker">
+    <view class="picker-content" catchtap="stopPropagation">
+      <view class="picker-header">
+        <text class="picker-title">选择性别</text>
+        <view class="picker-close" bindtap="hideGenderPicker">×</view>
+      </view>
+      <view class="picker-options">
+        <view class="picker-option {{formData.gender === 1 ? 'selected' : ''}}" bindtap="selectGender" data-value="1" data-text="男">男</view>
+        <view class="picker-option {{formData.gender === 2 ? 'selected' : ''}}" bindtap="selectGender" data-value="2" data-text="女">女</view>
+      </view>
+    </view>
+  </view>
+  
+</view>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.badge.mapper.UserBadgeNotificationMapper">
+
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.badge.entity.UserBadgeNotification">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="user_type" property="userType" />
+        <result column="badge_key" property="badgeKey" />
+        <result column="module_name" property="moduleName" />
+        <result column="is_visible" property="isVisible" />
+        <result column="badge_count" property="badgeCount" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, user_type, badge_key, module_name, is_visible, badge_count, create_time, update_time
+    </sql>
+
+    <!-- 根据用户ID和类型查询所有红点状态 -->
+    <select id="selectByUserIdAndType" resultMap="BaseResultMap">
+        SELECT 
+        <include refid="Base_Column_List"/>
+        FROM user_badge_notification
+        WHERE user_id = #{userId} AND user_type = #{userType}
+        ORDER BY create_time ASC
+    </select>
+
+    <!-- 根据用户ID、类型和红点键查询 -->
+    <select id="selectByUserAndBadgeKey" resultMap="BaseResultMap">
+        SELECT 
+        <include refid="Base_Column_List"/>
+        FROM user_badge_notification
+        WHERE user_id = #{userId} 
+          AND user_type = #{userType} 
+          AND badge_key = #{badgeKey}
+    </select>
+
+    <!-- 插入红点记录 -->
+    <insert id="insert" parameterType="com.education.admin.modules.badge.entity.UserBadgeNotification">
+        INSERT INTO user_badge_notification (
+            user_id, user_type, badge_key, module_name, is_visible, badge_count, create_time, update_time
+        ) VALUES (
+            #{userId}, #{userType}, #{badgeKey}, #{moduleName}, #{isVisible}, #{badgeCount}, 
+            NOW(), NOW()
+        )
+        ON DUPLICATE KEY UPDATE
+            is_visible = #{isVisible},
+            badge_count = #{badgeCount},
+            update_time = NOW()
+    </insert>
+
+    <!-- 更新红点状态 -->
+    <update id="updateBadgeStatus">
+        UPDATE user_badge_notification 
+        SET is_visible = #{isVisible}, 
+            badge_count = #{badgeCount}, 
+            update_time = NOW()
+        WHERE user_id = #{userId} 
+          AND user_type = #{userType} 
+          AND badge_key = #{badgeKey}
+    </update>
+
+    <!-- 隐藏指定用户的指定红点 -->
+    <update id="hideBadge">
+        UPDATE user_badge_notification 
+        SET is_visible = 0, 
+            badge_count = 0, 
+            update_time = NOW()
+        WHERE user_id = #{userId} 
+          AND user_type = #{userType} 
+          AND badge_key = #{badgeKey}
+    </update>
+
+    <!-- 显示指定用户的指定红点 -->
+    <update id="showBadge">
+        UPDATE user_badge_notification 
+        SET is_visible = 1, 
+            badge_count = #{badgeCount}, 
+            update_time = NOW()
+        WHERE user_id = #{userId} 
+          AND user_type = #{userType} 
+          AND badge_key = #{badgeKey}
+    </update>
+
+    <!-- 批量更新红点状态 -->
+    <update id="batchUpdateBadgeStatus">
+        UPDATE user_badge_notification 
+        SET is_visible = #{isVisible}, 
+            update_time = NOW()
+        WHERE user_id = #{userId} 
+          AND user_type = #{userType} 
+          AND badge_key IN
+        <foreach collection="badgeKeys" item="badgeKey" open="(" separator="," close=")">
+            #{badgeKey}
+        </foreach>
+    </update>
+
+</mapper>
+

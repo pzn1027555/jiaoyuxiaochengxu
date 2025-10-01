@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "资源中心",
+  "usingComponents": {
+    "role-tabbar": "/custom-tab-bar/index"
+  }
+}

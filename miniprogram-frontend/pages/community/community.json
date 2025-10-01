@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "社区",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "backgroundColor": "#f6fff3",
+  "usingComponents": {
+    "role-tabbar": "/custom-tab-bar/index"
+  }
+}
+

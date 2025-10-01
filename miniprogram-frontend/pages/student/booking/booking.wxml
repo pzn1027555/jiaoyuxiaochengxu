@@ -1,0 +1,132 @@
+<!-- miniprogram-frontend/pages/student/booking/booking.wxml -->
+<view class="booking-page">
+  <!-- 自定义头部组件 -->
+  <!-- <custom-header title="预约课程" bind:headerReady="onHeaderReady" /> -->
+
+  <!-- 日历选择器 -->
+  <view class="calendar-section">
+    <view class="calendar">
+      <view class="calendar-bar">
+        <view class="arrow" bindtap="prevMonth">‹</view>
+        <view class="month-text">{{year}}年{{month}}月</view>
+        <view class="arrow" bindtap="nextMonth">›</view>
+      </view>
+      
+      <view class="ms-week">
+        <text wx:for="{{['一','二','三','四','五','六','日']}}" wx:key="*this" class="ms-wd">{{item}}</text>
+      </view>
+      
+      <view class="ms-grid">
+        <view class="ms-cell {{item.isPast ? 'past' : ''}}" wx:for="{{days}}" wx:key="index" data-index="{{index}}" bindtap="onSelectDay">
+          <text class="ms-date {{item.isToday ? 'today' : ''}} {{item.selected ? 'selected' : ''}}">{{item.date}}</text>
+          <view class="ms-dot {{item.hasClass ? 'on' : ''}}"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 选择的日期 -->
+  <view class="date-title">{{selectedDate}}</view>
+
+  <!-- 可预约时间段 -->
+  <view class="time-slots-section">
+    <view class="loading" wx:if="{{loading}}">
+      <view class="loading-text">加载中...</view>
+    </view>
+    
+    <view class="time-slot" wx:for="{{availableTimeSlots}}" wx:key="id">
+      <view class="time-info">
+        <view class="time-range">
+          <text class="time-dot">●</text>
+          <text class="time-text">{{item.name}} {{item.startTime}} ~ {{item.endTime}}</text>
+        </view>
+        <view class="time-status">空闲</view>
+      </view>
+      
+      <view class="booking-action">
+        <button 
+          class="trial-btn {{item.status === 'available' ? '' : 'disabled'}}" 
+          bindtap="onBookTrial"
+          data-slotid="{{item.id}}"
+          disabled="{{item.status !== 'available'}}">
+          <text style="color: red;">¥{{trialPrice}}</text> 预约试听
+        </button>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-slots" wx:if="{{!loading && availableTimeSlots.length === 0}}">
+      <view class="empty-text">该日期暂无可预约时间段</view>
+      <view class="empty-desc">请选择其他日期或该教师当天已排满课程</view>
+    </view>
+  </view>
+
+  <!-- 预约确认弹窗 -->
+  <view class="booking-modal-mask" wx:if="{{showBookingModal}}" >
+    <view class="booking-modal" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">选择时间</text>
+      </view>
+      
+      <view class="modal-content">
+        <view class="time-selection">
+          <text class="selection-label">选择开始时间</text>
+          <view class="time-picker">
+            <picker mode="time" value="{{selectedTime}}" start="{{timePickerStart}}" end="{{timePickerEnd}}" bindchange="onTimeChange">
+              <view class="picker-item {{selectedTime ? 'selected' : ''}}">
+                <text>{{selectedTime || '请选择开始时间'}}</text>
+                <view class="picker-arrow">▼</view>
+              </view>
+            </picker>
+          </view>
+        </view>
+        
+        <view class="duration-selection">
+          <text class="selection-label">选择时长</text>
+          <view class="duration-options-row">
+            <view 
+              class="duration-option {{selectedDuration === item.id ? 'selected' : ''}}" 
+              wx:for="{{durationOptions}}" 
+              wx:key="id"
+              bindtap="onDurationSelect"
+              data-id="{{item.id}}">
+              <view class="option-check">{{selectedDuration === item.id ? '✓' : ''}}</view>
+              <view class="option-info">
+                <text class="option-time">{{item.name}}</text>
+                <text class="option-price">{{item.type === 'trial' ? '(¥' + item.price + '试听)' : '(正式课)'}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+        <view class="modal-actions">
+          <view class="cancel-btn" bindtap="hideBookingModal">取消</view>
+          <view class="confirm-btn" bindtap="confirmBooking">{{selectedDuration === 'trial' ? '填写问卷' : '确认预约'}}</view>
+        </view>
+    </view>
+  </view>
+  <!-- 家长选择器弹窗（试听家长代付） -->
+  <view class="parent-picker-mask" wx:if="{{showParentPicker}}" bindtap="hideParentPicker">
+    <view class="parent-picker" catchtap="">
+      <view class="picker-header">
+        <view class="picker-title">选择代付家长</view>
+        <view class="picker-close" bindtap="hideParentPicker">×</view>
+      </view>
+      <view class="parent-list">
+        <view class="parent-item {{selectedParent && selectedParent.parentId === item.parentId ? 'selected' : ''}}" 
+              wx:for="{{parents}}" 
+              wx:key="parentId"
+              bindtap="selectParent"
+              data-parentid="{{item.parentId}}">
+          <image class="parent-avatar" src="{{item.parentAvatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+          <view class="parent-details">
+            <view class="parent-name">{{item.parentName}}</view>
+            <view class="parent-phone">{{item.parentPhone}}</view>
+          </view>
+          <view class="parent-check" wx:if="{{selectedParent && selectedParent.parentId === item.parentId}}">✓</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

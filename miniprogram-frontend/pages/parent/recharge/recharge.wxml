@@ -1,0 +1,27 @@
+<!--pages/parent/recharge/recharge.wxml-->
+<view class="page-container">
+  <view class="content" >
+    <view class="form-section">
+      <view class="field-label">充值金额</view>
+      <view class="amount-input">
+        <text class="currency">¥</text>
+        <input class="input" type="digit" placeholder="请输入充值金额" value="{{amount}}" bindinput="onAmountInput" />
+      </view>
+    </view>
+
+    <view class="pay-section">
+      <view class="pay-title">支付方式</view>
+      <view class="pay-item" bindtap="selectWechat">
+        <image class="wx-icon" src="/images/wx.png" mode="widthFix"></image>
+        <text class="pay-name">微信支付</text>
+        <image class="wx-icon right" src="/images/checked.png" mode="widthFix"></image>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <button class="submit-btn" bindtap="onSubmit">充值</button>
+  </view>
+</view>
+
+

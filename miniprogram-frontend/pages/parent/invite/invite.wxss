@@ -1,0 +1,10 @@
+/* pages/parent/invite/invite.wxss */
+.invite-page{ background: linear-gradient(180deg, rgba(84,178,71,1) 0%, rgba(137,212,126,1) 100%); min-height:100vh; position:absolute; top:0; left:0; right:0 }
+.card{ margin: 240rpx 40rpx 40rpx; background:#fff; border-radius:24rpx; padding: 140rpx 40rpx 80rpx; position: relative; text-align:center }
+.avatar{ width: 180rpx; height: 180rpx; border-radius: 50%; position:absolute; top:-90rpx; left:50%; transform: translateX(-50%); border:8rpx solid #fff }
+.code-title{ color:#333; font-size:36rpx; margin-top:40rpx }
+.code{ color:#FF6B6B; font-size:64rpx; font-weight:800; letter-spacing: 8rpx; margin-top:20rpx }
+.input-block{ margin: 40rpx; display:flex; gap:20rpx }
+.code-input{ flex:1; height: 88rpx; line-height:88rpx; border-radius: 999px; border:1rpx solid #54B247; padding: 0 28rpx; background:#fff }
+.btn{ height: 88rpx; line-height:88rpx; border-radius:999px; text-align:center; font-size:30rpx }
+.btn.submit{ background:#54B247; color:#fff }

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.MiniFavoriteMapper">
+  <select id="exists" resultType="int">
+    SELECT COUNT(*) FROM student_teacher_favorite WHERE student_id = #{studentId} AND teacher_id = #{teacherId}
+  </select>
+  <insert id="insert">
+    INSERT INTO student_teacher_favorite(student_id, teacher_id) VALUES(#{studentId}, #{teacherId})
+  </insert>
+  <delete id="delete">
+    DELETE FROM student_teacher_favorite WHERE student_id = #{studentId} AND teacher_id = #{teacherId}
+  </delete>
+  <select id="countByStudentId" parameterType="long" resultType="int">
+    SELECT COUNT(1) FROM student_teacher_favorite WHERE student_id = #{studentId}
+  </select>
+
+  <!-- 获取学生收藏的教师列表 -->
+  <select id="getFavoriteTeachers" resultType="map">
+    SELECT 
+      t.id,
+      t.teacher_name AS name,
+      t.teacher_name AS teacherName,
+      t.avatar,
+      t.gender,
+      (
+        SELECT JSON_OBJECTAGG(cc.id, cc.category_name)
+        FROM course_category cc
+        WHERE JSON_CONTAINS(CAST(t.subjects AS JSON), CAST(cc.id AS JSON))
+      ) AS subjects,
+      t.teacher_level AS teacherLevel,
+      t.teacher_tags AS teacherTags,
+      t.teaching_experience AS teachingExperience,
+      t.introduction,
+      t.province,
+      t.city,
+      t.district,
+      t.star_rating AS starRating,
+      t.total_students AS totalStudents,
+      COALESCE(tlc.hourly_rate, 600) AS hourlyRate,
+      (
+        SELECT GROUP_CONCAT(cc.category_name SEPARATOR ' | ')
+        FROM course_category cc 
+        WHERE JSON_CONTAINS(CAST(t.subjects AS JSON), CAST(cc.id AS JSON))
+          AND cc.status = 1
+      ) AS subjectsText,
+      stf.create_time AS favoriteTime,
+      DATE_FORMAT(stf.create_time, '%Y-%m-%d') AS favoriteDate
+    FROM student_teacher_favorite stf
+    INNER JOIN teacher_info t ON stf.teacher_id = t.id
+    LEFT JOIN teacher_level_config tlc ON t.teacher_level = tlc.level_key AND tlc.is_enabled = 1
+    WHERE stf.student_id = #{studentId}
+      AND t.status = 1
+      AND t.audit_status = 1
+    ORDER BY stf.create_time DESC
+    <if test="pageSize != null and offset != null">
+      LIMIT #{pageSize} OFFSET #{offset}
+    </if>
+  </select>
+
+  <!-- 获取学生点赞的帖子列表 -->
+  <select id="getLikedPosts" resultType="map">
+    SELECT 
+      p.id,
+      p.post_title AS title,
+      SUBSTRING(p.post_content, 1, 120) AS content,
+      p.post_content AS fullContent,
+      p.category_id AS categoryId,
+      p.view_count AS viewCount,
+      p.like_count AS likeCount,
+      p.comment_count AS commentCount,
+      p.images,
+      DATE_FORMAT(p.create_time, '%Y-%m-%d %H:%i') AS createTime,
+      DATE_FORMAT(cpl.create_time, '%Y-%m-%d') AS likeDate,
+      COALESCE(t.teacher_name, pinfo.parent_name, s.student_name) AS authorName,
+      COALESCE(t.avatar, pinfo.avatar, s.avatar) AS authorAvatar,
+      CASE WHEN p.author_type = 'student' THEN s.gender ELSE NULL END AS authorGender,
+      CASE WHEN p.author_type = 'student' THEN s.grade ELSE NULL END AS authorGrade,
+      1 AS liked
+    FROM community_post_like cpl
+    INNER JOIN community_post p ON cpl.post_id = p.id
+    LEFT JOIN student_info s ON (p.author_type = 'student' AND s.id = p.author_id)
+    LEFT JOIN teacher_info t ON (p.author_type = 'teacher' AND t.id = p.author_id)
+    LEFT JOIN parent_info pinfo ON (p.author_type = 'parent' AND pinfo.id = p.author_id)
+    WHERE cpl.user_id = #{studentId}
+      AND cpl.user_type = 'student'
+      AND p.status = 1
+      AND p.audit_status = 1
+    ORDER BY cpl.create_time DESC
+    <if test="pageSize != null and offset != null">
+      LIMIT #{pageSize} OFFSET #{offset}
+    </if>
+  </select>
+
+  <!-- 统计收藏教师总数 -->
+  <select id="countFavoriteTeachers" resultType="int">
+    SELECT COUNT(1) 
+    FROM student_teacher_favorite stf
+    INNER JOIN teacher_info t ON stf.teacher_id = t.id
+    WHERE stf.student_id = #{studentId}
+      AND t.status = 1
+      AND t.audit_status = 1
+  </select>
+
+  <!-- 统计点赞帖子总数 -->
+  <select id="countLikedPosts" resultType="int">
+    SELECT COUNT(1)
+    FROM community_post_like cpl
+    INNER JOIN community_post p ON cpl.post_id = p.id
+    WHERE cpl.user_id = #{studentId}
+      AND cpl.user_type = 'student'
+      AND p.status = 1
+      AND p.audit_status = 1
+  </select>
+</mapper>
+
+

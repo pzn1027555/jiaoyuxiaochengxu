@@ -1,0 +1,5 @@
+.ht-page{ background: linear-gradient(180deg, rgba(84,178,71,1) 0%, rgba(137,212,126,1) 100%); min-height:100vh; padding: 120rpx 40rpx }
+.card{ background:#fff; border-radius:24rpx; padding:40rpx; text-align:center }
+.qr{ width: 520rpx; height: 520rpx; margin: 20rpx auto; background:#f6f6f6; border-radius: 12rpx }
+.desc{ color:#333; font-size: 28rpx; margin-top: 12rpx }
+/* pages/student/head-teacher/head-teacher.wxss */

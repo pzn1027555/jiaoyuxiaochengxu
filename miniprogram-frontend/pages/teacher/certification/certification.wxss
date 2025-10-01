@@ -1,0 +1,652 @@
+/* pages/teacher/certification/certification.wxss */
+
+.certification-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.content-wrapper {
+  padding-bottom: 170rpx;
+}
+
+/* 认证状态区域 */
+.status-section {
+  margin: 24rpx 32rpx;
+}
+
+.status-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.status-label {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.status-text {
+  font-size: 30rpx;
+  font-weight: 600;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.status-text.editable {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.status-text.readonly {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.interview-time-info {
+  width: 100%;
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background: #fff7e6;
+  border-radius: 12rpx;
+  border-left: 4rpx solid #faad14;
+}
+
+.interview-label {
+  font-size: 28rpx;
+  color: #d46b08;
+  font-weight: 500;
+  margin-right: 16rpx;
+}
+
+.interview-time {
+  font-size: 30rpx;
+  color: #fa8c16;
+  font-weight: 600;
+}
+
+/* 评级信息样式 */
+.grade-info {
+  width: 100%;
+  margin-top: 16rpx;
+  padding: 20rpx;
+  background: #f6ffed;
+  border-radius: 12rpx;
+}
+
+.grade-label {
+  font-size: 28rpx;
+  color: #389e0d;
+  font-weight: 500;
+  margin-right: 16rpx;
+}
+
+.grade-level {
+  font-size: 32rpx;
+  color: #52c41a;
+  font-weight: 700;
+}
+
+.grade-details {
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #d9f7be;
+}
+
+.grade-time {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.grade-reason {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.status-desc {
+  font-size: 24rpx;
+  color: #666;
+  width: 100%;
+  margin-top: 8rpx;
+}
+
+/* 表单区域 */
+.form-section {
+  background-color: #fff;
+  margin: 24rpx 32rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+/* 表单项 */
+.form-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 24rpx;
+  /* border-bottom: 1rpx solid #f0f0f0; */
+  min-height: 88rpx;
+  box-sizing: border-box;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.required-star {
+  color: #ff4444;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.item-label {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.item-value {
+  font-size: 30rpx;
+  color: #666;
+}
+
+.arrow-icon {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+/* 身份证上传区域 */
+.id-card-upload {
+  padding: 24rpx;
+}
+
+.upload-group {
+  display: flex;
+  gap: 24rpx;
+}
+
+.upload-item {
+  flex: 1;
+}
+
+.upload-box {
+  width: 100%;
+  height: 200rpx;
+  border: 2rpx dashed #4CAF50;
+  border-radius: 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.plus-icon {
+  font-size: 64rpx;
+  color: #4CAF50;
+  font-weight: 300;
+}
+
+.upload-text {
+  font-size: 24rpx;
+  color: #4CAF50;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.uploaded-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 学历提示 */
+.education-tip {
+  padding: 16rpx 24rpx;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 学历证明上传 */
+.diploma-upload {
+  padding: 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.diploma-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.diploma-item {
+  width: 160rpx;
+  height: 120rpx;
+  position: relative;
+}
+
+.diploma-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 8rpx;
+  object-fit: cover;
+}
+
+.remove-btn {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  width: 32rpx;
+  height: 32rpx;
+  background-color: #ff4444;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  font-weight: bold;
+}
+
+.upload-diploma-item {
+  width: 160rpx;
+  height: 120rpx;
+}
+
+.upload-diploma-box {
+  width: 100%;
+  height: 100%;
+  border: 2rpx dashed #e0e0e0;
+  border-radius: 8rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+  gap: 8rpx;
+}
+
+.upload-diploma-box .plus-icon {
+  font-size: 32rpx;
+  color: #4CAF50;
+}
+
+.upload-diploma-box .upload-text {
+  font-size: 20rpx;
+  color: #999;
+  text-align: center;
+}
+
+/* 单证书上传区域 */
+.certificate-upload,
+.award-upload {
+  padding: 24rpx;
+}
+
+/* 上传网格容器 */
+.upload-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24rpx;
+}
+
+/* 统一上传项样式：一行两个，多了就换行 */
+.certificate-upload .upload-grid .upload-item {
+  width: calc(50% - 12rpx) !important;
+  flex: none !important;
+}
+
+
+
+/* 章节标题 */
+.section-title {
+  padding: 32rpx 24rpx 16rpx;
+  background-color: #fff;
+  margin-top: 24rpx;
+  margin-left: 32rpx;
+  margin-right: 32rpx;
+  border-radius: 16rpx 16rpx 0 0;
+}
+
+.section-text {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 600;
+}
+
+/* 银行卡信息 */
+.bank-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex: 1;
+}
+
+.bank-name {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 8rpx;
+}
+
+/* 银行卡提示 */
+.bank-tip {
+  padding: 16rpx 32rpx 32rpx;
+  background-color: #fff;
+  margin-left: 32rpx;
+  margin-right: 32rpx;
+  border-radius: 0 0 16rpx 16rpx;
+}
+
+/* 提交按钮区域 */
+.submit-section {
+  position: fixed;
+  bottom: 0rpx;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  padding: 32rpx;
+  border-top: 1rpx solid #f0f0f0;
+  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.08);
+  z-index: 999;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 88rpx;
+  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+  border-radius: 44rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30rpx;
+}
+
+.submit-btn::after {
+  border: none;
+}
+
+.submit-btn:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+.submit-btn.disabled {
+  background: #d9d9d9;
+  color: #999;
+  pointer-events: none;
+}
+
+.submit-btn.disabled:active {
+  opacity: 1;
+  transform: none;
+}
+
+/* 性别选择弹窗 */
+.picker-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.picker-content {
+  width: 80%;
+  max-width: 600rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  background-color: #f8f9fa;
+  border-bottom: 1rpx solid #e9ecef;
+}
+
+.picker-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.picker-close {
+  width: 48rpx;
+  height: 48rpx;
+  background-color: #e9ecef;
+  color: #666;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.picker-options {
+  padding: 16rpx 0;
+}
+
+.picker-option {
+  padding: 24rpx 32rpx;
+  font-size: 30rpx;
+  color: #333;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.picker-option:last-child {
+  border-bottom: none;
+}
+
+.picker-option:active {
+  background-color: #f0f0f0;
+}
+
+.picker-option.selected {
+  background-color: #007aff;
+  color: #fff;
+}
+
+/* 响应式调整 */
+@media screen and (max-width: 750rpx) {
+  .upload-group {
+    flex-direction: column;
+  }
+  
+  .diploma-group {
+    justify-content: space-between;
+  }
+  
+  .diploma-item,
+  .upload-diploma-item {
+    width: calc(50% - 8rpx);
+  }
+}
+
+/* 通知图标样式 */
+.notification-icon {
+  position: relative;
+  padding: 8rpx;
+}
+
+.notification-img {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ff4757;
+  color: #fff;
+  border-radius: 20rpx;
+  font-size: 20rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+  transform: scale(0.8);
+}
+
+/* 通知面板样式 */
+.notification-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1rpx solid #e5e5e5;
+  z-index: 100;
+  max-height: 60vh;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.notification-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.mark-all-read {
+  font-size: 28rpx;
+  color: #007aff;
+}
+
+.notification-list {
+  max-height: 50vh;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.notification-item:active {
+  background-color: #f8f8f8;
+}
+
+.notification-item.unread {
+  background-color: #f0f8ff;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-type {
+  font-size: 24rpx;
+  color: #007aff;
+  background: #e6f3ff;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  display: inline-block;
+  margin-bottom: 8rpx;
+}
+
+.notification-text {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 8rpx;
+  word-break: break-all;
+}
+
+.notification-desc {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.4;
+  margin-bottom: 8rpx;
+  word-break: break-all;
+}
+
+.notification-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.unread-dot {
+  width: 16rpx;
+  height: 16rpx;
+  background: #ff4757;
+  border-radius: 50%;
+  margin-left: 16rpx;
+}
+
+.no-notifications {
+  text-align: center;
+  padding: 80rpx 32rpx;
+  color: #999;
+  font-size: 28rpx;
+}

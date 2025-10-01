@@ -1,0 +1,190 @@
+<!--pages/teacher/workspace/workspace.wxml-->
+<view class="workspace-container">
+  <!-- 页面背景装饰 -->
+  <view class="page-background">
+    <image class="background-image" src="/images/workspace/bg.png" mode="scaleToFill"></image>
+    <view class="character-decoration"></view>
+  </view>
+  
+  <!-- 授课日历 -->
+  <view class="calendar-section">
+    <view class="calendar-header">
+      <text class="calendar-title">授课日历</text>
+    </view>
+    
+    <view class="calendar-week">
+      <scroll-view class="week-scroll" scroll-x="true" show-scrollbar="false" enable-flex="true">
+        <view class="week-track">
+          <view class="week-item {{item.isSelected ? 'selected' : ''}}" wx:for="{{weekDays}}" wx:key="date" bindtap="onDateTap" data-date="{{item.date}}">
+            <view class="week-date">{{item.day}}</view>
+            <view class="week-day">{{item.dayName}}</view>
+            <view class="week-dot {{item.hasClass ? 'active' : ''}}"></view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="calendar-icon" bindtap="openCalendar">
+        <image class="calendar-icon-img" src="/images/workspace/rili.png" mode="aspectFit"></image>
+        <text>日历</text>
+        <view class="dropdown-arrow"></view>
+      </view>
+    </view>
+   
+  </view>
+
+  <!-- 今日排课 -->
+  <view class="today-classes">
+    <view class="section-header">
+      <text class="section-title">今日排课</text>
+      <view class="section-link" bindtap="viewAllClasses">
+        <text>授课记录</text>
+        <image class="next-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+      </view>
+    </view>
+    
+    <!-- 课程时间轴 -->
+    <view class="classes-timeline">
+      <!-- 未开始的课程 -->
+      <view class="class-item pending" wx:for="{{todayClasses}}" wx:key="id" wx:if="{{item.status === 'pending'}}">
+        <view class="timeline-axis"></view>
+        <view class="class-time-line">
+          <view class="time-dot pending-dot"></view>
+          <view class="time-content">
+            <view class="time-info">
+              <text class="class-time">{{item.startTime}} ~ {{item.endTime}}</text>
+              <text class="time-countdown">{{!!item.countdown?'('+item.countdown+')':''}}</text>
+            </view>
+            <view class="class-status-tag pending">未开始</view>
+          </view>
+        </view>
+        
+        <view class="class-card">
+          <view class="class-main-info">
+            <view class="timeline-axis"></view>
+            <image  class="class-cover-img" src="{{item.coverFullUrl}}" mode="aspectFill" />
+            <view class="class-details">
+              <view class="class-title">
+                <text>{{item.courseTitle}}</text>
+                <view class="class-tag" wx:if="{{item.classType==='big_class'}}">班课</view>
+              </view>
+              <view class="class-meta">第{{item.lessonNumber}}课 / 共{{item.totalLessons}}节课</view>
+              <view class="class-students">
+                <block wx:if="{{item.classType==='big_class'}}">
+                  <image class="student-avatar" wx:for="{{item.displayStudents}}" wx:key="id" src="{{item.avatar}}" />
+                  <text class="student-count">{{(item.students && item.students.length) || 0}} 人</text>
+                </block>
+                <block wx:else>
+                  <view class="student-all" wx:for="{{item.displayStudents}}" wx:key="id">
+                    <image class="student-avatar" src="{{item.avatar}}" />
+                    <text class="student-name">{{item.name}}</text>
+                  </view>
+                </block>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 请假申请 -->
+          <view class="leave-request" wx:if="{{item.leaveRequest}}">
+            <view class="leave-header">
+              <!-- 预留位置：学生头像图片 -->
+              <view class="leave-student-avatar-placeholder"></view>
+              <text class="leave-student-name">{{item.leaveRequest.studentName}}</text>
+              <text class="leave-label">申请请假</text>
+            </view>
+            <view class="leave-message">"{{item.leaveRequest.reason}}"</view>
+            <view class="leave-actions">
+              <button class="leave-btn reject" bindtap="handleLeaveRequest" data-id="{{item.id}}" data-action="reject">拒绝</button>
+              <button class="leave-btn approve" bindtap="handleLeaveRequest" data-id="{{item.id}}" data-action="approve">同意</button>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 已完成的课程 -->
+      <view class="class-item completed" wx:for="{{todayClasses}}" wx:key="id" wx:if="{{item.status === 'completed'}}">
+        <view class="timeline-axis"></view>
+        <view class="class-time-line">
+          <view class="time-dot completed-dot"></view>
+          <view class="time-content">
+            <view class="time-info">
+              <text class="class-time">{{item.startTime}} ~ {{item.endTime}}</text>
+            </view>
+            <view class="class-status-tag completed">已完成</view>
+          </view>
+        </view>
+        
+        <view class="class-card">
+          <view class="class-main-info">
+            <image  class="class-cover-img" src="{{item.coverFullUrl}}" mode="aspectFill" />
+            <view class="class-details">
+              <view class="class-title">
+                <text>{{item.courseTitle}}</text>
+                <view class="class-tag" wx:if="{{item.classType==='big_class'}}">班课</view>
+              </view>
+              <view class="class-meta">第{{item.lessonNumber}}课 / 共{{item.totalLessons}}节课</view>
+              <view class="class-students">
+                <block wx:if="{{item.classType==='big_class'}}">
+                  <image class="student-avatar" wx:for="{{item.displayStudents}}" wx:key="id" src="{{item.avatar}}" />
+                  <text class="student-count">{{(item.students && item.students.length) || 0}} 人</text>
+                </block>
+                <block wx:else>
+                  <view class="student-all" wx:for="{{item.displayStudents}}" wx:key="id">
+                    <image class="student-avatar" src="{{item.avatar}}" />
+                    <text class="student-name">{{item.name}}</text>
+                  </view>
+                </block>
+              </view>
+              <view class="class-teacher" wx:if="{{false}}">
+                <!-- 预留位置：教师头像图片 -->
+                <view class="teacher-avatar-placeholder"></view>
+                <text class="teacher-name">{{item.teacherName}}</text>
+              </view>
+            </view>
+              <view class="class-actions">
+                <button class="feedback-btn action-btn" wx:if="{{item.canWriteFeedback && !item.hasFeedback}}" bindtap="writeFeedback" data-id="{{item.id}}">填写反馈</button>
+                <button class="view-feedback-btn action-btn" wx:else bindtap="viewFeedback" data-id="{{item.id}}">查看反馈</button>
+              </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-classes" wx:if="{{!todayClasses.length}}">
+      <view class="empty-icon-placeholder"></view>
+      <text class="empty-text">今天暂无课程安排</text>
+    </view>
+  </view>
+
+  <!-- 底部角色导航 -->
+  <role-tabbar></role-tabbar>
+
+  <!-- 月历弹层 -->
+  <view class="mask" wx:if="{{showMonthPicker}}" bindtap="closeCalendar"></view>
+  <view class="month-sheet" wx:if="{{showMonthPicker}}" catchtouchmove="noop">
+    <view class="ms-hd">
+      <text class="ms-btn" bindtap="prevMonth">‹</text>
+      <text class="ms-title">{{year}}年{{month}}月</text>
+      <text class="ms-btn" bindtap="nextMonth">›</text>
+    </view>
+    <view class="ms-week">
+      <text wx:for="{{['一','二','三','四','五','六','日']}}" wx:key="*this" class="ms-wd">{{item}}</text>
+    </view>
+    <view class="ms-grid">
+      <view class="ms-cell" wx:for="{{monthDays}}" wx:key="index" data-d="{{item.date}}" bindtap="onPickMonthDay">
+        <text class="ms-date {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}}">{{item.date}}</text>
+        <view class="ms-dot {{item.hasCourse?'on':''}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 反馈弹窗 -->
+  <view class="mask" wx:if="{{showFeedbackModal}}" bindtap="closeFb"></view>
+  <view class="fb-sheet" wx:if="{{showFeedbackModal}}" catchtouchmove="noop">
+    <view class="fb-hd">{{fbView ? '查看反馈' : '填写反馈'}}</view>
+    <textarea class="fb-input" placeholder="请输入本课反馈" value="{{fbContent}}" bindinput="onFbInput" disabled="{{fbView}}"></textarea>
+    <view class="fb-ft">
+      <button class="btn ghost" bindtap="closeFb">关闭</button>
+      <button class="btn primary" wx:if="{{!fbView}}" bindtap="submitFb">提交</button>
+    </view>
+  </view>
+</view>

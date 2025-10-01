@@ -1,0 +1,112 @@
+<!-- 上传资料页面 -->
+<view class="upload-container">
+  <!-- 通用顶部导航栏 -->
+  <custom-header 
+    title="{{pageTitle}}" 
+    bind:headerReady="onHeaderReady"
+    bind:back="onBackTap"
+  >
+    <view slot="right" class="header-right-content">
+      <view class="menu-icon" bindtap="showMenu">
+        <!-- 🔧 切图位置1：三点菜单图标 建议尺寸：48rpx × 48rpx -->
+        <view class="menu-dots">
+          <view class="dot"></view>
+          <view class="dot"></view>
+          <view class="dot"></view>
+        </view>
+      </view>
+      <view class="record-icon" bindtap="showRecordOptions">
+        <!-- 🔧 切图位置2：录制/其他功能图标 建议尺寸：64rpx × 64rpx -->
+        <view class="record-placeholder"></view>
+      </view>
+    </view>
+  </custom-header>
+
+  <!-- 页面内容区域 -->
+  <view class="content-container" style="padding-top: {{headerHeight}}px;">
+
+  <!-- 顶部：已上传文件信息 -->
+  <view wx:if="{{uploaded && uploaded.success}}" class="uploaded-info card">
+    <view class="ui-row">
+      <text class="ui-label">已上传文件：</text>
+      <text class="ui-name">{{uploaded.name || '未命名文件'}}</text>
+    </view>
+    <view wx:if="{{uploaded.coverUrl}}" class="ui-cover-preview">
+      <image class="ui-cover-img" src="{{previewCoverUrl}}" mode="aspectFill"></image>
+    </view>
+  </view>
+
+  <!-- 编辑模式显示原始资料信息 -->
+  <view class="edit-info" wx:if="{{mode === 'edit'}}">
+    <view class="edit-title">正在编辑资料</view>
+    <view class="original-title">{{originalTitle}}</view>
+    <view class="edit-tip">可以修改价格和描述，如需替换文件请重新选择文件</view>
+  </view>
+
+  <!-- 上传区域 -->
+  <view class="upload-section">
+    <view class="upload-area" bindtap="selectFile">
+      <view class="upload-icon">+</view>
+      <view class="upload-text">{{ uploaded && uploaded.success ? '重新上传' : (mode === 'edit' ? '点击替换文件（可选）' : '点击上传资料') }}</view>
+      <view class="upload-hint">支持：文档/图片/视频（按分类限制）</view>
+    </view>
+  </view>
+
+  <!-- 封面图上传（所有类型均可单独设置/替换） -->
+  <view class="cover-section">
+    <view class="cover-header">
+      <view class="cover-title">封面图</view>
+    </view>
+    <view class="cover-area" bindtap="selectCoverImage">
+      <block wx:if="{{!uploaded.coverUrl}}">
+        <view class="upload-icon">+</view>
+        <view class="upload-text">{{mode === 'edit' ? '点击更换封面' : '点击上传封面'}}</view>
+        <view class="upload-hint">建议16:9，≤2MB</view>
+      </block>
+      <block wx:else>
+        <image class="cover-preview" src="{{previewCoverUrl}}" mode="aspectFill"></image>
+      </block>
+    </view>
+  </view>
+
+  <!-- 分类选择：试听视频 / 学习资料 -->
+  <view class="category-section">
+    <view class="category-label">资料分类</view>
+    <picker mode="selector" range="{{categoryOptions}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
+      <view class="category-value">
+        <text>{{categoryOptions[categoryIndex]}}</text>
+        <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 售卖价格设置（证书不展示） -->
+  <view class="price-section" wx:if="{{resourceType!=='certificate'}}">
+    <view class="price-row" bindtap="setPriceDetails">
+      <view class="price-label">售卖价格</view>
+      <view class="price-value">
+        <text class="price-text">¥{{priceInfo.price}}</text>
+        <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+      </view>
+    </view>
+  </view>
+
+  <!-- 备注区域 -->
+  <view class="note-section">
+    <view class="note-label">备注</view>
+    <textarea 
+      class="note-input" 
+      placeholder="请填写简介"
+      value="{{description}}"
+      bindinput="onDescriptionInput"
+      maxlength="500"
+    ></textarea>
+  </view>
+
+  <!-- 确认上传按钮 -->
+  <view class="upload-btn-container">
+    <button class="upload-btn" bindtap="confirmUpload">{{buttonText}}</button>
+  </view>
+  
+  </view> <!-- 关闭 content-container -->
+</view>

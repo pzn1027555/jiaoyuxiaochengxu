@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.course.mapper.CourseMapper">
+
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.course.entity.Course">
+        <id column="id" property="id"/>
+        <result column="course_name" property="title"/>
+        <result column="course_description" property="description"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="teacher_id" property="teacherId"/>
+        <result column="current_price" property="price"/>
+        <result column="course_cover" property="coverImage"/>
+        <result column="video_url" property="videoUrl"/>
+        <result column="duration" property="duration"/>
+        <result column="course_status" property="status"/>
+        <result column="sort_order" property="sort"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, course_name, course_description, category_id, teacher_id, current_price, course_cover,
+        video_url, duration, course_status, sort_order, create_time, update_time
+    </sql>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM course_info
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM course_info
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findByPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM course_info
+        <where>
+            <if test="categoryId != null">AND category_id = #{categoryId}</if>
+            <if test="teacherId != null">AND teacher_id = #{teacherId}</if>
+            <if test="status != null">AND course_status = #{status}</if>
+            <if test="keyword != null and keyword != ''">
+                AND (course_name LIKE CONCAT('%', #{keyword}, '%')
+                     OR course_description LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.education.admin.modules.course.entity.Course">
+        INSERT INTO course_info(
+            course_name, course_description, category_id, teacher_id, current_price, course_cover,
+            video_url, duration, course_status, sort_order, create_time, update_time
+        ) VALUES (
+            #{title}, #{description}, #{categoryId}, #{teacherId}, #{price}, #{coverImage},
+            #{videoUrl}, #{duration}, #{status}, #{sort}, NOW(), NOW()
+        )
+    </insert>
+
+    <update id="update" parameterType="com.education.admin.modules.course.entity.Course">
+        UPDATE course_info SET
+            course_name = #{title},
+            course_description = #{description},
+            category_id = #{categoryId},
+            teacher_id = #{teacherId},
+            current_price = #{price},
+            course_cover = #{coverImage},
+            video_url = #{videoUrl},
+            duration = #{duration},
+            course_status = #{status},
+            sort_order = #{sort},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM course_info WHERE id = #{id}
+    </delete>
+
+</mapper>
+
+

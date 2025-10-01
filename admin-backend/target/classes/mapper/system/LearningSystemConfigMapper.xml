@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.system.mapper.LearningSystemConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.system.entity.LearningSystemConfig">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="system_key" property="systemKey" jdbcType="VARCHAR"/>
+        <result column="display_name" property="displayName" jdbcType="VARCHAR"/>
+        <result column="is_enabled" property="isEnabled" jdbcType="INTEGER"/>
+        <result column="sort_order" property="sortOrder" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, system_key, display_name, is_enabled, sort_order, remark, create_time, update_time
+    </sql>
+
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM learning_system_config
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectBySystemKey" parameterType="string" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM learning_system_config
+        WHERE system_key = #{systemKey}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM learning_system_config
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <select id="selectEnabled" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM learning_system_config
+        WHERE is_enabled = 1
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <insert id="insert" parameterType="com.education.admin.modules.system.entity.LearningSystemConfig" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO learning_system_config
+        (system_key, display_name, is_enabled, sort_order, remark, create_time, update_time)
+        VALUES
+        (#{systemKey}, #{displayName}, #{isEnabled}, #{sortOrder}, #{remark}, NOW(), NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.education.admin.modules.system.entity.LearningSystemConfig">
+        UPDATE learning_system_config
+        <set>
+            <if test="systemKey != null">system_key = #{systemKey},</if>
+            <if test="displayName != null">display_name = #{displayName},</if>
+            <if test="isEnabled != null">is_enabled = #{isEnabled},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM learning_system_config WHERE id = #{id}
+    </delete>
+
+</mapper>
+
+

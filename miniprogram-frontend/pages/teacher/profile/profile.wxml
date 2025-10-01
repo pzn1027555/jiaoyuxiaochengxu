@@ -1,0 +1,135 @@
+<!--pages/teacher/profile/profile.wxml-->
+<view class="profile-container">
+  <!-- 页面背景图 -->
+  <view class="background-gradient">
+    <image class="background-image" src="/images/profile/bg.png" mode="scaleToFill"></image>
+  </view>
+  
+  <!-- 顶部操作区域 -->
+  <!-- <view class="header-actions">
+    <view class="menu-icon" bindtap="showMenu">
+      <view class="menu-dots">
+        <view class="dot"></view>
+        <view class="dot"></view>
+        <view class="dot"></view>
+      </view>
+    </view>
+    <view class="switch-identity" bindtap="switchIdentity">
+      <text>切换身份</text>
+      <view class="arrow-right">></view>
+    </view>
+  </view> -->
+
+  <!-- 用户信息区域 -->
+  <view class="user-profile-section">
+    <view class="user-avatar">
+      <!-- 👤 用户头像 圆形 120rpx × 120rpx -->
+      <image class="avatar-image" src="{{userProfile.avatar}}" mode="aspectFill"></image>
+    </view>
+    
+    <view class="user-info">
+      <view class="user-name-row">
+        <text class="user-name">{{userProfile.name}}</text>
+        <image class="gender-icon" wx:if="{{userProfile.gender}}" src="{{userProfile.gender==='♀' ? '/images/student/female.png' : '/images/student/male.png'}}" mode="widthFix"></image>
+      </view>
+      
+      <view class="user-tags">
+        <view class="tag teacher-tag" wx:if="{{userProfile.certification}}">{{userProfile.certification}}</view>
+        <view class="tag examiner-tag" wx:if="{{userProfile.examiner}}">{{userProfile.examiner}}</view>
+      </view>
+      
+      <view class="subjects-row">
+        <text class="subjects-label">所授科目：</text>
+        <text class="subjects-list">{{userProfile.subjects}}</text>
+      </view>
+      
+      <view class="stats-row">
+        <view class="stat-item">
+          <text class="stat-label">粉丝</text>
+          <text class="stat-number">{{userProfile.followers}}</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-label">获赞</text>
+          <text class="stat-number">{{userProfile.likes}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 用户简介 -->
+  <view class="bio-section">
+    <text class="bio-text">{{userProfile.bio}}</text>
+  </view>
+
+  <!-- 收入概览 -->
+  <view class="income-overview">
+    <image class="income-background" src="/images/profile/moneyBg.png" mode="scaleToFill"></image>
+    <view class="income-content">
+      <view class="income-header">
+        <text class="income-title">收入概览（元）</text>
+        <view class="view-more" bindtap="viewIncomeDetails">
+          <text>查看</text>
+          <image class="next-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+        </view>
+      </view>
+      
+      <view class="income-stats">
+        <view class="income-item">
+          <text class="income-amount">{{incomeData.month}}</text>
+          <text class="income-label">本月</text>
+        </view>
+        <view class="income-item">
+          <text class="income-amount total">{{incomeData.total}}</text>
+          <text class="income-label">总</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 我的功能 -->
+  <view class="my-functions-section">
+    <view class="section-title">
+      <view class="title-bar"></view>
+      <text class="title-text">我的功能</text>
+    </view>
+    
+    <view class="functions-grid">
+      <view class="function-item" wx:for="{{myFunctions}}" wx:key="id" bindtap="onFunctionTap" data-action="{{item.action}}">
+        <image class="function-icon" src="{{item.iconSrc}}" mode="aspectFit"></image>
+        <text class="function-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 老师服务 -->
+  <view class="teacher-services-section">
+    <view class="section-title">
+      <view class="title-bar"></view>
+      <text class="title-text">老师服务</text>
+    </view>
+    
+    <view class="services-grid">
+      <view class="service-item" wx:for="{{teacherServices}}" wx:key="id" bindtap="onServiceTap" data-action="{{item.action}}">
+        <view class="service-icon-wrapper">
+          <image class="service-icon" src="{{item.iconSrc}}" mode="aspectFit"></image>
+          <!-- 通用红点组件 -->
+          <badge-indicator 
+            badge-key="{{item.action}}"
+            visible="{{badgeStatus[item.action] && badgeStatus[item.action].visible}}"
+            count="{{badgeStatus[item.action] ? badgeStatus[item.action].count : 0}}"
+            size="medium">
+          </badge-indicator>
+        </view>
+        <text class="service-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <view class="logout-section">
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 使用通用角色底部导航，保持与学生/家长一致的层级行为 -->
+  <role-tabbar></role-tabbar>
+</view>

@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "就业服务",
+  "usingComponents": {
+    "post-list": "/components/post-list/post-list"
+  }
+}
+
+
+

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.order.mapper.OrderMapper">
+
+  <!-- 获取学生的订单列表 -->
+  <select id="getStudentOrders" resultType="map">
+    SELECT 
+      o.id,
+      o.order_no AS orderNo,
+      o.course_name AS courseName,
+      o.course_type AS courseType,
+      o.lesson_count AS lessonCount,
+      o.unit_price AS unitPrice,
+      o.total_amount AS totalAmount,
+      o.discount_amount AS discountAmount,
+      o.actual_amount AS actualAmount,
+      o.payment_method AS paymentMethod,
+      o.order_status AS orderStatus,
+      o.payment_status AS paymentStatus,
+      o.order_source AS orderSource,
+      o.pay_time AS payTime,
+      o.create_time AS createTime,
+      o.survey_id AS surveyId,
+      o.remark,
+      t.teacher_name AS teacherName,
+      t.avatar AS teacherAvatar,
+      s.avatar AS studentAvatar,
+      o.teacher_id AS teacherId,
+      EXISTS(SELECT 1 FROM order_review r WHERE r.student_id = o.student_id AND r.order_id = o.id LIMIT 1) AS hasReviewed,
+      s.student_name AS studentName,
+      ts.cover_url AS coverUrl
+    FROM order_info o
+    LEFT JOIN teacher_info t ON o.teacher_id = t.id
+    LEFT JOIN student_info s ON o.student_id = s.id
+    LEFT JOIN teacher_schedule ts ON o.schedule_id = ts.id
+    WHERE o.student_id = #{studentId}
+    ORDER BY o.create_time DESC
+    <if test="pageSize != null and offset != null">
+      LIMIT #{pageSize} OFFSET #{offset}
+    </if>
+  </select>
+
+  <!-- 统计学生订单总数 -->
+  <select id="countStudentOrders" resultType="int">
+    SELECT COUNT(1) 
+    FROM order_info 
+    WHERE student_id = #{studentId}
+  </select>
+
+  <!-- 家长聚合：根据多个学生ID获取订单列表 -->
+  <select id="getOrdersByStudentIds" resultType="map">
+    SELECT 
+      o.id,
+      o.order_no AS orderNo,
+      o.course_name AS courseName,
+      o.course_type AS courseType,
+      o.lesson_count AS lessonCount,
+      o.unit_price AS unitPrice,
+      o.total_amount AS totalAmount,
+      o.discount_amount AS discountAmount,
+      o.actual_amount AS actualAmount,
+      o.payment_method AS paymentMethod,
+      o.order_status AS orderStatus,
+      o.payment_status AS paymentStatus,
+      o.order_source AS orderSource,
+      o.pay_time AS payTime,
+      o.create_time AS createTime,
+      o.survey_id AS surveyId,
+      o.remark,
+      t.teacher_name AS teacherName,
+      t.avatar AS teacherAvatar,
+      s.avatar AS studentAvatar,
+      o.teacher_id AS teacherId,
+      EXISTS(SELECT 1 FROM order_review r WHERE r.student_id = o.student_id AND r.order_id = o.id LIMIT 1) AS hasReviewed,
+      s.student_name AS studentName,
+      ts.cover_url AS coverUrl
+    FROM order_info o
+    LEFT JOIN teacher_info t ON o.teacher_id = t.id
+    LEFT JOIN student_info s ON o.student_id = s.id
+    LEFT JOIN teacher_schedule ts ON o.schedule_id = ts.id
+    WHERE 
+      <if test="studentIds != null and studentIds.size > 0">
+        o.student_id IN 
+        <foreach collection="studentIds" item="sid" open="(" separator="," close=")">
+          #{sid}
+        </foreach>
+      </if>
+    ORDER BY o.create_time DESC
+    <if test="pageSize != null and offset != null">
+      LIMIT #{pageSize} OFFSET #{offset}
+    </if>
+  </select>
+
+  <!-- 家长聚合：统计多个学生订单总数 -->
+  <select id="countOrdersByStudentIds" resultType="int">
+    SELECT COUNT(1)
+    FROM order_info o
+    <where>
+      <if test="studentIds != null and studentIds.size > 0">
+        o.student_id IN 
+        <foreach collection="studentIds" item="sid" open="(" separator="," close=")">
+          #{sid}
+        </foreach>
+      </if>
+    </where>
+  </select>
+
+  <!-- 根据订单号查询订单详情 -->
+  <select id="getOrderByNo" resultType="com.education.admin.modules.order.entity.OrderInfo">
+    SELECT 
+      o.*,
+      t.teacher_name AS teacherName,
+      t.avatar AS teacherAvatar,
+      s.student_name AS studentName,
+      ts.cover_url AS coverUrl
+    FROM order_info o
+    LEFT JOIN teacher_info t ON o.teacher_id = t.id
+    LEFT JOIN student_info s ON o.student_id = s.id
+    LEFT JOIN teacher_schedule ts ON o.schedule_id = ts.id
+    WHERE o.order_no = #{orderNo}
+  </select>
+
+  <!-- 根据ID查询订单详情 -->
+  <select id="getOrderById" resultType="com.education.admin.modules.order.entity.OrderInfo">
+    SELECT 
+      o.*,
+      t.teacher_name AS teacherName,
+      t.avatar AS teacherAvatar,
+      s.student_name AS studentName,
+      ts.cover_url AS coverUrl
+    FROM order_info o
+    LEFT JOIN teacher_info t ON o.teacher_id = t.id
+    LEFT JOIN student_info s ON o.student_id = s.id
+    LEFT JOIN teacher_schedule ts ON o.schedule_id = ts.id
+    WHERE o.id = #{id}
+  </select>
+
+  <!-- 创建订单 -->
+  <insert id="insertOrder" parameterType="com.education.admin.modules.order.entity.OrderInfo" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO order_info (
+      order_no, parent_order_no, student_id, schedule_id, teacher_id,
+      course_name, course_type, lesson_count, unit_price, total_amount,
+      discount_amount, actual_amount, commission_amount, teacher_income,
+      payment_method, order_status, payment_status, order_source,
+      transaction_id, survey_id, remark, create_time, update_time
+    ) VALUES (
+      #{orderNo}, #{parentOrderNo}, #{studentId}, #{scheduleId}, #{teacherId},
+      #{courseName}, #{courseType}, #{lessonCount}, #{unitPrice}, #{totalAmount},
+      #{discountAmount}, #{actualAmount}, #{commissionAmount}, #{teacherIncome},
+      #{paymentMethod}, #{orderStatus}, #{paymentStatus}, #{orderSource},
+      #{transactionId}, #{surveyId}, #{remark}, NOW(), NOW()
+    )
+  </insert>
+
+  <!-- 更新订单状态 -->
+  <update id="updateOrderStatus">
+    UPDATE order_info 
+    SET order_status = #{orderStatus},
+        payment_status = #{paymentStatus},
+        <if test="orderStatus == 2">
+          pay_time = NOW(),
+        </if>
+        <if test="orderStatus == 3">
+          complete_time = NOW(),
+        </if>
+        update_time = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <!-- 更新订单的survey_id -->
+  <update id="updateOrderSurveyId">
+    UPDATE order_info 
+    SET survey_id = #{surveyId},
+        update_time = NOW()
+    WHERE id = #{orderId}
+  </update>
+
+  <!-- 取消订单 -->
+  <update id="cancelOrder">
+    UPDATE order_info 
+    SET order_status = 4,
+        cancel_time = NOW(),
+        cancel_reason = #{cancelReason},
+        update_time = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <!-- 判断订单是否已被指定学生评价 -->
+  <select id="existsOrderReview" resultType="boolean">
+    SELECT CASE WHEN COUNT(1) &gt; 0 THEN TRUE ELSE FALSE END
+    FROM order_review
+    WHERE order_id = #{orderId}
+      AND student_id = #{studentId}
+    LIMIT 1
+  </select>
+
+</mapper>

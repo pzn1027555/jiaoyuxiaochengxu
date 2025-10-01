@@ -1,0 +1,138 @@
+{
+  "entryPagePath": "pages/login/login",
+  "pages": [
+    "pages/login/login",
+    "pages/role-select/role-select",
+    "pages/community/resources/resources",
+    "pages/community/detail/detail",
+    "pages/community/create/create",
+    "pages/search/search",
+    "pages/course/detail/detail",
+    "pages/order/checkout/checkout",
+    "pages/order/refund-apply/refund-apply",
+    "pages/teacher/employment-detail/employment-detail",
+    "pages/teacher/research-detail/research-detail",
+    "pages/teacher/employment-apply/employment-apply",
+    "pages/teacher/employment/employment",
+    "pages/teacher/research/research",
+    "pages/teacher/booking/booking",
+    "pages/teacher/schedule-plan/schedule-plan",
+    "pages/student/schedule-confirm/schedule-confirm",
+    "pages/parent/study-plan/study-plan",
+    "pages/student/survey/survey",
+    "pages/index/index",
+    "pages/profile/profile",
+    "pages/courses/courses",
+    "pages/teachers/teachers",
+    "pages/community/community",
+    "pages/orders/orders",
+    "pages/student/learning-center/learning-center",
+    "pages/student/profile/profile",
+    "pages/parent/edit-profile/edit-profile",
+    "pages/parent/supervision/supervision",
+    "pages/parent/profile/profile",
+    "pages/teacher/workspace/workspace",
+    "pages/teacher/resources/resources",
+    "pages/teacher/upload/upload",
+    "pages/teacher/edit-profile/edit-profile",
+    "pages/teacher/teaching-records/teaching-records",
+    "pages/student/teaching-records/teaching-records",
+    "pages/teacher/midterm-report-write/midterm-report-write",
+    "pages/teacher/midterm-report-view/midterm-report-view",
+    "pages/teacher/income-overview/income-overview",
+    "pages/teacher/schedule/schedule",
+    "pages/teacher/schedule-edit/schedule-edit",
+    "pages/teacher/my-students/my-students",
+    "pages/teacher/profile/profile",
+    "pages/teacher/homepage/homepage",
+    "pages/teacher/certification/certification",
+    "pages/teacher/bank-card/bank-card",
+    "pages/teacher/mooc/mooc",
+    "pages/student/edit-profile/edit-profile",
+    "pages/student/favorites/favorites",
+    "pages/student/booking/booking",
+    "pages/order/review/review",
+    "pages/student/notifications/notifications",
+    "pages/student/parent-bind/parent-bind",
+    "pages/student/head-teacher/head-teacher",
+    "pages/student/invite/invite",
+    "pages/student/invite/list/list",
+    "pages/parent/child-bind/child-bind",
+    "pages/parent/head-teacher/head-teacher",
+    "pages/parent/invite/invite",
+    "pages/parent/notifications/notifications",
+    "pages/parent/consumption-overview/consumption-overview",
+    "pages/parent/recharge/recharge"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#4CAF50",
+    "navigationBarTitleText": "新文枢教育",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f8f8f8"
+  },
+  "useExtendedLib": {},
+  "tabBar": {
+    "custom": true,
+    "color": "#8a8a8a",
+    "selectedColor": "#4CAF50",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/courses/courses",
+        "text": "课程"
+      },
+      {
+        "pagePath": "pages/teachers/teachers",
+        "text": "老师"
+      },
+      {
+        "pagePath": "pages/student/learning-center/learning-center",
+        "text": "学习中心"
+      },
+      {
+        "pagePath": "pages/community/community",
+        "text": "社区"
+      },
+      {
+        "pagePath": "pages/parent/supervision/supervision",
+        "text": "学习监督"
+      },
+      {
+        "pagePath": "pages/teacher/workspace/workspace",
+        "text": "工作台"
+      },
+      {
+        "pagePath": "pages/teacher/resources/resources",
+        "text": "资源中心"
+      },
+      {
+        "pagePath": "pages/teacher/profile/profile",
+        "text": "我的"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "networkTimeout": {
+    "request": 10000,
+    "downloadFile": 10000
+  },
+  "debug": true,
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于为你提供更好的服务"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ],
+  "sitemapLocation": "sitemap.json"
+}

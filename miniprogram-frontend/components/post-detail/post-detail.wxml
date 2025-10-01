@@ -1,0 +1,14 @@
+<view class="detail">
+  <view class="header">
+    <view class="title">{{detail.title}}</view>
+    <view class="time">{{detail.publishTime}}</view>
+  </view>
+  <image class="banner" src="{{type === 'employment' ? '/images/employment/banner.png' : '/images/research/banner.png'}}" mode="aspectFill" />
+  <view class="content">{{detail.description}}</view>
+
+  <view class="bottom-bar">
+    <button class="action-btn" bindtap="onAction">{{type === 'employment' ? '我要应聘' : '我要报名'}}</button>
+  </view>
+</view>
+
+

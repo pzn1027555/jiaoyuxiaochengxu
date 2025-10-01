@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.teacher.mapper.TeacherMapper">
+    
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.teacher.entity.Teacher">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="teacher_no" property="teacherNo" jdbcType="VARCHAR"/>
+        <result column="teacher_name" property="teacherName" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="wx_openid" property="wxOpenid" jdbcType="VARCHAR"/>
+        <result column="wx_unionid" property="wxUnionid" jdbcType="VARCHAR"/>
+        <result column="nickname" property="nickname" jdbcType="VARCHAR"/>
+        <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP"/>
+        <result column="last_login_ip" property="lastLoginIp" jdbcType="VARCHAR"/>
+        <result column="is_first_login" property="isFirstLogin" jdbcType="INTEGER"/>
+        <result column="register_source" property="registerSource" jdbcType="VARCHAR"/>
+        <result column="avatar" property="avatar" jdbcType="VARCHAR"/>
+        <result column="gender" property="gender" jdbcType="INTEGER"/>
+        <result column="birth_date" property="birthDate" jdbcType="DATE"/>
+        <result column="teaching_experience" property="teachingExperience" jdbcType="INTEGER"/>
+        <result column="introduction" property="introduction" jdbcType="LONGVARCHAR"/>
+        <result column="province" property="province" jdbcType="VARCHAR"/>
+        <result column="city" property="city" jdbcType="VARCHAR"/>
+        <result column="district" property="district" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="subjects" property="subjects" jdbcType="VARCHAR" typeHandler="com.education.admin.config.JsonLongListTypeHandler"/>
+        <!-- 衍生：科目中文名列表（运行时拼接，select时用 JSON_ARRAYAGG 生成） -->
+        <result column="subjects_name_list" property="subjectsNameList" jdbcType="LONGVARCHAR" typeHandler="com.education.admin.config.JsonTypeHandler"/>
+        <result column="subjects_map" property="subjectsMap" jdbcType="LONGVARCHAR" typeHandler="com.education.admin.config.StringObjectMapTypeHandler"/>
+        <result column="teacher_tags" property="teacherTags" jdbcType="VARCHAR" typeHandler="com.education.admin.config.JsonTypeHandler"/>
+        <result column="hourly_rate" property="hourlyRate" jdbcType="DECIMAL"/>
+        <result column="commission_rate" property="commissionRate" jdbcType="DECIMAL"/>
+        <result column="teacher_level" property="teacherLevel" jdbcType="VARCHAR"/>
+        <result column="audit_status" property="auditStatus" jdbcType="INTEGER"/>
+        <result column="audit_reason" property="auditReason" jdbcType="VARCHAR"/>
+        <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP"/>
+        <result column="audit_user_id" property="auditUserId" jdbcType="BIGINT"/>
+        <result column="contract_status" property="contractStatus" jdbcType="INTEGER"/>
+        <result column="contract_send_time" property="contractSendTime" jdbcType="TIMESTAMP"/>
+        <result column="contract_sign_time" property="contractSignTime" jdbcType="TIMESTAMP"/>
+        <result column="contract_url" property="contractUrl" jdbcType="VARCHAR"/>
+        <result column="risk_level" property="riskLevel" jdbcType="INTEGER"/>
+        <result column="complaint_count" property="complaintCount" jdbcType="INTEGER"/>
+        <result column="complaint_rate" property="complaintRate" jdbcType="DECIMAL"/>
+        <result column="conversion_rate" property="conversionRate" jdbcType="DECIMAL"/>
+        <result column="active_score" property="activeScore" jdbcType="DECIMAL"/>
+        <result column="total_students" property="totalStudents" jdbcType="INTEGER"/>
+        <result column="total_courses" property="totalCourses" jdbcType="INTEGER"/>
+        <result column="total_income" property="totalIncome" jdbcType="DECIMAL"/>
+        <result column="star_rating" property="starRating" jdbcType="DECIMAL"/>
+        <result column="check_count" property="checkCount" jdbcType="INTEGER"/>
+        <result column="violation_content" property="violationContent" jdbcType="LONGVARCHAR"/>
+        <result column="is_hidden" property="isHidden" jdbcType="INTEGER"/>
+        <result column="is_recommended" property="isRecommended" jdbcType="INTEGER"/>
+        <result column="recommend_order" property="recommendOrder" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="cert_education" property="certEducation" jdbcType="VARCHAR"/>
+        <result column="cert_graduate_school" property="certGraduateSchool" jdbcType="VARCHAR"/>
+        <result column="cert_major" property="certMajor" jdbcType="VARCHAR"/>
+        <result column="has_mooc_apply" property="hasMoocApply" jdbcType="INTEGER"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, teacher_no, teacher_name, phone, wx_openid, wx_unionid, nickname,
+        last_login_time, last_login_ip, is_first_login, register_source,
+        avatar, gender, birth_date, province, city, district, address,
+        teaching_experience, introduction,
+        subjects, teacher_tags,
+        teacher_level, audit_status, audit_reason, audit_time,
+        audit_user_id, status, create_time, update_time
+    </sql>
+    
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT 
+            ti.*,
+            (
+              SELECT JSON_OBJECTAGG(cc.id, cc.category_name)
+              FROM course_category cc
+              WHERE JSON_CONTAINS(CAST(ti.subjects AS JSON), CAST(cc.id AS JSON))
+            ) AS subjects_map,
+            (
+              SELECT JSON_ARRAYAGG(cc.category_name)
+              FROM course_category cc
+              WHERE JSON_CONTAINS(CAST(ti.subjects AS JSON), CAST(cc.id AS JSON))
+            ) AS subjects_name_list
+        FROM teacher_info ti
+        WHERE ti.id = #{id}
+    </select>
+    
+    <select id="findByPhone" resultMap="BaseResultMap">
+        SELECT 
+            ti.*,
+            tlc.hourly_rate AS hourly_rate,
+            tlc.commission_rate AS commission_rate,
+            tc_latest.education AS cert_education,
+            tc_latest.graduate_school AS cert_graduate_school,
+            (
+              SELECT JSON_OBJECTAGG(cc.id, cc.category_name)
+              FROM course_category cc
+              WHERE JSON_CONTAINS(CAST(ti.subjects AS JSON), CAST(cc.id AS JSON))
+            ) AS subjects_map
+        FROM teacher_info ti
+        LEFT JOIN teacher_level_config tlc ON tlc.level_key = ti.teacher_level
+        LEFT JOIN (
+            SELECT t1.*
+            FROM teacher_certification t1
+            INNER JOIN (
+                SELECT teacher_id, MAX(id) AS max_id
+                FROM teacher_certification
+                GROUP BY teacher_id
+            ) t2 ON t1.id = t2.max_id
+        ) tc_latest ON tc_latest.teacher_id = ti.id
+        WHERE ti.phone = #{phone}
+    </select>
+    
+    <select id="findByPage" resultMap="BaseResultMap">
+        SELECT 
+            ti.*, 
+            tlc.hourly_rate AS hourly_rate,
+            tlc.commission_rate AS commission_rate,
+            tc_latest.education AS cert_education,
+            tc_latest.graduate_school AS cert_graduate_school,
+            (
+              SELECT JSON_OBJECTAGG(cc.id, cc.category_name)
+              FROM course_category cc
+              WHERE JSON_CONTAINS(CAST(ti.subjects AS JSON), CAST(cc.id AS JSON))
+            ) AS subjects_map,
+            EXISTS(
+                SELECT 1 FROM mooc_application ma 
+                WHERE ma.teacher_id = ti.id AND ma.status = 0
+            ) AS has_mooc_apply
+        FROM teacher_info ti
+        LEFT JOIN teacher_level_config tlc ON tlc.level_key = ti.teacher_level
+        /* 仅展示面试通过(4)及以后状态的教师：连接教师最新一次认证记录并过滤 */
+        INNER JOIN (
+            SELECT t1.*
+            FROM teacher_certification t1
+            INNER JOIN (
+                SELECT teacher_id, MAX(id) AS max_id
+                FROM teacher_certification
+                GROUP BY teacher_id
+            ) t2 ON t1.id = t2.max_id
+        ) tc_latest ON tc_latest.teacher_id = ti.id AND tc_latest.certification_status = 4
+        <where>
+            <if test="name != null and name != ''">
+                AND ti.teacher_name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="status != null">
+                AND ti.audit_status = #{status}
+            </if>
+            <if test="risk != null and risk == 1">
+                AND (ti.complaint_rate &gt; 10 OR ti.star_rating &lt; 3)
+            </if>
+            <if test="province != null and province != ''">AND ti.province = #{province}</if>
+            <if test="city != null and city != ''">AND ti.city = #{city}</if>
+            <if test="district != null and district != ''">AND ti.district = #{district}</if>
+            <if test="subjectId != null">
+                AND EXISTS (
+                    SELECT 1 FROM (
+                        SELECT id FROM course_category WHERE id = #{subjectId}
+                        UNION ALL
+                        SELECT id FROM course_category WHERE parent_id = #{subjectId}
+                    ) cc
+                    WHERE JSON_CONTAINS(CAST(ti.subjects AS JSON), CAST(cc.id AS JSON))
+                )
+            </if>
+        </where>
+        ORDER BY ti.create_time DESC
+    </select>
+    
+    <select id="countTotal" resultType="int">
+        SELECT COUNT(*)
+        FROM teacher_info ti
+        <where>
+            <if test="name != null and name != ''">
+                AND ti.teacher_name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="status != null">
+                AND ti.audit_status = #{status}
+            </if>
+            <if test="risk != null and risk == 1">
+                AND (ti.complaint_rate &gt; 10 OR ti.star_rating &lt; 3)
+            </if>
+            <if test="province != null and province != ''">AND ti.province = #{province}</if>
+            <if test="city != null and city != ''">AND ti.city = #{city}</if>
+            <if test="district != null and district != ''">AND ti.district = #{district}</if>
+            <if test="subjectId != null">
+                AND EXISTS (
+                    SELECT 1 FROM (
+                        SELECT id FROM course_category WHERE id = #{subjectId}
+                        UNION ALL
+                        SELECT id FROM course_category WHERE parent_id = #{subjectId}
+                    ) cc
+                    WHERE JSON_CONTAINS(CAST(ti.subjects AS JSON), CAST(cc.id AS JSON))
+                )
+            </if>
+        </where>
+    </select>
+    
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT ti.*, tlc.hourly_rate AS hourly_rate, tlc.commission_rate AS commission_rate
+        FROM teacher_info ti
+        LEFT JOIN teacher_level_config tlc ON tlc.level_key = ti.teacher_level
+        ORDER BY ti.create_time DESC
+    </select>
+
+    <!-- 风险教师列表：投诉率>10 或 星级<3，且认证通过(4) -->
+    <select id="findRiskTeachers" resultMap="BaseResultMap">
+        SELECT 
+            ti.*, 
+            tlc.hourly_rate AS hourly_rate,
+            tlc.commission_rate AS commission_rate,
+            tc_latest.education AS cert_education,
+            tc_latest.graduate_school AS cert_graduate_school,
+            (
+              SELECT JSON_ARRAYAGG(cc.category_name)
+              FROM course_category cc
+              WHERE JSON_CONTAINS(CAST(ti.subjects AS JSON), CAST(cc.id AS JSON))
+            ) AS subjects_name_list
+        FROM teacher_info ti
+        LEFT JOIN teacher_level_config tlc ON tlc.level_key = ti.teacher_level
+        INNER JOIN (
+            SELECT t1.*
+            FROM teacher_certification t1
+            INNER JOIN (
+                SELECT teacher_id, MAX(id) AS max_id
+                FROM teacher_certification
+                GROUP BY teacher_id
+            ) t2 ON t1.id = t2.max_id
+        ) tc_latest ON tc_latest.teacher_id = ti.id AND tc_latest.certification_status = 4
+        WHERE (ti.complaint_rate &gt; 10 OR ti.star_rating &lt; 3)
+        ORDER BY ti.create_time DESC
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO teacher_info
+        (teacher_no, teacher_name, phone, wx_openid, wx_unionid, nickname,
+         avatar, gender, birth_date,
+         teaching_experience, introduction, teacher_level,
+         audit_status, audit_reason, audit_time, audit_user_id, 
+         last_login_time, last_login_ip, is_first_login, register_source, status, 
+         create_time, update_time)
+        VALUES
+        (#{teacherNo}, #{teacherName}, #{phone}, #{wxOpenid}, #{wxUnionid}, #{nickname},
+         #{avatar}, #{gender}, #{birthDate},
+         #{teachingExperience}, #{introduction}, #{teacherLevel},
+         #{auditStatus}, #{auditReason}, #{auditTime}, #{auditUserId},
+         #{lastLoginTime}, #{lastLoginIp}, #{isFirstLogin}, #{registerSource}, #{status},
+         #{createTime}, #{updateTime})
+    </insert>
+    
+    <update id="update">
+        UPDATE teacher_info
+        <set>
+            <if test="teacherName != null">teacher_name = #{teacherName},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="province != null">province = #{province},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="district != null">district = #{district},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="teachingExperience != null">teaching_experience = #{teachingExperience},</if>
+            <if test="introduction != null">introduction = #{introduction},</if>
+            <if test="subjects != null">subjects = #{subjects, typeHandler=com.education.admin.config.JsonLongListTypeHandler},</if>
+            <if test="teacherTags != null">teacher_tags = #{teacherTags, typeHandler=com.education.admin.config.JsonTypeHandler},</if>
+            <if test="teacherLevel != null">teacher_level = #{teacherLevel},</if>
+            update_time = #{updateTime}
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <update id="updateAuditStatus">
+        UPDATE teacher_info
+        SET audit_status = #{status},
+            audit_reason = #{auditReason},
+            audit_time = NOW(),
+            audit_user_id = #{auditUserId}
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        DELETE FROM teacher_info WHERE id = #{id}
+    </delete>
+    
+    <update id="increaseCheckCount">
+        UPDATE teacher_info
+        SET check_count = IFNULL(check_count, 0) + 1,
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <update id="markContractSent">
+        UPDATE teacher_info
+        SET contract_status = 1,
+            contract_send_time = NOW(),
+            contract_url = #{contractUrl},
+            audit_status = 1,
+            audit_time = NOW(),
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <update id="toggleHidden">
+        UPDATE teacher_info
+        SET is_hidden = IF(IFNULL(is_hidden,0)=1, 0, 1),
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <update id="toggleRecommend">
+        UPDATE teacher_info
+        SET is_recommended = IF(IFNULL(is_recommended,0)=1, 0, 1),
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 新增：推荐老师查询（is_recommended=1 且 is_hidden=0 且 status=1）按 recommend_order、update_time 排序 -->
+    <select id="findRecommended" resultMap="BaseResultMap">
+        SELECT ti.*, tlc.hourly_rate AS hourly_rate, tlc.commission_rate AS commission_rate, ti.is_hidden, ti.is_recommended, ti.recommend_order
+        FROM teacher_info ti
+        LEFT JOIN teacher_level_config tlc ON tlc.level_key = ti.teacher_level
+        WHERE IFNULL(is_recommended,0) = 1
+          AND IFNULL(is_hidden,0) = 0
+          AND IFNULL(status,1) = 1
+        ORDER BY COALESCE(recommend_order,0) ASC, ti.update_time DESC
+        <if test="limit != null and limit &gt; 0">LIMIT #{limit}</if>
+    </select>
+    
+</mapper>

@@ -1,0 +1,39 @@
+<view class="detail-page">
+  <view class="title">{{post.title}}</view>
+  <view class="meta">{{post.createTime}} · {{post.authorName}}</view>
+  <view class="content">{{post.content}}</view>
+
+  <view class="images" wx:if="{{post.images && post.images.length}}">
+    <view class="grid">
+      <image class="img" wx:for="{{post.images}}" wx:key="*this" src="{{item}}" mode="aspectFill" bindtap="onPreview" data-url="{{item}}" />
+    </view>
+  </view>
+
+  <view class="actions">
+    <view class="act" bindtap="onLike"><image class="icon" src="{{post.liked?'/images/student/likeChecked.png':'/images/student/like.png'}}" />{{post.likeCount}}</view>
+    <view class="act"><image class="icon" src="{{post.commented?'/images/student/hascomment.png':'/images/student/comment.png'}}" />{{post.commentCount}}</view>
+  </view>
+
+  <view class="comments">
+    <view class="c-title">共{{comments.length}}条</view>
+    <view class="c-item" wx:for="{{comments}}" wx:key="id">
+      <image class="avatar" src="{{item.userAvatar || '/images/workspace/default-avatar.png'}}" mode="aspectFill" />
+      <view class="c-body">
+        <view class="c-meta">{{item.userName}} · {{item.createTime}}</view>
+        <view class="c-content">{{item.content}}</view>
+        <view class="c-actions">
+          <view class="c-like {{item.liked?'liked':''}}" catchtap="onLikeComment" data-id="{{item.id}}">
+            <image class="like-icon" src="{{item.liked?'/images/student/likeChecked.png':'/images/student/like.png'}}" />
+            <text class="like-count">{{item.likeCount||0}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="comment-bar">
+    <input class="c-input" placeholder="输入消息内容" value="{{newComment}}" bindinput="onInputComment" />
+    <button class="send" bindtap="onSend">发送</button>
+  </view>
+</view>
+

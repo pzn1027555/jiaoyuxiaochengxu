@@ -1,0 +1,36 @@
+/* 通用滚动条隐藏样式（保留滚动能力） */
+
+/* 横向滚动，隐藏滚动条 */
+.scroll-x-no-bar {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.scroll-x-no-bar::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* 纵向滚动，隐藏滚动条 */
+.scroll-y-no-bar {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scroll-y-no-bar::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* 双向滚动，隐藏滚动条 */
+.scroll-both-no-bar {
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scroll-both-no-bar::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* 兼容 scroll-view：给 scroll-view 设置该类，同时在组件上加 show-scrollbar="false" */
+.sv-no-bar { -ms-overflow-style: none; scrollbar-width: none; }
+.sv-no-bar::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+

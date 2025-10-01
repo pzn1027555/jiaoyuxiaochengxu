@@ -1,0 +1,60 @@
+<!--pages/teacher/midterm-report-view/midterm-report-view.wxml-->
+<view class="midterm-report-container">
+  <!-- 自定义头部 -->
+  <custom-header 
+    title="中期报告" 
+    show-back="{{true}}"
+    bind:headerReady="onHeaderReady"
+  ></custom-header>
+  
+  <!-- 报告内容 -->
+  <view class="report-content" style="padding-top: {{headerHeight}}px;">
+    <!-- 本期课程内容 -->
+    <view class="content-section">
+      <view class="section-title">本期课程内容</view>
+      <view class="content-box">
+        <text class="content-text">{{reportData.currentContent || '暂无内容'}}</text>
+      </view>
+    </view>
+
+    <!-- 本期课程学生表现 -->
+    <view class="content-section">
+      <view class="section-title">本期课程学生表现</view>
+      <view class="content-box">
+        <text class="content-text">{{reportData.studentPerformance || '暂无内容'}}</text>
+      </view>
+    </view>
+
+    <!-- 后期课程内容及教学计划 -->
+    <view class="content-section">
+      <view class="section-title">后期课程内容及教学计划</view>
+      <view class="content-box">
+        <text class="content-text">{{reportData.futurePlan || '暂无内容'}}</text>
+      </view>
+    </view>
+
+    <!-- 报告信息 -->
+    <view class="report-info" wx:if="{{reportData.submitTime}}">
+      <view class="info-item">
+        <text class="info-label">提交时间：</text>
+        <text class="info-value">{{reportData.submitTime}}</text>
+      </view>
+      <view class="info-item" wx:if="{{reportData.teacherName}}">
+        <text class="info-label">填写教师：</text>
+        <text class="info-value">{{reportData.teacherName}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && !reportData.currentContent && !reportData.studentPerformance && !reportData.futurePlan}}">
+    <view class="empty-icon">📋</view>
+    <text class="empty-text">暂无报告内容</text>
+  </view>
+</view>

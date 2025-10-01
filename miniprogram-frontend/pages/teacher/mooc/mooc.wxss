@@ -1,0 +1,17 @@
+.booking-container { background: #f7fbf8; min-height: 100vh; }
+.content { padding: 16rpx 24rpx 40rpx; }
+.booking-item { display: flex; background: #fff; border-radius: 16rpx; padding: 24rpx; margin-bottom: 20rpx; }
+.avatar { width: 96rpx; height: 96rpx; border-radius: 50%; background: #eee; flex-shrink: 0; }
+.meta { flex: 1; margin-left: 20rpx; }
+.row1 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8rpx; }
+.name { font-size: 30rpx; font-weight: 600; color: #222; }
+.desc { color: #222; font-size: 28rpx; }
+.row-bottom { margin-top: 12rpx; display: flex; justify-content: space-between; align-items: center; }
+.time { font-size: 24rpx; color: #9aa29a; }
+.actions { display: flex; gap: 16rpx; }
+.btn { line-height: 64rpx; height: 64rpx; border-radius: 40rpx; padding: 0 28rpx; font-size: 26rpx; }
+.btn.approve { background: #54B247; color: #fff; }
+.empty { margin-top: 120rpx; text-align: center; color: #9aa29a; }
+.empty-img { width: 280rpx; height: 200rpx; margin: 0 auto 12rpx; }
+.empty-text { font-size: 26rpx; }
+

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.MiniStudentQueryMapper">
+
+  <!-- 基于排课 teacher_schedule + teacher_schedule_student 关联查询老师名下所有学生（去重） -->
+  <select id="findStudentsByTeacherId" parameterType="long" resultType="com.education.admin.modules.student.entity.Student">
+    SELECT si.*
+    FROM student_info si
+    WHERE si.id IN (
+      SELECT DISTINCT tss.student_id
+      FROM teacher_schedule_student tss
+      INNER JOIN teacher_schedule ts ON ts.id = tss.schedule_id
+      WHERE ts.teacher_id = #{teacherId}
+    )
+    ORDER BY si.update_time DESC
+  </select>
+
+  <!-- 学生最近一条该教师订单/课程进度摘要 -->
+  <select id="findLatestOrderBrief" parameterType="map" resultType="map">
+    SELECT ts.id AS scheduleId,
+           ts.title AS courseName,
+           ts.class_type AS courseType,
+           ts.total_lessons AS totalLessons,
+           ts.lesson_number AS lessonNumber,
+           ts.start_time AS startTime,
+           ts.end_time AS endTime,
+           COALESCE(
+             ts.subject_name,
+             cat.category_name,
+             (
+               SELECT o2.course_name
+               FROM order_info o2
+               WHERE o2.teacher_id = #{teacherId}
+                 AND o2.student_id = #{studentId}
+               ORDER BY COALESCE(o2.pay_time, o2.create_time) DESC
+               LIMIT 1
+             ),
+             ts.title
+           ) AS subject
+    FROM teacher_schedule ts
+    LEFT JOIN course_category cat ON cat.id = ts.subject_id
+    WHERE ts.teacher_id = #{teacherId}
+      AND EXISTS (
+        SELECT 1 FROM teacher_schedule_student tss
+        WHERE tss.schedule_id = ts.id AND tss.student_id = #{studentId}
+      )
+    ORDER BY ts.start_time DESC
+    LIMIT 1
+  </select>
+
+  <!-- 统计该教师当月总课时：按排课记录条数统计 -->
+  <select id="sumMonthlyHours" parameterType="map" resultType="int">
+    SELECT COALESCE(COUNT(*), 0)
+    FROM teacher_schedule ts
+    WHERE ts.teacher_id = #{teacherId}
+      AND ts.start_time BETWEEN #{start} AND #{end}
+  </select>
+
+</mapper>
+
+

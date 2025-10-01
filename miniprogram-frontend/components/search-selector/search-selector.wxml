@@ -1,0 +1,61 @@
+<!--components/search-selector/search-selector.wxml-->
+<view class="search-selector-container">
+  <!-- 遮罩层 -->
+  <view class="selector-mask {{show ? 'show' : ''}}" bindtap="hide"></view>
+  
+  <!-- 选择器弹窗 -->
+  <view class="selector-popup {{show ? 'show' : ''}}" catchtap="preventClose">
+    <!-- 头部 -->
+    <view class="selector-header">
+      <text class="selector-title">{{title}}</text>
+      <view class="close-btn" bindtap="hide">×</view>
+    </view>
+    
+    <!-- 搜索框 -->
+    <view class="search-section">
+      <view class="search-input-wrapper">
+        <input 
+          class="search-input" 
+          type="text" 
+          placeholder="搜索{{title}}" 
+          value="{{searchText}}"
+          bindinput="onSearchInput"
+          confirm-type="search"
+          bindconfirm="onSearchConfirm"
+        />
+        <view class="search-icon">🔍</view>
+        <view 
+          class="clear-btn {{searchText ? 'show' : ''}}" 
+          bindtap="clearSearch"
+        >×</view>
+      </view>
+    </view>
+    
+    <!-- 选项列表 -->
+    <scroll-view class="options-list" scroll-y="true">
+      <view 
+        class="option-item {{item.selected ? 'selected' : ''}}" 
+        wx:for="{{filteredOptions}}" 
+        wx:key="{{item.value || item}}"
+        bindtap="selectOption"
+        data-index="{{index}}"
+        data-value="{{item.value || item}}"
+        data-label="{{item.label || item}}"
+      >
+        <text class="option-text">{{item.label || item}}</text>
+        <view class="check-icon {{item.selected ? 'show' : ''}}">✓</view>
+      </view>
+      
+      <!-- 无数据提示 -->
+      <view class="no-data" wx:if="{{filteredOptions.length === 0}}">
+        <text>暂无匹配结果</text>
+      </view>
+    </scroll-view>
+    
+    <!-- 底部按钮 -->
+    <view class="selector-footer" wx:if="{{multiple}}">
+      <button class="cancel-btn" bindtap="hide">取消</button>
+      <button class="confirm-btn" bindtap="confirm">确定</button>
+    </view>
+  </view>
+</view>

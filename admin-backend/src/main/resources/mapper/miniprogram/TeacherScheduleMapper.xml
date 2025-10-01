@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.TeacherScheduleMapper">
+
+  <resultMap id="BaseResultMap" type="com.education.admin.modules.miniprogram.entity.TeacherSchedule">
+    <id column="id" property="id"/>
+    <result column="teacher_id" property="teacherId"/>
+    <result column="course_id" property="courseId"/>
+    <result column="subject_id" property="subjectId"/>
+    <result column="subject_name" property="subjectName"/>
+    <result column="title" property="title"/>
+    <result column="class_type" property="classType"/>
+    <result column="total_lessons" property="totalLessons"/>
+    <result column="start_time" property="startTime"/>
+    <result column="end_time" property="endTime"/>
+    <result column="cover_url" property="coverUrl"/>
+    <result column="student_count" property="studentCount"/>
+    <result column="remark" property="remark"/>
+    <result column="intro" property="intro"/>
+    <result column="course_tags" property="courseTags"/>
+    <result column="duration_minutes" property="durationMinutes"/>
+    <result column="teach_mode" property="teachMode"/>
+    <result column="address" property="address"/>
+    <result column="province" property="province"/>
+    <result column="city" property="city"/>
+    <result column="district" property="district"/>
+    <result column="detail_address" property="detailAddress"/>
+    <result column="contact_phone" property="contactPhone"/>
+    <result column="lesson_number" property="lessonNumber"/>
+    <result column="plan_id" property="planId"/>
+    <result column="lesson_price" property="lessonPrice"/>
+    <result column="confirmation_status" property="confirmationStatus"/>
+    <result column="status" property="status"/>
+    <result column="create_time" property="createTime"/>
+    <result column="update_time" property="updateTime"/>
+  </resultMap>
+
+  <select id="findByTeacherAndRange" parameterType="map" resultMap="BaseResultMap">
+    SELECT * FROM teacher_schedule
+    WHERE teacher_id = #{teacherId}
+      AND start_time &gt;= #{start}
+      AND end_time &lt;= #{end}
+      AND status = 1
+    ORDER BY start_time ASC, lesson_number ASC
+  </select>
+
+  <select id="findByIdAndTeacher" parameterType="map" resultMap="BaseResultMap">
+    SELECT ts.*
+    FROM teacher_schedule ts
+    WHERE ts.id = #{id} AND ts.teacher_id = #{teacherId}
+  </select>
+
+  <!-- 统计与已有课程时间段冲突的数量（可排除自身id） -->
+  <select id="countConflicts" parameterType="map" resultType="int">
+    SELECT COUNT(1) FROM teacher_schedule
+    WHERE teacher_id = #{teacherId}
+      AND status = 1
+      AND NOT (end_time &lt;= #{start} OR start_time &gt;= #{end})
+      <if test="excludeId != null">AND id &lt;&gt; #{excludeId}</if>
+  </select>
+
+  <insert id="insert" parameterType="com.education.admin.modules.miniprogram.entity.TeacherSchedule" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO teacher_schedule(
+      teacher_id, course_id, subject_id, subject_name, title, class_type, total_lessons, start_time, end_time, cover_url, student_count, remark, intro, course_tags, duration_minutes, teach_mode, address, province, city, district, detail_address, contact_phone, lesson_number, plan_id, lesson_price, confirmation_status, status, create_time, update_time
+    ) VALUES (
+      #{teacherId}, #{courseId}, #{subjectId}, #{subjectName}, #{title}, COALESCE(#{classType}, 'one_to_one'), #{totalLessons}, #{startTime}, #{endTime}, #{coverUrl}, #{studentCount}, #{remark}, #{intro}, #{courseTags}, #{durationMinutes}, #{teachMode}, #{address}, #{province}, #{city}, #{district}, #{detailAddress}, #{contactPhone}, #{lessonNumber}, #{planId}, #{lessonPrice}, #{confirmationStatus}, #{status}, NOW(), NOW()
+    )
+  </insert>
+
+  <update id="update" parameterType="com.education.admin.modules.miniprogram.entity.TeacherSchedule">
+    UPDATE teacher_schedule
+    SET subject_id = #{subjectId},
+        subject_name = #{subjectName},
+        title = #{title},
+        class_type = #{classType},
+        total_lessons = #{totalLessons},
+        start_time = #{startTime},
+        end_time = #{endTime},
+        cover_url = #{coverUrl},
+        student_count = #{studentCount},
+        remark = #{remark},
+        intro = #{intro},
+        course_tags = #{courseTags},
+        duration_minutes = #{durationMinutes},
+        teach_mode = #{teachMode},
+        address = #{address},
+        province = #{province},
+        city = #{city},
+        district = #{district},
+        detail_address = #{detailAddress},
+        contact_phone = #{contactPhone},
+        lesson_number = #{lessonNumber},
+        plan_id = #{planId},
+        lesson_price = #{lessonPrice},
+        confirmation_status = #{confirmationStatus},
+        status = #{status},
+        update_time = NOW()
+    WHERE id = #{id} AND teacher_id = #{teacherId}
+  </update>
+
+  <!-- 按学习计划编号(plan_id存放计划编码)查询该计划下的所有排课 -->
+  <select id="findByPlanId" parameterType="string" resultMap="BaseResultMap">
+    SELECT *
+    FROM teacher_schedule
+    WHERE plan_id = #{planId}
+      AND status = 1
+    ORDER BY lesson_number ASC, start_time ASC
+  </select>
+
+  <update id="updateConfirmationStatusByPlanId">
+    UPDATE teacher_schedule
+    SET confirmation_status = #{status},
+        update_time = NOW()
+    WHERE plan_id = #{planId}
+  </update>
+
+  <delete id="deleteByIdAndTeacher" parameterType="map">
+    DELETE FROM teacher_schedule WHERE id = #{id} AND teacher_id = #{teacherId}
+  </delete>
+
+  <!-- 学生端：按学生查询当日课程（通过关联表） -->
+  <select id="findByStudentAndRange" parameterType="map" resultMap="BaseResultMap">
+    SELECT ts.*
+    FROM teacher_schedule ts
+    INNER JOIN teacher_schedule_student tss ON tss.schedule_id = ts.id
+    WHERE tss.student_id = #{studentId}
+      AND ts.start_time &gt;= #{start}
+      AND ts.end_time &lt;= #{end}
+      AND ts.status = 1
+    ORDER BY ts.start_time ASC, ts.lesson_number ASC
+  </select>
+
+  <select id="findById" resultMap="BaseResultMap">
+    SELECT * FROM teacher_schedule WHERE id = #{id}
+  </select>
+
+  <select id="findByIdForStudent" parameterType="map" resultMap="BaseResultMap">
+    SELECT ts.*
+    FROM teacher_schedule ts
+    INNER JOIN teacher_schedule_student tss ON tss.schedule_id = ts.id
+    WHERE ts.id = #{id} AND tss.student_id = #{studentId}
+  </select>
+
+  <!-- 统计学生课程数量：按 plan_id 去重 -->
+  <select id="countCoursesByStudent" parameterType="long" resultType="int">
+    SELECT COUNT(DISTINCT ts.plan_id)
+    FROM teacher_schedule ts
+    INNER JOIN teacher_schedule_student tss ON tss.schedule_id = ts.id
+    WHERE tss.student_id = #{studentId}
+      AND ts.status = 1
+      AND ts.plan_id IS NOT NULL
+  </select>
+
+</mapper>
+
+

@@ -1,0 +1,15 @@
+.list-container { padding: 24rpx; }
+.loading { text-align: center; color: #888; padding: 60rpx 0; }
+.empty { padding: 120rpx 0; text-align: center; color: #999; }
+.empty-img { width: 200rpx; height: 200rpx; margin-bottom: 20rpx; }
+.card { background: #fff; border-radius: 16rpx; overflow: hidden; margin-bottom: 24rpx; box-shadow: 0 6rpx 24rpx rgba(0,0,0,.06); }
+.banner { width: 100%; height: 260rpx; display: block; }
+.content { padding: 24rpx; }
+.title { font-size: 32rpx; font-weight: 600; line-height: 1.5; color: #222; }
+.desc { margin-top: 12rpx; font-size: 28rpx; color: #333; line-height: 1.6; }
+.footer { margin-top: 20rpx; display: flex; align-items: center; justify-content: space-between; }
+.time { font-size: 24rpx; color: #888; }
+.detail-btn { background: #30C27C; color: #fff; border: none; padding: 0 24rpx; height: 56rpx; line-height: 56rpx; border-radius: 28rpx; float: right;    margin: 0;}
+
+
+

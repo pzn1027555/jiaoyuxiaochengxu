@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "教师认证",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "custom-header": "/components/custom-header/custom-header"
+  }
+}

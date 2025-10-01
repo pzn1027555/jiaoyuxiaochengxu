@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.system.mapper.CourseBannerMapper">
+
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.system.entity.CourseBanner">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="image_url" property="imageUrl" jdbcType="VARCHAR"/>
+        <result column="link_type" property="linkType" jdbcType="VARCHAR"/>
+        <result column="link_value" property="linkValue" jdbcType="VARCHAR"/>
+        <result column="sort_order" property="sortOrder" jdbcType="INTEGER"/>
+        <result column="is_enabled" property="isEnabled" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT id, title, image_url, link_type, link_value, sort_order, is_enabled, create_time, update_time
+        FROM course_banner
+        <where>
+            <if test="isEnabled != null">
+                AND is_enabled = #{isEnabled}
+            </if>
+        </where>
+        ORDER BY sort_order DESC, update_time DESC
+    </select>
+
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT id, title, image_url, link_type, link_value, sort_order, is_enabled, create_time, update_time
+        FROM course_banner
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.education.admin.modules.system.entity.CourseBanner">
+        INSERT INTO course_banner
+        (title, image_url, link_type, link_value, sort_order, is_enabled, create_time, update_time)
+        VALUES
+        (#{title}, #{imageUrl}, #{linkType}, #{linkValue}, #{sortOrder}, #{isEnabled}, NOW(), NOW())
+    </insert>
+
+    <update id="update" parameterType="com.education.admin.modules.system.entity.CourseBanner">
+        UPDATE course_banner
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="imageUrl != null">image_url = #{imageUrl},</if>
+            <if test="linkType != null">link_type = #{linkType},</if>
+            <if test="linkValue != null">link_value = #{linkValue},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="isEnabled != null">is_enabled = #{isEnabled},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM course_banner WHERE id = #{id}
+    </delete>
+
+</mapper>
+
+

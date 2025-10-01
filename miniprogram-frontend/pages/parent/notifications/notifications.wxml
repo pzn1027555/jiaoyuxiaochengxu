@@ -1,0 +1,27 @@
+<view class="notice-container">
+  <custom-header title="消息通知" show-back="{{true}}" bind:headerReady="onHeaderReady"></custom-header>
+
+  <view class="content" style="padding-top: {{headerHeight}}px;">
+    <block wx:if="{{list.length}}">
+      <view class="notice-item" wx:for="{{list}}" wx:key="id">
+        <image class="icon" src="/images/student/tongzhi.png" mode="aspectFit"></image>
+        <view class="right">
+          <view class="top">
+            <text class="title">{{item.title}}</text>
+            <text class="time">{{item.displayTime}}</text>
+          </view>
+          <view class="content-text">{{item.content}}</view>
+        </view>
+        <image class="next" src="/images/workspace/next.png" mode="aspectFit" 
+               data-type="{{item.type}}" data-relatedid="{{item.relatedId}}" data-id="{{item.id}}"
+               bindtap="openTarget"></image>
+      </view>
+    </block>
+
+    <view class="empty" wx:else>
+      <image class="empty-img" src="/images/common/no-data.png" mode="aspectFit"></image>
+      <text class="empty-text">暂无通知</text>
+    </view>
+  </view>
+</view>
+

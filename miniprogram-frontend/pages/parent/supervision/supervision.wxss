@@ -1,0 +1,104 @@
+/* pages/parent/supervision/supervision.wxss - 精简，仅保留页面现用样式 */
+
+.container {
+  padding: 20rpx;
+  background: linear-gradient( rgba(245, 255, 242, 1), rgba(255, 255, 255, 1));
+    min-height: 100vh;
+  padding-bottom: 180rpx;
+}
+
+/* 孩子选择器 */
+.child-selector {
+  /* background: white; */
+  border-radius: 20rpx;
+  margin-bottom: 30rpx;
+  padding: 30rpx;
+  margin: 0 24rpx;
+  /* box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1); */
+}
+
+.picker-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selected-child {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.child-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+
+.child-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.child-name-row{ display:flex; align-items:center; gap: 12rpx; }
+.gender-icon{ width: 28rpx; height: 28rpx; }
+
+.child-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.child-detail {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.switch-group{ display:flex; align-items:center; gap: 12rpx; }
+.switch-text{ font-size: 26rpx; color: rgba(152, 152, 166, 1); }
+.picker-next{ width: 28rpx; height: 28rpx; }
+
+/* 学习时长统计卡片 */
+.study-duration-card{ position: relative; margin: 24rpx; border-radius: 24rpx; overflow: hidden; background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%); color:#fff; }
+.study-duration-card .card-bg{ width: 100%; height: 220rpx; opacity: 0.12; }
+.card-title{ position:absolute; top: 18rpx; left: 20rpx; font-size: 26rpx; color:#fff; opacity: .95; }
+.duration-metrics{ position: absolute; left: 24rpx; right:24rpx; top: 72rpx; display: flex;  justify-content: center; gap: 24rpx; }
+
+.metric{ display:flex; flex-direction:column; align-items:center; width: 120rpx;}
+.metric .value{ font-size: 42rpx; font-weight: 600; }
+.metric .label{ margin-top: 8rpx; font-size: 24rpx; opacity: .9; }
+.metric-sep{ width: 2rpx; height: 60rpx; background: rgba(0, 0, 0, 0.10); }
+
+/* 图表区域 */
+.chart-section{  border-radius: 20rpx; margin: 24rpx; padding: 10rpx;  }
+.chart-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 12rpx; }
+.chart-title{ font-size: 30rpx; font-weight: 700; color:#333; }
+.period-switch{ display:none; }
+
+/* 胶囊分段控件 */
+.segmented{ position: relative; display:flex; align-items:center; gap:0; border: 2rpx solid #6bc179; border-radius: 48rpx; padding: 0; background: #ffffff; width: 300rpx; height: 50rpx; overflow: hidden; }
+.seg-thumb{ position:absolute;  left:0; width: 100rpx; height: 52rpx; background:#4CAF50; border-radius: 42rpx; transition: left .2s ease; }
+.seg-item{ flex:1; text-align:center; font-size: 28rpx; color:#6bc179; z-index:1; }
+.seg-item.active{ color:#fff; font-weight:700; }
+.chart-canvas{ width: 100%; height: 400rpx; display:block; }
+
+/* 报告区域 */
+.report-section{ border-radius: 20rpx; margin: 24rpx; }
+.report-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 12rpx; }
+.tabs{ display:flex; gap: 40rpx; }
+.tab{ font-size: 26rpx; color:rgba(152, 152, 166, 1); padding-top: 12rpx;}
+.tab.active{ color:#fff; font-weight: 400; background:rgba(84, 178, 71, 1); padding: 12rpx 24rpx; border-radius: 30rpx; }
+.month-picker{ font-size: 26rpx; color:rgba(67, 67, 77, 1); background:#ffffff; border: 2rpx solid rgba(235, 235, 235, 1); border-radius: 30rpx; padding: 8rpx 30rpx 8rpx 50rpx; }
+
+.report-list{ margin-top: 8rpx; }
+.report-item{ display:flex; gap: 20rpx; padding: 24rpx 8rpx; }
+.report-item + .report-item{ border-top: 1rpx solid #f0f0f0; }
+.avatar{ width: 96rpx; height: 96rpx; border-radius: 50%; flex-shrink:0; }
+.content{ flex:1; }
+.line1{ font-size: 32rpx; }
+.line1 .strong{ color: rgba(70, 70, 77, 1); font-weight: 600; }
+.line1 .normal{ color: rgba(67, 67, 77, 1); font-weight: 400; }
+.line2{ font-size: 26rpx; color: rgba(67, 67, 77, 1); font-weight: 400; margin-top: 8rpx; }
+.bubble{ margin-top: 16rpx; background:rgba(244, 255, 242, 1); color:#2f6b3b; padding: 16rpx 20rpx; border-radius: 12rpx; line-height: 1.6; font-size: 28rpx; }

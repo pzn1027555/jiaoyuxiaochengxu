@@ -1,0 +1,91 @@
+<!--pages/student/profile/profile.wxml-->
+<view class="profile-container">
+  <!-- 页面背景图 -->
+  <view class="background-gradient">
+    <image class="background-image" src="/images/profile/bg.png" mode="scaleToFill"></image>
+  </view>
+  
+  <!-- 用户信息区域 -->
+  <view class="user-profile-section">
+    <view class="user-avatar">
+      <!-- 👤 用户头像 圆形 120rpx × 120rpx -->
+      <image class="avatar-image" src="{{userProfile.avatar}}" mode="aspectFill"></image>
+    </view>
+    
+    <view class="user-info">
+      <view class="user-name-row">
+        <text class="user-name">{{userProfile.name}}</text>
+        <image class="gender-icon" wx:if="{{userProfile.gender}}" src="{{userProfile.gender==='♀' ? '/images/student/female.png' : '/images/student/male.png'}}" mode="widthFix"></image>
+        <view class="tag student-tag" wx:if="{{userProfile.certification}}">{{userProfile.certification}}</view>
+      </view>
+  <!-- 用户简介 -->
+  <!-- <view class="bio-section">
+    <text class="bio-text">{{userProfile.bio}}</text>
+  </view> -->
+      
+    </view>
+  </view>
+  <!-- 学生统计：放在简介下面 -->
+  <view class="stats-row compact">
+    <view class="stat-item" bindtap="goMyCourses" hover-class="stat-item-hover">
+      <text class="stat-number">{{userProfile.myCourses}}</text>
+      <text class="stat-label">我的课程</text>
+    </view>
+    <view class="stat-item stat-item-border">
+      <text class="stat-number">{{userProfile.followedTeachers}}</text>
+      <text class="stat-label">关注老师</text>
+    </view>
+  </view>
+
+
+
+
+  <!-- 学生端无余额，移除该模块 -->
+
+  <!-- 我的功能 -->
+  <view class="my-functions-section">
+    <view class="section-title">
+      <view class="title-bar"></view>
+      <text class="title-text">我的功能</text>
+    </view>
+    
+    <view class="functions-grid">
+      <view class="function-item" wx:for="{{myFunctions}}" wx:key="id" bindtap="onFunctionTap" data-action="{{item.action}}">
+        <image class="function-icon" src="{{item.iconSrc}}" mode="aspectFit"></image>
+        <text class="function-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学生服务 -->
+  <view class="teacher-services-section">
+    <view class="section-title">
+      <view class="title-bar"></view>
+      <text class="title-text">学生服务</text>
+    </view>
+    
+    <view class="services-grid">
+      <view class="service-item" wx:for="{{studentServices}}" wx:key="id" bindtap="onServiceTap" data-action="{{item.action}}">
+        <view class="service-icon-wrapper">
+          <image class="service-icon" src="{{item.iconSrc}}" mode="aspectFit"></image>
+          <!-- 通用红点组件 -->
+          <badge-indicator 
+            badge-key="{{item.action}}"
+            visible="{{badgeStatus[item.action] && badgeStatus[item.action].visible}}"
+            count="{{badgeStatus[item.action] ? badgeStatus[item.action].count : 0}}"
+            size="medium">
+          </badge-indicator>
+        </view>
+        <text class="service-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <view class="logout-section">
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 使用角色底部导航 -->
+  <role-tabbar></role-tabbar>
+</view>

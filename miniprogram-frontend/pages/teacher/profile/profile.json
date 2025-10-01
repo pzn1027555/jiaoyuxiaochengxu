@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "我的",
+  "usingComponents": {
+    "role-tabbar": "/custom-tab-bar/index",
+    "badge-indicator": "/components/badge-indicator/badge-indicator"
+  }
+}

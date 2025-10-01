@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.student.mapper.StudentReviewMapper">
+
+  <resultMap id="BaseResultMap" type="com.education.admin.modules.student.entity.StudentReview">
+    <id column="id" property="id"/>
+    <result column="student_id" property="studentId"/>
+    <result column="teacher_id" property="teacherId"/>
+    <result column="course_id" property="courseId"/>
+    <result column="order_id" property="orderId"/>
+    <result column="star_rating" property="starRating"/>
+    <result column="review_content" property="reviewContent"/>
+    <result column="audit_status" property="auditStatus"/>
+    <result column="status" property="status"/>
+    <result column="create_time" property="createTime"/>
+    <result column="update_time" property="updateTime"/>
+  </resultMap>
+
+  <!-- 分页查询，关联 student_info / teacher_info / course_info 返回展示字段 -->
+  <select id="findByPage" resultType="map">
+    SELECT r.id,
+           s.student_name   AS studentName,
+           s.student_no     AS studentNo,
+           t.teacher_name   AS teacherName,
+           t.teacher_level  AS teacherLevel,
+           c.course_name    AS courseName,
+           r.star_rating    AS starRating,
+           r.review_content AS reviewContent,
+           r.audit_status   AS auditStatus,
+           r.create_time    AS createTime
+    FROM student_review r
+      LEFT JOIN student_info s ON s.id = r.student_id
+      LEFT JOIN teacher_info t ON t.id = r.teacher_id
+      LEFT JOIN course_info  c ON c.id = r.course_id
+    <where>
+      <if test="studentName != null and studentName != ''">
+        AND s.student_name LIKE CONCAT('%', #{studentName}, '%')
+      </if>
+      <if test="teacherName != null and teacherName != ''">
+        AND t.teacher_name LIKE CONCAT('%', #{teacherName}, '%')
+      </if>
+      <if test="starRating != null">
+        AND r.star_rating = #{starRating}
+      </if>
+      <if test="auditStatus != null">
+        AND r.audit_status = #{auditStatus}
+      </if>
+    </where>
+    ORDER BY r.create_time DESC
+  </select>
+
+  <select id="findByStudentAndSchedule" parameterType="map" resultMap="BaseResultMap">
+    SELECT * FROM student_review
+    WHERE student_id = #{studentId} AND order_id = #{scheduleId}
+    LIMIT 1
+  </select>
+
+  <insert id="insert" parameterType="com.education.admin.modules.student.entity.StudentReview" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO student_review(student_id, teacher_id, course_id, order_id, star_rating, review_content, audit_status, status, create_time, update_time)
+    VALUES(#{studentId}, #{teacherId}, #{courseId}, #{orderId}, #{starRating}, #{reviewContent}, COALESCE(#{auditStatus},1), COALESCE(#{status},1), NOW(), NOW())
+  </insert>
+
+  <update id="update" parameterType="com.education.admin.modules.student.entity.StudentReview">
+    UPDATE student_review
+    SET star_rating = #{starRating},
+        review_content = #{reviewContent},
+        update_time = NOW()
+    WHERE id = #{id}
+  </update>
+
+</mapper>
+
+

@@ -1,0 +1,285 @@
+/* app.wxss */
+
+/* 全局样式 */
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', SimSun, sans-serif;
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8f8f8;
+}
+
+/* 容器样式 */
+.container {
+  padding: 20rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* 卡片样式 */
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 按钮样式 */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #4CAF50, #45A049);
+  color: #fff;
+}
+
+.btn-primary:active {
+  background: linear-gradient(135deg, #45A049, #3d8b40);
+}
+
+.btn-secondary {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.btn-secondary:active {
+  background: #e0e0e0;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2rpx solid #4CAF50;
+  color: #4CAF50;
+}
+
+.btn-outline:active {
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.btn-disabled {
+  background: #e0e0e0 !important;
+  color: #999 !important;
+}
+
+/* 输入框样式 */
+.input {
+  background: transparent;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  padding: 24rpx 20rpx;
+  font-size: 28rpx;
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  border-color: #4CAF50;
+  background: #fff;
+}
+
+.input-error {
+  border-color: #f44336;
+}
+
+/* 标题样式 */
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 40rpx;
+}
+
+/* 列表样式 */
+.list-item {
+  background: #fff;
+  padding: 30rpx 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item:active {
+  background: #f8f8f8;
+}
+
+/* 加载样式 */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  color: #999;
+}
+
+/* 空状态样式 */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 40rpx;
+  color: #999;
+}
+
+.empty-icon {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 20rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 24rpx;
+}
+
+/* 文本样式 */
+.text-primary {
+  color: #4CAF50;
+}
+
+.text-secondary {
+  color: #666;
+}
+
+.text-success {
+  color: #4CAF50;
+}
+
+.text-warning {
+  color: #ff9800;
+}
+
+.text-error {
+  color: #f44336;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* 间距样式 */
+.m-0 { margin: 0 !important; }
+.m-1 { margin: 20rpx !important; }
+.m-2 { margin: 40rpx !important; }
+
+.mt-0 { margin-top: 0 !important; }
+.mt-1 { margin-top: 20rpx !important; }
+.mt-2 { margin-top: 40rpx !important; }
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: 20rpx !important; }
+.mb-2 { margin-bottom: 40rpx !important; }
+
+.p-0 { padding: 0 !important; }
+.p-1 { padding: 20rpx !important; }
+.p-2 { padding: 40rpx !important; }
+
+/* 布局样式 */
+.flex {
+  display: flex;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.justify-start {
+  justify-content: flex-start;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.align-start {
+  align-items: flex-start;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.align-end {
+  align-items: flex-end;
+}
+
+/* 动画样式 */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* 安全区域适配 */
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 引入通用滚动条隐藏样式（请确保构建工具支持 @import 到样式目录） */
+@import "./styles/scrollbar.wxss";

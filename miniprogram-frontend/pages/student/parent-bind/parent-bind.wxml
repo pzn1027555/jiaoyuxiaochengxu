@@ -1,0 +1,25 @@
+<view class="bind-page">
+  <view class="card" >
+    <image class="avatar" src="{{avatarFull || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+    <view class="code-title">我的绑定码</view>
+    <view class="code">{{bindCode}}</view>
+  </view>
+  <view class="parents" wx:if="{{parents && parents.length}}">
+    <view class="p-item" wx:for="{{parents}}" wx:key="parentId">
+      <image class="p-avatar" src="{{item.parentAvatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="p-info">
+        <view class="p-name">{{item.parentName}}</view>
+        <view class="p-phone">{{item.parentPhone || ''}}</view>
+      </view>
+    </view>
+  </view>
+  <view class="hint">家长在“填写邀请码”处输入此绑定码，即可与学生账号关联。</view>
+  <view class="input-card">
+    <view class="input-title">家长绑定</view>
+    <input class="code-input" placeholder="请输入家长绑定码" bindinput="onCodeInput"/>
+    <button class="submit-btn" bindtap="submitBind">提交绑定</button>
+  </view>
+</view>
+
+<!-- <view>家长绑定（开发中）</view> -->
+

@@ -1,0 +1,6 @@
+<!--pages/teachers/teachers.wxml-->
+<view class="container">
+  <text>老师页</text>
+  <!-- 底部角色导航 -->
+  <role-tabbar></role-tabbar>
+</view>

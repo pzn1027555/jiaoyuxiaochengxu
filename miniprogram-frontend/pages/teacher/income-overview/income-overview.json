@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "收入概览",
+  "navigationStyle": "custom",
+  "backgroundTextStyle": "light",
+  "backgroundColor": "#f8f8f8",
+  "usingComponents": {
+    "custom-header": "/components/custom-header/custom-header"
+  }
+}

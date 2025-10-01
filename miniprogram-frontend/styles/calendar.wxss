@@ -1,0 +1,75 @@
+/* 通用月历样式（所有页面统一引用） */
+
+/* 周标题行 */
+.ms-week {
+  display: flex;
+  justify-content: space-between;
+  padding: 8rpx 0;
+}
+
+.ms-wd {
+  width: 14%;
+  text-align: center;
+  color: #999;
+  font-size: 24rpx;
+}
+
+/* 日期网格 */
+.ms-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ms-cell {
+  width: 14%;
+  padding: 16rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.ms-date {
+  color: #333;
+  font-size: 28rpx;
+  width: 56rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ms-dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: #e0e0e0;
+  margin-top: 6rpx;
+}
+
+.ms-dot.on { background: #54B247; }
+
+/* 选中与今天（统一规范） */
+.ms-date.selected {
+  background: #E8FFE5;
+  color: #54B247;
+  border: 2rpx dashed #54B247;
+  box-sizing: border-box;
+}
+
+.ms-date.today {
+  background: #54B247;
+  color: #fff;
+}
+
+/* 选中/今天 圆点颜色 */
+.ms-date.today + .ms-dot,
+.ms-date.selected + .ms-dot {
+  /* background: #fff; */
+}
+
+/* 过去日期（可按需覆盖） */
+.ms-cell.past .ms-date { color: #ccc; }
+
+

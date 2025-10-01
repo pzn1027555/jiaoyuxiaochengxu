@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.StudentHeadTeacherMapper">
+
+  <select id="findByStudentId" resultType="map">
+    SELECT s.id, s.student_id AS studentId, s.head_teacher_id AS headTeacherId,
+           h.name, h.phone, h.wechat_qr_url AS wechatQrUrl, h.remark, h.status
+    FROM student_head_teacher s
+    JOIN head_teacher h ON h.id = s.head_teacher_id
+    WHERE s.student_id = #{studentId}
+    LIMIT 1
+  </select>
+
+  <insert id="insert">
+    INSERT INTO student_head_teacher(student_id, head_teacher_id, create_time, update_time)
+    VALUES(#{studentId}, #{headTeacherId}, NOW(), NOW())
+  </insert>
+
+</mapper>
+
+

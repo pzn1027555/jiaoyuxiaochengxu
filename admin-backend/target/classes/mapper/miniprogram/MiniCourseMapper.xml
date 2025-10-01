@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.MiniCourseMapper">
+
+  <!-- 联表查询：teacher_schedule ts LEFT JOIN teacher_info ti LEFT JOIN teacher_schedule_student tss LEFT JOIN student_info si -->
+  <select id="list" parameterType="map" resultType="map">
+    SELECT
+      ANY_VALUE(ts.id) AS id,
+      ANY_VALUE(ts.title) AS title,
+      ANY_VALUE(ts.cover_url) AS coverUrl,
+      ANY_VALUE(ts.subject_name) AS subjectName,
+      ANY_VALUE(ts.subject_id) AS subjectId,
+      ANY_VALUE(ts.class_type) AS classType,
+      ANY_VALUE(ts.total_lessons) AS totalLessons,
+      ANY_VALUE(ts.lesson_number) AS lessonNumber,
+      MAX(ts.start_time) AS startTime,
+      ANY_VALUE(ts.end_time) AS endTime,
+      ANY_VALUE(ts.intro) AS intro,
+      ANY_VALUE(ts.course_tags) AS courseTags,
+      ts.plan_id AS planId,
+      ANY_VALUE(ti.id) AS teacherId,
+      ANY_VALUE(ti.teacher_name) AS teacherName,
+      ANY_VALUE(ti.avatar) AS teacherAvatar,
+      ANY_VALUE(COALESCE(ts.student_count, 0)) AS studentCount
+    FROM teacher_schedule ts
+    LEFT JOIN teacher_info ti ON ti.id = ts.teacher_id
+    LEFT JOIN teacher_schedule_student tss ON tss.schedule_id = ts.id
+    LEFT JOIN student_info si ON si.id = tss.student_id
+    <where>
+      ts.status = 1
+      AND ts.class_type = 'big_class'
+      <if test="keyword != null and keyword != ''">
+        AND (
+          ts.title LIKE CONCAT('%', #{keyword}, '%')
+          OR ti.teacher_name LIKE CONCAT('%', #{keyword}, '%')
+          OR ts.subject_name LIKE CONCAT('%', #{keyword}, '%')
+        )
+      </if>
+      <if test="subjectId != null">
+        AND ts.subject_id IN (
+          SELECT id FROM course_category WHERE id = #{subjectId} OR parent_id = #{subjectId}
+        )
+      </if>
+    </where>
+    GROUP BY ts.plan_id
+    ORDER BY MAX(ts.start_time) DESC
+    LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <select id="count" parameterType="map" resultType="int">
+    SELECT COUNT(*)
+    FROM (
+      SELECT ts.plan_id
+      FROM teacher_schedule ts
+      LEFT JOIN teacher_info ti ON ti.id = ts.teacher_id
+      <where>
+        ts.status = 1
+        AND ts.class_type = 'big_class'
+        <if test="keyword != null and keyword != ''">
+          AND (
+            ts.title LIKE CONCAT('%', #{keyword}, '%')
+            OR ti.teacher_name LIKE CONCAT('%', #{keyword}, '%')
+            OR ts.subject_name LIKE CONCAT('%', #{keyword}, '%')
+          )
+        </if>
+        <if test="subjectId != null">
+          AND ts.subject_id IN (
+            SELECT id FROM course_category WHERE id = #{subjectId} OR parent_id = #{subjectId}
+          )
+        </if>
+      </where>
+      GROUP BY ts.plan_id
+    ) t
+  </select>
+
+  <!-- 详情：按排课ID或计划ID聚合后的代表记录返回，并联教师信息 -->
+  <select id="detail" parameterType="java.lang.Long" resultType="map">
+    SELECT
+      ts.id,
+      ts.title,
+      ts.cover_url AS coverUrl,
+      ts.subject_name AS subjectName,
+      ts.subject_id AS subjectId,
+      ts.class_type AS classType,
+      ts.total_lessons AS totalLessons,
+      ts.lesson_number AS lessonNumber,
+      ts.start_time AS startTime,
+      ts.end_time AS endTime,
+      ts.intro AS intro,
+      ts.course_tags AS courseTags,
+      ts.plan_id AS planId,
+      ts.lesson_price AS lessonPrice,
+      ti.id AS teacherId,
+      ti.teacher_name AS teacherName,
+      ti.avatar AS teacherAvatar,
+      COALESCE(ts.student_count,0) AS studentCount
+    FROM teacher_schedule ts
+    LEFT JOIN teacher_info ti ON ti.id = ts.teacher_id
+    WHERE ts.id = #{id}
+    LIMIT 1
+  </select>
+
+</mapper>
+
+
+

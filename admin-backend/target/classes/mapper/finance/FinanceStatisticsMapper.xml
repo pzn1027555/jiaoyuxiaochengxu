@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.finance.mapper.FinanceStatisticsMapper">
+
+    <!-- 基于 order_info 汇总订单统计数据 -->
+    <select id="getOrderStatistics" resultType="map">
+        SELECT
+            COALESCE(SUM(CASE WHEN oi.order_status IN (2,3) THEN oi.actual_amount ELSE 0 END), 0)           AS totalRevenue,
+            COALESCE(SUM(CASE WHEN DATE(oi.pay_time) = CURRENT_DATE AND oi.order_status IN (2,3) THEN oi.actual_amount ELSE 0 END), 0) AS todayRevenue,
+            COALESCE(AVG(CASE WHEN oi.order_status IN (2,3) THEN oi.actual_amount END), 0)                  AS averageOrderValue,
+            COUNT(1)                                                                                       AS totalOrders,
+            SUM(CASE WHEN DATE(oi.create_time) = CURRENT_DATE THEN 1 ELSE 0 END)                           AS todayOrders,
+            SUM(CASE WHEN oi.order_status = 3 THEN 1 ELSE 0 END)                                           AS completedOrders,
+            SUM(CASE WHEN oi.order_status = 5 THEN 1 ELSE 0 END)                                           AS refundOrders,
+            SUM(CASE WHEN oi.order_status = 1 THEN 1 ELSE 0 END)                                           AS pendingOrders
+        FROM order_info oi
+    </select>
+
+    <!-- 最近订单简表：仅返回页面需要的字段（实付金额、状态、基础信息） -->
+    <select id="getRecentOrders" resultType="map">
+        SELECT
+            oi.id,
+            oi.order_no       AS orderNo,
+            s.student_name    AS studentName,
+            t.teacher_name    AS teacherName,
+            oi.course_name    AS courseName,
+            oi.actual_amount  AS actualAmount,
+            oi.order_status   AS orderStatus,
+            oi.payment_status AS paymentStatus,
+            DATE_FORMAT(oi.create_time, '%Y-%m-%d %H:%i:%s') AS createTime
+        FROM order_info oi
+        LEFT JOIN student_info s ON s.id = oi.student_id
+        LEFT JOIN teacher_info t ON t.id = oi.teacher_id
+        ORDER BY oi.create_time DESC
+        <if test="limit != null and limit &gt; 0">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 财务统计页 - 核心指标卡片 -->
+    <select id="getFinancialSummary" resultType="map">
+        SELECT
+            totalRevenue,
+            todayRevenue,
+            avgOrderAmount,
+            totalOrders,
+            todayOrders,
+            totalRefundAmount,
+            CASE WHEN paidOrders = 0 THEN 0 ELSE ROUND(refundedOrdersCount / paidOrders * 100, 2) END AS refundRate,
+            CASE WHEN totalPayAttempts = 0 THEN 0 ELSE ROUND(successPayCount / totalPayAttempts * 100, 2) END AS paymentSuccessRate
+        FROM (
+            SELECT
+                COALESCE(SUM(CASE WHEN oi.order_status IN (2,3) THEN oi.actual_amount END), 0) AS totalRevenue,
+                COALESCE(SUM(CASE WHEN DATE(oi.pay_time) = CURRENT_DATE AND oi.order_status IN (2,3) THEN oi.actual_amount END), 0) AS todayRevenue,
+                COALESCE(AVG(CASE WHEN oi.order_status IN (2,3) THEN oi.actual_amount END), 0) AS avgOrderAmount,
+                COUNT(1) AS totalOrders,
+                SUM(CASE WHEN DATE(oi.create_time) = CURRENT_DATE THEN 1 ELSE 0 END) AS todayOrders,
+                COALESCE(SUM(CASE WHEN oi.order_status IN (2,3) THEN 1 ELSE 0 END), 0) AS paidOrders,
+                COALESCE(SUM(CASE WHEN oi.payment_status IN (2,3) THEN 1 ELSE 0 END), 0) AS refundedOrdersCount,
+                COALESCE(SUM(oi.refund_amount), 0) AS totalRefundAmount,
+                COALESCE(SUM(CASE WHEN oi.payment_status >= 1 THEN 1 ELSE 0 END), 0) AS totalPayAttempts,
+                COALESCE(SUM(CASE WHEN oi.payment_status = 1 THEN 1 ELSE 0 END), 0) AS successPayCount
+            FROM order_info oi
+        ) t
+    </select>
+
+    <!-- 支付方式分布 -->
+    <select id="getPaymentMethodDistribution" resultType="map">
+        SELECT
+            pm.payment_method AS paymentMethod,
+            pm.amount,
+            pm.orderCount,
+            CASE WHEN tot.totalAmount = 0 THEN 0 ELSE ROUND(pm.amount / tot.totalAmount * 100, 2) END AS percentage
+        FROM (
+            SELECT
+                COALESCE(oi.payment_method, 'unknown') AS payment_method,
+                COALESCE(SUM(CASE WHEN oi.order_status IN (2,3) THEN oi.actual_amount ELSE 0 END), 0) AS amount,
+                COUNT(1) AS orderCount
+            FROM order_info oi
+            GROUP BY COALESCE(oi.payment_method, 'unknown')
+        ) pm
+        CROSS JOIN (
+            SELECT COALESCE(SUM(CASE WHEN order_status IN (2,3) THEN actual_amount END), 0) AS totalAmount
+            FROM order_info
+        ) tot
+        ORDER BY pm.amount DESC
+    </select>
+
+    <!-- 课程类型收入分布 -->
+    <select id="getCourseTypeRevenue" resultType="map">
+        SELECT
+            ct.course_type AS courseType,
+            ct.revenue,
+            ct.orderCount,
+            CASE WHEN tot.totalAmount = 0 THEN 0 ELSE ROUND(ct.revenue / tot.totalAmount * 100, 2) END AS percentage
+        FROM (
+            SELECT
+                COALESCE(oi.course_type, 'unknown') AS course_type,
+                COALESCE(SUM(CASE WHEN oi.order_status IN (2,3) THEN oi.actual_amount ELSE 0 END), 0) AS revenue,
+                SUM(CASE WHEN oi.order_status IN (2,3) THEN 1 ELSE 0 END) AS orderCount
+            FROM order_info oi
+            GROUP BY COALESCE(oi.course_type, 'unknown')
+        ) ct
+        CROSS JOIN (
+            SELECT COALESCE(SUM(CASE WHEN order_status IN (2,3) THEN actual_amount END), 0) AS totalAmount
+            FROM order_info
+        ) tot
+        ORDER BY ct.revenue DESC
+    </select>
+
+    <!-- 教师收入排行 TOP N -->
+    <select id="getTeacherRevenueRanking" resultType="map">
+        SELECT
+            t.teacher_name AS teacherName,
+            sub.subject    AS subject,
+            revenue,
+            orderCount
+        FROM (
+            SELECT
+                oi.teacher_id,
+                COALESCE(SUM(CASE WHEN oi.order_status IN (2,3) THEN oi.teacher_income ELSE 0 END), 0) AS revenue,
+                SUM(CASE WHEN oi.order_status IN (2,3) THEN 1 ELSE 0 END) AS orderCount
+            FROM order_info oi
+            WHERE oi.teacher_id IS NOT NULL
+            GROUP BY oi.teacher_id
+        ) x
+        LEFT JOIN teacher_info t ON t.id = x.teacher_id
+        LEFT JOIN (
+            SELECT teacher_id, MAX(subject_name) AS subject
+            FROM teacher_schedule
+            GROUP BY teacher_id
+        ) sub ON sub.teacher_id = x.teacher_id
+        ORDER BY x.revenue DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 学生消费排行 TOP N -->
+    <select id="getStudentConsumptionRanking" resultType="map">
+        SELECT
+            s.student_name AS studentName,
+            s.student_level AS level,
+            x.consumption,
+            x.orderCount
+        FROM (
+            SELECT
+                oi.student_id,
+                COALESCE(SUM(CASE WHEN oi.order_status IN (2,3) THEN oi.actual_amount ELSE 0 END), 0) AS consumption,
+                SUM(CASE WHEN oi.order_status IN (2,3) THEN 1 ELSE 0 END) AS orderCount
+            FROM order_info oi
+            WHERE oi.student_id IS NOT NULL
+            GROUP BY oi.student_id
+        ) x
+        LEFT JOIN student_info s ON s.id = x.student_id
+        ORDER BY x.consumption DESC
+        LIMIT #{limit}
+    </select>
+
+    
+</mapper>
+
+

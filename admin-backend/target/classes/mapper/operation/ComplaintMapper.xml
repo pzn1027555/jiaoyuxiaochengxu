@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.operation.mapper.ComplaintMapper">
+
+    <!-- 获取投诉列表 -->
+    <select id="getComplaintList" resultType="java.util.Map">
+        SELECT
+            cr.id,
+            cr.complaint_no as complaintNo,
+            cr.complaint_type as complaintType,
+            cr.complaint_title as complaintTitle,
+            cr.complaint_content as complaintContent,
+            cr.complaint_status as complaintStatus,
+            cr.satisfaction_score as satisfactionScore,
+            cr.process_result as processResult,
+            cr.create_time as createTime,
+            cr.update_time as updateTime,
+            cr.process_time as processTime,
+            si.student_name as complainantName,
+            ti.teacher_name as complainedName,
+            cr.complainant_type as complainantType,
+            cr.complained_type as complainedType
+        FROM complaint_record cr
+        LEFT JOIN student_info si ON cr.complainant_id = si.id AND cr.complainant_type = 'student'
+        LEFT JOIN teacher_info ti ON cr.complained_id = ti.id AND cr.complained_type = 'teacher'
+        <where>
+            <if test="complaintStatus != null and complaintStatus != ''">
+                AND cr.complaint_status = #{complaintStatus}
+            </if>
+            <if test="complaintType != null and complaintType != ''">
+                AND cr.complaint_type = #{complaintType}
+            </if>
+        </where>
+        ORDER BY cr.create_time DESC
+        <if test="pageSize != null and offset != null">
+            LIMIT #{pageSize} OFFSET #{offset}
+        </if>
+    </select>
+
+    <!-- 获取投诉总数 -->
+    <select id="getComplaintCount" resultType="int">
+        SELECT COUNT(*)
+        FROM complaint_record cr
+        LEFT JOIN student_info si ON cr.complainant_id = si.id AND cr.complainant_type = 'student'
+        LEFT JOIN teacher_info ti ON cr.complained_id = ti.id AND cr.complained_type = 'teacher'
+        <where>
+            <if test="complaintStatus != null and complaintStatus != ''">
+                AND cr.complaint_status = #{complaintStatus}
+            </if>
+            <if test="complaintType != null and complaintType != ''">
+                AND cr.complaint_type = #{complaintType}
+            </if>
+        </where>
+    </select>
+
+    <!-- 获取投诉详情 -->
+    <select id="getComplaintDetail" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            cr.id,
+            cr.complaint_no as complaintNo,
+            cr.complaint_type as complaintType,
+            cr.complaint_title as complaintTitle,
+            cr.complaint_content as complaintContent,
+            cr.complaint_status as complaintStatus,
+            cr.satisfaction_score as satisfactionScore,
+            cr.process_result as processResult,
+            cr.evidence_files as evidenceFiles,
+            cr.create_time as createTime,
+            cr.update_time as updateTime,
+            cr.process_time as processTime,
+            si.student_name as complainantName,
+            ti.teacher_name as complainedName,
+            cr.complainant_type as complainantType,
+            cr.complained_type as complainedType,
+            cr.complainant_id as complainantId,
+            cr.complained_id as complainedId
+        FROM complaint_record cr
+        LEFT JOIN student_info si ON cr.complainant_id = si.id AND cr.complainant_type = 'student'
+        LEFT JOIN teacher_info ti ON cr.complained_id = ti.id AND cr.complained_type = 'teacher'
+        WHERE cr.id = #{id}
+        ]]>
+    </select>
+
+    <!-- 更新投诉状态 -->
+    <update id="updateComplaintStatus">
+        UPDATE complaint_record
+        SET complaint_status = #{status}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新投诉处理结果 -->
+    <update id="updateComplaintProcess">
+        <![CDATA[
+        UPDATE complaint_record
+        SET process_result = #{processResult},
+            satisfaction_score = #{satisfactionScore},
+            complaint_status = 2,
+            process_time = NOW(),
+            update_time = NOW()
+        WHERE id = #{id}
+        ]]>
+    </update>
+
+    <!-- 获取待处理投诉列表 -->
+    <select id="getPendingComplaints" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            cr.id,
+            cr.complaint_no as complaintNo,
+            cr.complaint_title as complaintTitle,
+            cr.complaint_type as complaintType,
+            cr.complaint_content as complaintContent,
+            cr.create_time as createTime,
+            si.student_name as complainantName,
+            ti.teacher_name as complainedName
+        FROM complaint_record cr
+        LEFT JOIN student_info si ON cr.complainant_id = si.id AND cr.complainant_type = 'student'
+        LEFT JOIN teacher_info ti ON cr.complained_id = ti.id AND cr.complained_type = 'teacher'
+        WHERE cr.complaint_status = 0
+        ORDER BY cr.create_time ASC
+        LIMIT #{limit}
+        ]]>
+    </select>
+
+    <!-- 获取今日新增投诉列表 -->
+    <select id="getTodayComplaints" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            cr.id,
+            cr.complaint_no as complaintNo,
+            cr.complaint_title as complaintTitle,
+            cr.complaint_type as complaintType,
+            cr.complaint_content as complaintContent,
+            cr.create_time as createTime,
+            si.student_name as complainantName,
+            ti.teacher_name as complainedName
+        FROM complaint_record cr
+        LEFT JOIN student_info si ON cr.complainant_id = si.id AND cr.complainant_type = 'student'
+        LEFT JOIN teacher_info ti ON cr.complained_id = ti.id AND cr.complained_type = 'teacher'
+        WHERE DATE(cr.create_time) = CURDATE()
+        ORDER BY cr.create_time DESC
+        ]]>
+    </select>
+
+    <!-- 获取投诉统计数据 -->
+    <select id="getComplaintStatistics" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            (SELECT COUNT(*) FROM complaint_record WHERE complaint_status = 0) as pendingComplaints,
+            (SELECT COUNT(*) FROM complaint_record WHERE complaint_status = 1) as processingComplaints,
+            (SELECT COUNT(*) FROM complaint_record WHERE DATE(create_time) = CURDATE()) as todayComplaints,
+            (SELECT COUNT(*) FROM complaint_record) as totalComplaints,
+            (SELECT COUNT(*) FROM complaint_record WHERE complaint_status = 2 AND DATE(process_time) = CURDATE()) as resolvedToday,
+            (SELECT COUNT(*) FROM complaint_record WHERE complaint_type = 'service') as serviceComplaints,
+            (SELECT COUNT(*) FROM complaint_record WHERE complaint_type = 'quality') as qualityComplaints,
+            (SELECT COUNT(*) FROM complaint_record WHERE complaint_type = 'time') as timeComplaints,
+            (SELECT COUNT(*) FROM complaint_record WHERE complaint_type = 'other') as otherComplaints,
+            (SELECT AVG(satisfaction_score) FROM complaint_record WHERE satisfaction_score IS NOT NULL) as avgSatisfactionScore
+        ]]>
+    </select>
+
+</mapper>

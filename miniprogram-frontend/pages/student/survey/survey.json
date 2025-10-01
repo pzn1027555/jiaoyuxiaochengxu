@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "custom-header": "/components/custom-header/custom-header",
+    "subject-picker": "/components/subject-picker/subject-picker"
+  },
+  "navigationStyle": "custom"
+}
+
+

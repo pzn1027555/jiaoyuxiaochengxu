@@ -1,0 +1,338 @@
+/* pages/student/schedule-confirm/schedule-confirm.wxss */
+@import "/styles/calendar.wxss";
+.page-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f8f8;
+}
+
+/* 自定义头部 */
+.custom-header {
+  background-color: #fff;
+  border-bottom: 1rpx solid #e5e5e5;
+  padding-top: var(--status-bar-height);
+}
+
+.header-content {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 32rpx;
+  position: relative;
+}
+
+.back-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 内容区域 */
+.content {
+  flex: 1;
+  padding: 0 32rpx 32rpx;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400rpx;
+  color: #999;
+}
+
+.plan-content {
+  padding-bottom: 120rpx; /* 为底部按钮留空间 */
+}
+
+/* 教师信息卡片 */
+.profile-card {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.profile-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  margin-right: 24rpx;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.profile-desc {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.profile-right {
+  display: flex;
+  align-items: center;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 32rpx;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #007AFF;
+  margin-bottom: 4rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 学习计划信息 */
+.plan-info {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.plan-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+
+.plan-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.detail-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.total-price {
+  color: #007AFF;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+/* 日历部分 - 使用统一的month-sheet样式 */
+.calendar-section {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+
+.ms-btn {
+  padding: 0 16rpx;
+  font-size: 40rpx;
+  color: #54B247;
+  cursor: pointer;
+}
+
+.ms-title {
+  font-weight: 700;
+  color: #333;
+  font-size: 32rpx;
+}
+
+/* 月历结构与状态样式由 /styles/calendar.wxss 提供 */
+
+/* 课程安排列表 */
+.schedule-list {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.schedule-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+}
+
+.no-schedule {
+  text-align: center;
+  color: #999;
+  padding: 60rpx 0;
+}
+
+.schedule-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.schedule-title .bar{
+  width: 8rpx;
+  height: 32rpx;
+  background:#54B247;
+  display:inline-block;
+  border-radius:4rpx;
+  margin-right: 12rpx;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  transition: all 0.3s;
+}
+
+.schedule-item.selected {
+  border-color: #007AFF;
+  background-color: #f0f8ff;
+}
+
+.schedule-date {
+  font-size: 24rpx;
+  color: #666;
+  min-width: 120rpx;
+  margin-right: 16rpx;
+}
+
+.schedule-info {
+  flex: 1;
+}
+
+.schedule-title-text {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.schedule-meta {
+  display: flex;
+  gap: 16rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.schedule-price {
+  color: #007AFF;
+  font-weight: 500;
+}
+
+/* 课程详情 */
+.course-detail {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.detail-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+
+.detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+}
+
+/* 底部操作按钮 */
+.footer-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  padding: 32rpx;
+  border-top: 1rpx solid #e5e5e5;
+  z-index: 100;
+}
+
+.confirm-btn {
+  width: 100%;
+  height: 88rpx;
+  background-color: #54B247;
+  color: #fff;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  outline: none;
+}
+
+.confirm-btn.loading {
+  opacity: 0.6;
+}
+
+.confirm-btn::after {
+  border: none;
+}

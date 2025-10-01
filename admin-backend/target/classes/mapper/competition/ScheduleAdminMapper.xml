@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.competition.mapper.ScheduleAdminMapper">
+
+  <!-- 后台列表：teacher_schedule + teacher_info + tss + student_info + feedback(是否有) -->
+  <select id="list" resultType="map">
+    SELECT
+      ts.id,
+      ts.title,
+      ts.class_type AS classType,
+      ts.start_time AS startTime,
+      ts.end_time AS endTime,
+      ts.student_count AS studentCount,
+      ti.teacher_name AS teacherName,
+      -- 学生姓名聚合
+      (
+        SELECT GROUP_CONCAT(si.student_name ORDER BY si.student_name SEPARATOR ',')
+        FROM teacher_schedule_student tss2
+        JOIN student_info si ON si.id = tss2.student_id
+        WHERE tss2.schedule_id = ts.id
+      ) AS studentNames,
+      -- 是否有反馈
+      CASE WHEN EXISTS (SELECT 1 FROM teacher_schedule_feedback tf WHERE tf.schedule_id = ts.id) THEN 1 ELSE 0 END AS hasFeedback
+    FROM teacher_schedule ts
+    JOIN teacher_info ti ON ti.id = ts.teacher_id
+    <where>
+      ts.status = 1
+      <if test="classType != null and classType != ''">
+        AND ts.class_type = #{classType}
+      </if>
+      <if test="start != null">
+        AND ts.start_time &gt;= #{start}
+      </if>
+      <if test="end != null">
+        AND ts.end_time &lt;= #{end}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        AND (
+          ts.title LIKE CONCAT('%', #{keyword}, '%')
+          OR ti.teacher_name LIKE CONCAT('%', #{keyword}, '%')
+          OR EXISTS (
+            SELECT 1 FROM teacher_schedule_student tss3
+            JOIN student_info si2 ON si2.id = tss3.student_id
+            WHERE tss3.schedule_id = ts.id AND si2.student_name LIKE CONCAT('%', #{keyword}, '%')
+          )
+        )
+      </if>
+    </where>
+    ORDER BY ts.start_time DESC, ts.id DESC
+  </select>
+
+</mapper>
+
+

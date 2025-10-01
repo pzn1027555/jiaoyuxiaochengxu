@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.InvitationRecordMapper">
+
+  <insert id="insert">
+    INSERT INTO invitation_record(activity_id, inviter_id, inviter_type, invited_id, invited_type, invitation_code, create_time)
+    VALUES(#{activityId}, #{inviterId}, #{inviterType}, #{invitedId}, #{invitedType}, #{invitationCode}, NOW())
+  </insert>
+
+  <select id="exists" resultType="int">
+    SELECT COUNT(1) FROM invitation_record WHERE inviter_id=#{inviterId} AND invited_id=#{invitedId}
+  </select>
+
+  <select id="listInvitees" resultType="map">
+    SELECT ir.id,
+           s.id AS userId,
+           s.student_name AS name,
+           s.avatar AS avatar
+    FROM invitation_record ir
+      LEFT JOIN student_info s ON s.id = ir.invited_id
+    WHERE ir.inviter_id = #{inviterId}
+    ORDER BY ir.create_time DESC
+  </select>
+
+</mapper>
+
+

@@ -1,0 +1,16 @@
+<!-- 通用顶部导航组件 -->
+<view class="custom-header">
+  <!-- 状态栏占位 -->
+  <view class="status-bar" style="height: {{statusBarHeight}}px;"></view>
+  
+  <!-- 导航栏内容 -->
+  <view class="header-content">
+    <view class="header-left" bindtap="onBackTap">
+      <image class="back-icon" src="/images/workspace/back.png" mode="aspectFit"></image>
+    </view>
+    <view class="header-title">{{title}}</view>
+    <view class="header-right">
+      <slot name="right"></slot>
+    </view>
+  </view>
+</view>

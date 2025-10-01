@@ -1,0 +1,267 @@
+/* pages/teacher/my-students/my-students.wxss */
+
+.my-students-container {
+  min-height: 100vh;
+  background-color: #f8f8f8;
+}
+
+/* 筛选区域 */
+.filter-section {
+  padding: 24rpx 32rpx;
+  background-color: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+/* 学生姓名筛选 */
+.name-filter-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  background-color: #f8f9fa;
+  border-radius: 24rpx;
+  border: 1rpx solid #e9ecef;
+}
+
+.name-filter-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.name-filter-input::placeholder {
+  color: #999;
+}
+
+/* 科目筛选 */
+.subject-filter-picker {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 16rpx 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 24rpx;
+  border: 1rpx solid #e9ecef;
+  min-width: 160rpx;
+}
+
+.filter-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.dropdown-icon {
+  width: 20rpx;
+  height: 20rpx;
+  transform: rotate(90deg);
+}
+
+/* 查询按钮 */
+.search-btn {
+  padding: 16rpx 32rpx;
+  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  border-radius: 24rpx;
+}
+
+.search-btn-text {
+  font-size: 26rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* 学生列表区域 */
+.students-section {
+  flex: 1;
+  padding: 24rpx 32rpx 200rpx;
+}
+
+.table{ background:#fff; border-radius:16rpx; overflow:hidden; }
+.thead{ display:flex; padding:20rpx 24rpx; color:#7b8b84; font-size:26rpx; background:#f7fbf8; }
+.th{ flex:1; }
+.col-name{ flex: 2.2; }
+.col-subject{ flex: 1.2; text-align:center; }
+.col-progress{ flex: 1.6; text-align:right; }
+.tbody{ height: calc(100vh - 420rpx); }
+.tr{ display:flex; align-items:center; padding:20rpx 24rpx; border-bottom:2rpx solid #f1f3f2; }
+.td{ flex:1; }
+.td.col-name{ display:flex; align-items:center; gap:20rpx; }
+.avatar{ width:72rpx; height:72rpx; border-radius:50%; background:#eee; }
+.meta{ display:flex; flex-direction:column; }
+.name{ color:#222; font-size:24rpx; }
+.grade{ color:#9aa29a; font-size:24rpx; }
+.td.col-subject{ text-align:center; color:#222; }
+.td.col-progress{ text-align:right; color:#222; }
+
+/* 学生卡片 */
+.student-card {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.06);
+  border: 1rpx solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.student-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08);
+}
+
+.student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* 学生基本信息 */
+.student-basic {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.student-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  border: 2rpx solid #f0f0f0;
+}
+
+.student-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.student-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.student-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.gender-icon {
+  width: 28rpx;
+  height: 28rpx;
+}
+
+.student-grade {
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* 课程进度 */
+.course-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  padding: 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  border-left: 4rpx solid #4CAF50;
+}
+
+.progress-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.course-subject {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.course-progress-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 无数据提示 */
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 40rpx;
+  gap: 24rpx;
+}
+
+.no-data-icon {
+  width: 120rpx;
+  height: 120rpx;
+  opacity: 0.6;
+}
+
+.no-data-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 加载更多 */
+.loading-more {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40rpx;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 底部统计信息 */
+.bottom-statistics {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  padding: 32rpx;
+  color: #fff;
+  border-top: 1rpx solid rgba(255,255,255,0.1);
+}
+
+.statistics-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40rpx;
+  margin-bottom: 30rpx;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.stat-label {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.stat-separator {
+  font-size: 24rpx;
+  opacity: 0.6;
+}

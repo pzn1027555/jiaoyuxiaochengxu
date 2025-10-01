@@ -1,0 +1,16 @@
+<view class="res-page">
+  <view class="list">
+    <view class="item" wx:for="{{items}}" wx:key="id">
+      <image class="thumb" src="{{item.coverUrl || '/images/profile/doc-thumb-placeholder.png'}}" mode="aspectFill" />
+      <view class="i-right">
+        <view class="title">{{item.title}}</view>
+        <view class="desc">{{item.displayTime}}</view>
+        <button class="btn-download" size="mini" data-id="{{item.id}}" data-url="{{item.fileUrl}}" bindtap="onDownload">下载</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="load-more" wx:if="{{loading}}">加载中...</view>
+  <view class="load-end" wx:if="{{!loading && items.length===0}}">暂无资源</view>
+</view>
+

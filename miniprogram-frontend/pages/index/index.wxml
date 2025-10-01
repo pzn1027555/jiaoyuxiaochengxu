@@ -1,0 +1,61 @@
+<!-- 学生发现页：搜索老师/课程 -> 老师卡片列表 -->
+<view class="index-container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrap" bindtap="goSearchTeacher">
+      <image class="icon-img" src="/images/searchicon.png" mode="widthFix"></image>
+      <view class="search-input" style="color:#9aa89a">搜索老师</view>
+    </view>
+  </view>
+
+  <!-- 顶部主推banner（占位，后续可替换为切片图） -->
+  <!-- <view class="hero-banner">
+  </view> -->
+
+  <!-- 科目Tab（从后端拉取，横向滚动） -->
+  <scroll-view class="subject-tabs" scroll-x="true" show-scrollbar="false">
+    <view class="tabs-track">
+      <view class="tab {{activeSubject==='全部'?'active':''}}" data-key="全部" bindtap="switchSubject">全部</view>
+      <view class="tab {{activeSubject===item?'active':''}}" wx:for="{{subjectTabs}}" wx:key="*this" wx:if="{{item!=='全部'}}" data-key="{{item}}" bindtap="switchSubject">{{item}}</view>
+    </view>
+  </scroll-view>
+
+  <!-- 筛选：城市 / 价格 / 性别 -->
+  <view class="filter-bar">
+    <picker mode="multiSelector" range="{{regionPickerRange}}" value="{{regionPickerValue}}" bindchange="onRegionChange" bindcolumnchange="onRegionColumnChange">
+      <view class="filter-item">{{regionText || '城市 ▾'}}<text class="clear-x" wx:if="{{regionText}}" bindtap="clearRegion"> ×</text></view>
+    </picker>
+    <picker mode="selector" range="{{priceOptions}}" value="{{priceIndex}}" bindchange="onPriceChange">
+      <view class="filter-item">{{priceText || '价格 ▾'}}<text class="clear-x" wx:if="{{priceText}}" bindtap="clearPrice"> ×</text></view>
+    </picker>
+    <picker mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
+      <view class="filter-item">{{genderText || '性别 ▾'}}<text class="clear-x" wx:if="{{genderText}}" bindtap="clearGender"> ×</text></view>
+    </picker>
+  </view>
+
+  <!-- 老师卡片列表 -->
+  <view class="teacher-list">
+    <view class="teacher-card" wx:for="{{teachers}}" wx:key="id" bindtap="goTeacherHome" data-id="{{item.id}}">
+      <view class="card-row">
+        <image class="avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+        <view class="content-right">
+          <view class="title-row">
+            <text class="name">{{item.name}}</text>
+            <image class="gender-icon" wx:if="{{item.genderSymbol}}" src="{{item.genderSymbol=='♀' ? '/images/student/female.png' : '/images/student/male.png'}}" mode="widthFix"></image>
+            <text class="district" wx:if="{{item.district}}">{{item.district}}</text>
+          </view>
+          <view class="tag-row">
+            <text class="badge" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
+          </view>
+          <view class="subjects">所授科目：<text class="subjects-strong">{{item.subjectsText}}</text></view>
+          <view class="desc">{{item.intro}}</view>
+          <view class="price-row">
+            <text class="price"><text class="price-num">¥ {{item.price>0?item.price:600}}</text><text class="price-unit"> /小时</text></text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="loading-more" wx:if="{{loading}}">加载中...</view>
+</view>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.MiniUserMapper">
+    
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.miniprogram.entity.MiniUser">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="openid" property="openid" jdbcType="VARCHAR"/>
+        <result column="unionid" property="unionid" jdbcType="VARCHAR"/>
+        <result column="session_key" property="sessionKey" jdbcType="VARCHAR"/>
+        <result column="nickname" property="nickname" jdbcType="VARCHAR"/>
+        <result column="avatar" property="avatar" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="user_type" property="userType" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, openid, unionid, session_key, nickname, avatar, phone, user_type, status, create_time, update_time
+    </sql>
+    
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM miniprogram_user
+        WHERE id = #{id}
+    </select>
+    
+    <select id="findByOpenid" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM miniprogram_user
+        WHERE openid = #{openid}
+    </select>
+    
+    <select id="findByPhone" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM miniprogram_user
+        WHERE phone = #{phone}
+    </select>
+    
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM miniprogram_user
+        ORDER BY create_time DESC
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO miniprogram_user
+        (openid, unionid, session_key, nickname, avatar, phone, user_type, status, create_time, update_time)
+        VALUES
+        (#{openid}, #{unionid}, #{sessionKey}, #{nickname}, #{avatar}, #{phone}, #{userType}, #{status}, #{createTime}, #{updateTime})
+    </insert>
+    
+    <update id="update">
+        UPDATE miniprogram_user
+        SET openid = #{openid},
+            unionid = #{unionid},
+            session_key = #{sessionKey},
+            nickname = #{nickname},
+            avatar = #{avatar},
+            phone = #{phone},
+            user_type = #{userType},
+            status = #{status},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        DELETE FROM miniprogram_user WHERE id = #{id}
+    </delete>
+    
+</mapper>

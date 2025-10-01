@@ -1,0 +1,176 @@
+<view class="edit-container">
+  <custom-header title="学习计划" bind:headerReady="onHeaderReady" />
+  <view class="form" style="padding-top: {{headerHeight}}px;">
+    <view class="cell" bindtap="pickSubject">
+      <text class="label">科目</text>
+      <text class="value value-right">{{form.subjectName || '请选择科目'}}</text>
+      <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"/>
+    </view>
+    <view class="cell" bindtap="pickTitle">
+      <text class="label">课程名称</text>
+      <text class="value value-right">{{form.title || '请选择/填写'}}</text>
+      <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"/>
+    </view>
+    <view class="cell" bindtap="pickLessons">
+      <text class="label">课时</text>
+      <text class="value value-right">{{form.totalLessons != null ? form.totalLessons + '节课' : '请选择'}}</text>
+      <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"/>
+    </view>
+
+	<view class="cell">
+		<text class="label">课程类别</text>
+		<text class="value value-right">1对1</text>
+	</view>
+
+	<!-- 班课封面上传已移除：小程序仅支持1对1发布 -->
+
+    <view class="section-label">添加学生</view>
+    <view class="avatars">
+      <block wx:for="{{students}}" wx:key="id">
+        <view class="avatar-item">
+          <image class="avatar" src="{{item.avatar || '/images/workspace/default-avatar.png'}}" />
+          <text class="name">{{item.name}}</text>
+        </view>
+      </block>
+      <view class="avatar-add" bindtap="addStudent">+</view>
+    </view>
+
+    <picker mode="date" value="{{form.startDate}}" bindchange="onStartDateChange">
+      <view class="cell">
+        <text class="label">开始日期</text>
+        <text class="value value-right">{{dateText}}</text>
+        <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"/>
+      </view>
+    </picker>
+    <view class="cell" bindtap="pickTime">
+      <text class="label">上课时间</text>
+      <text class="value value-right">{{timeText}}</text>
+      <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"/>
+    </view>
+    <view class="cell" bindtap="pickDuration">
+      <text class="label">时长</text>
+      <text class="value value-right">{{durationText}}</text>
+      <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"/>
+    </view>
+
+    <view class="section-label">重复</view>
+    <view class="repeat-row">
+      <button class="chip {{form.repeatType==='daily'?'on':''}}" data-val="daily" bindtap="onRepeat">每天</button>
+      <button class="chip {{form.repeatType==='every3days'?'on':''}}" data-val="every3days" bindtap="onRepeat">每三天</button>
+      <button class="chip {{form.repeatType==='every5days'?'on':''}}" data-val="every5days" bindtap="onRepeat">每五天</button>
+      <button class="chip {{form.repeatType==='weekly'?'on':''}}" data-val="weekly" bindtap="onRepeat">每周</button>
+      <button class="chip {{form.repeatType==='monthly'?'on':''}}" data-val="monthly" bindtap="onRepeat">每月</button>
+      <!-- <button class="chip {{form.repeatType==='custom'?'on':''}}" data-val="custom" bindtap="onRepeat">自定义</button> -->
+    </view>
+
+    <view wx:if="{{form.repeatType==='custom' && form.totalLessons>1}}">
+      <view class="section-label">自定义每期日期（从第2期开始）</view>
+      <block wx:for="{{form.customDates}}" wx:key="index">
+        <picker mode="date" value="{{item}}" data-index="{{index}}" bindchange="onCustomDateChange">
+          <view class="cell">
+            <text class="label">第{{index+2}}期日期</text>
+            <text class="value value-right">{{item || '请选择'}}</text>
+            <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"/>
+          </view>
+        </picker>
+      </block>
+    </view>
+
+	<view class="section-label">课程介绍</view>
+	<textarea class="textarea full-width" placeholder="请填写课程介绍" value="{{form.intro}}" bindinput="onIntro" />
+  </view>
+
+  <view class="footer"><button class="ok" bindtap="onSubmit">确定</button></view>
+
+  <!-- 学生选择器：复用编辑页样式 -->
+  <view class="student-mask" wx:if="{{showStudentPicker}}" bindtap="closeStudentPicker" catchtouchmove="noop"></view>
+  <view class="student-panel" wx:if="{{showStudentPicker}}" catchtouchmove="noop">
+    <view class="sp-header">
+      <text class="sp-title">选择学生</text>
+      <view class="sp-close" bindtap="closeStudentPicker">✕</view>
+    </view>
+    <view class="sp-search">
+      <image class="sp-search-icon" src="/images/icons/search.png" mode="aspectFit" />
+      <input class="sp-input" placeholder="按姓名/手机号搜索" bindinput="onStudentKeyword" value="{{studentKeyword}}" cursor-spacing="80"/>
+    </view>
+    <scroll-view class="sp-list" scroll-y="true" enable-flex="true">
+      <view class="sp-item {{item.checked ? 'active':''}}" wx:for="{{filteredStudents}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleStudent">
+        <image class="sp-avatar" src="{{item.avatar || '/images/workspace/default-avatar.png'}}" mode="aspectFill" />
+        <view class="sp-meta">
+          <text class="sp-name">{{item.name}}</text>
+          <text class="sp-sub">{{item.phone || ''}} {{item.grade ? ' · ' + item.grade : ''}}</text>
+        </view>
+        <view class="sp-check">{{ item.checked ? '✓' : '' }}</view>
+      </view>
+      <view class="sp-empty" wx:if="{{!filteredStudents.length}}">暂无匹配学生</view>
+    </scroll-view>
+    <view class="sp-footer">
+      <button class="sp-btn" bindtap="closeStudentPicker">取消</button>
+      <button class="sp-btn primary" bindtap="confirmStudents">确定</button>
+    </view>
+  </view>
+
+  <!-- 时间弹窗：复用编辑页样式 -->
+  <view class="mask" wx:if="{{showTimePicker}}" bindtap="closeTimePicker"></view>
+  <view class="sheet" wx:if="{{showTimePicker}}" catchtouchmove="noop">
+    <view class="sheet-hd">请选择开始时间</view>
+    <picker-view class="sheet-picker" value="{{timeIndex}}" indicator-style="height: 40px;" bindchange="onTimeChange">
+      <picker-view-column>
+        <view wx:for="{{hours}}" wx:key="*this" class="sheet-item">{{item}}</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view wx:for="{{minutes}}" wx:key="*this" class="sheet-item">{{item}}</view>
+      </picker-view-column>
+    </picker-view>
+    <view class="sheet-ft">
+      <button class="btn" bindtap="closeTimePicker">取消</button>
+      <button class="btn primary" bindtap="confirmTime">确定</button>
+    </view>
+  </view>
+
+  <!-- 标签输入弹窗（与编辑页一致） -->
+  <view class="student-mask" wx:if="{{showTagInput}}" bindtap="()=>this.setData({showTagInput:false})"></view>
+  <view class="student-panel" wx:if="{{showTagInput}}" catchtouchmove="noop">
+    <view class="sp-header">
+      <text class="sp-title">添加课程标签</text>
+      <view class="sp-close" bindtap="()=>this.setData({showTagInput:false})">✕</view>
+    </view>
+    <view class="sp-search">
+      <input class="sp-input" placeholder="输入标签，例如：精品/冲刺/系统课" bindinput="onTagInput" value="{{tempTag}}" />
+    </view>
+    <view class="sp-footer">
+      <button class="sp-btn" bindtap="()=>this.setData({showTagInput:false})">取消</button>
+      <button class="sp-btn primary" bindtap="confirmAddTag">确定</button>
+    </view>
+  </view>
+
+  <!-- 科目选择弹窗 -->
+  <view class="mask" wx:if="{{showSubjectPicker}}" bindtap="closeSubjectPicker"></view>
+  <view class="sheet" wx:if="{{showSubjectPicker}}" catchtouchmove="noop">
+    <view class="sheet-hd">请选择科目</view>
+    <scroll-view class="subject-list" scroll-y="true">
+      <block wx:for="{{subjectTree}}" wx:key="id">
+        <view class="subject-group">
+          <view class="subject-parent">{{item.name}}</view>
+          <view class="subject-children">
+            <view 
+              class="subject-child {{child.id === form.subjectId ? 'selected' : ''}}" 
+              wx:for="{{item.children}}" 
+              wx:for-item="child" 
+              wx:key="id"
+              data-id="{{child.id}}" 
+              data-name="{{child.name}}"
+              bindtap="selectSubject"
+            >
+              {{child.name}}
+            </view>
+          </view>
+        </view>
+      </block>
+    </scroll-view>
+    <view class="sheet-ft">
+      <button class="btn" bindtap="closeSubjectPicker">取消</button>
+    </view>
+  </view>
+</view>
+

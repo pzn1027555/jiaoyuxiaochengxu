@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.parent.mapper.ParentWalletTxnMapper">
+
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.parent.entity.ParentWalletTxn">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="type" column="type"/>
+        <result property="title" column="title"/>
+        <result property="amount" column="amount"/>
+        <result property="orderId" column="order_id"/>
+        <result property="extra" column="extra"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.education.admin.modules.parent.entity.ParentWalletTxn" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO parent_wallet_txn (parent_id, type, title, amount, order_id, extra, create_time)
+        VALUES (#{parentId}, #{type}, #{title}, #{amount}, #{orderId}, #{extra}, NOW())
+    </insert>
+
+    <select id="findByParentId" resultMap="BaseResultMap">
+        SELECT * FROM parent_wallet_txn 
+        WHERE parent_id = #{parentId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findByOrderId" resultMap="BaseResultMap">
+        SELECT * FROM parent_wallet_txn 
+        WHERE order_id = #{orderId}
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

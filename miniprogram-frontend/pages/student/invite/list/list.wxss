@@ -1,0 +1,6 @@
+.invite-list-page{ padding: 24rpx }
+.item{ display:flex; align-items:center; background:#fff; border-radius:16rpx; padding:20rpx; margin-bottom:16rpx }
+.avatar{ width:96rpx; height:96rpx; border-radius:50%; background:#eee; margin-right:16rpx }
+.name{ font-size:30rpx; color:#333 }
+.empty{ text-align:center; color:#9aa29a; padding:80rpx 0 }
+

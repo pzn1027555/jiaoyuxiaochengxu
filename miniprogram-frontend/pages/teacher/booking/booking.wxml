@@ -1,0 +1,55 @@
+<!--pages/teacher/booking/booking.wxml-->
+<view class="booking-container">
+  <custom-header title="课程预约" show-back="{{true}}" bind:headerReady="onHeaderReady"></custom-header>
+
+  <view class="content" style="padding-top: {{headerHeight}}px;">
+
+
+    <block wx:if="{{list.length}}">
+      <view class="booking-item" wx:for="{{list}}" wx:key="id">
+        <view class="top-row">
+          <image class="avatar" src="{{item.avatar || '/images/workspace/default-avatar.png'}}" mode="aspectFill"></image>
+          <view class="meta">
+            <view class="row1">
+              <text class="name">{{item.name}}</text>
+              <text class="desc">预约了您的</text>
+              <text class="course">{{item.bookingType === 'trial' ? '试听课程' : (item.courseName || '课程')}}</text>
+            </view>
+            <view class="booking-info" wx:if="{{item.bookingDate}}">
+              <text class="booking-time">预约时间：{{item.bookingDate}} {{item.bookingStartTime}}</text>
+              <text class="booking-duration" wx:if="{{item.bookingType}}">时长：{{item.bookingType === 'trial' ? '40分钟' : '2小时'}}</text>
+              <text class="booking-price" wx:if="{{item.bookingPrice}}">价格：¥{{item.bookingPrice}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="row-bottom">
+          <text class="time">{{item.timeDesc}}</text>
+          <view class="actions">
+            <block wx:if="{{item.status==='pending'}}">
+              <button class="btn reject" size="mini" bindtap="onReject" data-id="{{item.id}}">拒绝</button>
+              <button class="btn approve" size="mini" bindtap="onApprove" data-id="{{item.id}}">同意预约</button>
+            </block>
+            <block wx:elif="{{item.status==='approved'}}">
+              <!-- 40分钟仅显示"查看问卷"，2小时显示学习计划相关按钮 -->
+              <block wx:if="{{item.bookingType !== 'trial'}}">
+                <button wx:if="{{!item.hasStudyPlan}}" class="btn ghost" size="mini" bindtap="writePlan" data-id="{{item.id}}">填写学习计划</button>
+                <button wx:else class="btn ghost" size="mini" bindtap="viewPlan" data-id="{{item.id}}">查看学习计划</button>
+              </block>
+              <button class="btn ghost" size="mini" bindtap="viewSurvey" data-id="{{item.id}}">查看问卷</button>
+            </block>
+            <block wx:elif="{{item.status==='rejected'}}">
+              <text class="rejected-tag">已拒绝</text>
+            </block>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <view class="empty" wx:else>
+      <image class="empty-img" src="/images/common/no-data.png" mode="aspectFit"></image>
+      <text class="empty-text">暂无预约</text>
+    </view>
+  </view>
+</view>
+
+

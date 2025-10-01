@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "就业服务详情",
+  "usingComponents": {
+    "post-detail": "/components/post-detail/post-detail"
+  }
+}
+
+

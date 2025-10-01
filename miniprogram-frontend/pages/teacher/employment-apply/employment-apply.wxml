@@ -1,0 +1,14 @@
+<view class="apply-page">
+  <view class="resume-uploader" bindtap="chooseResume">
+    <view class="plus">+</view>
+    <view class="hint1">点击上传最新简历</view>
+    <view class="hint2">文件格式仅限pdf、doc、docx、ppt、pptx</view>
+    <view class="file-name" wx:if="{{resume.name}}">已选：{{resume.name}}</view>
+  </view>
+
+  <view class="btn-bar">
+    <button class="confirm" bindtap="submitApply" loading="{{submitting}}">确定</button>
+  </view>
+</view>
+
+

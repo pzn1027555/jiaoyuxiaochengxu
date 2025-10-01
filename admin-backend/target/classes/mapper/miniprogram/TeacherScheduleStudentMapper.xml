@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.TeacherScheduleStudentMapper">
+    
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.miniprogram.entity.TeacherScheduleStudent">
+        <id property="id" column="id"/>
+        <result property="scheduleId" column="schedule_id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="studentName" column="student_name"/>
+        <result property="studentAvatar" column="student_avatar"/>
+    </resultMap>
+
+    <!-- 检查学生是否已经报名了该课程 -->
+    <select id="checkEnrollment" resultType="int">
+        SELECT COUNT(1) 
+        FROM teacher_schedule_student 
+        WHERE schedule_id = #{scheduleId} AND student_id = #{studentId}
+    </select>
+
+    <!-- 添加学生到课程 -->
+    <insert id="insertEnrollment" parameterType="com.education.admin.modules.miniprogram.entity.TeacherScheduleStudent" 
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO teacher_schedule_student (schedule_id, student_id) 
+        VALUES (#{scheduleId}, #{studentId})
+    </insert>
+
+    <!-- 删除报名记录 -->
+    <delete id="deleteEnrollment">
+        DELETE FROM teacher_schedule_student 
+        WHERE schedule_id = #{scheduleId} AND student_id = #{studentId}
+    </delete>
+
+    <!-- 获取某个课程的学生数量 -->
+    <select id="getStudentCountBySchedule" resultType="int">
+        SELECT COUNT(1) 
+        FROM teacher_schedule_student 
+        WHERE schedule_id = #{scheduleId}
+    </select>
+
+    <!-- 批量添加学生到课程 -->
+    <insert id="insertBatch">
+        INSERT INTO teacher_schedule_student (schedule_id, student_id)
+        VALUES
+        <foreach collection="studentIds" item="studentId" separator=",">
+            (#{scheduleId}, #{studentId})
+        </foreach>
+    </insert>
+
+    <!-- 根据排课ID删除所有学生 -->
+    <delete id="deleteByScheduleId">
+        DELETE FROM teacher_schedule_student
+        WHERE schedule_id = #{scheduleId}
+    </delete>
+
+    <!-- 根据排课ID获取所有学生ID列表 -->
+    <select id="findStudentIdsByScheduleId" resultType="java.lang.Long">
+        SELECT student_id
+        FROM teacher_schedule_student
+        WHERE schedule_id = #{scheduleId}
+        ORDER BY id ASC
+    </select>
+
+    <!-- 根据排课ID获取学生详细信息列表（包括姓名、头像等） -->
+    <select id="findByScheduleId" resultMap="BaseResultMap">
+        SELECT tss.*,
+               si.student_name AS student_name,
+               si.avatar AS student_avatar
+        FROM teacher_schedule_student tss
+        LEFT JOIN student_info si ON tss.student_id = si.id
+        WHERE tss.schedule_id = #{scheduleId}
+        ORDER BY tss.id ASC
+    </select>
+
+</mapper>

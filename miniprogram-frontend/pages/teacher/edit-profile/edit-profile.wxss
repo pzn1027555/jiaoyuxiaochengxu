@@ -1,0 +1,391 @@
+/* 教师个人信息编辑页面样式 */
+.edit-profile-container {
+  min-height: 100vh;
+  background-color: #f8f8f8;
+  padding-bottom: 40rpx;
+}
+
+/* 页面内容容器 */
+.content-container {
+  min-height: 100vh;
+}
+
+/* 顶部右侧内容 */
+.header-right-content {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.menu-icon, .record-icon {
+  padding: 12rpx;
+}
+
+.menu-dots {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  align-items: center;
+}
+
+.dot {
+  width: 8rpx;
+  height: 8rpx;
+  background-color: #666;
+  border-radius: 50%;
+}
+
+.record-placeholder {
+  width: 48rpx;
+  height: 48rpx;
+  background-color: #4CAF50;
+  border-radius: 50%;
+}
+
+/* 个人信息表单 */
+.profile-form {
+  background-color: #fff;
+  margin: 32rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+/* 表单项 */
+.form-item {
+  display: flex;
+  align-items: center;
+  padding: 32rpx;
+  min-height: 80rpx;
+}
+
+/* 基本信息项（靠右展示） */
+.form-item.basic-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  font-size: 32rpx;
+  color: #333;
+  width: 180rpx;
+  flex-shrink: 0;
+}
+
+.form-input {
+  flex: 1;
+  font-size: 32rpx;
+  color: #333;
+  text-align: right;
+}
+
+.form-input::placeholder {
+  color: #999;
+}
+
+.form-value-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.form-value {
+  font-size: 32rpx;
+  color: #333;
+  margin-right: 16rpx;
+}
+
+.arrow-icon {
+  width: 28rpx;
+  height: 28rpx;
+  opacity: 0.6;
+}
+
+/* 头像相关 */
+.avatar-item {
+  position: relative;
+}
+
+.avatar-container {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.avatar-image {
+  width: 90rpx;
+  height: 90rpx;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+}
+
+/* 标签相关 */
+.tags-item {
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 32rpx;
+  padding-bottom: 32rpx;
+}
+
+.tags-item .form-label {
+  margin-bottom: 24rpx;
+  width: 100%;
+}
+
+.tags-container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  justify-content: flex-start;
+}
+
+.tag-item {
+  display: flex;
+  align-items: center;
+  background-color: #4CAF50;
+  border-radius: 32rpx;
+  padding: 12rpx 20rpx;
+  position: relative;
+  padding-right: 50rpx; /* 给删除按钮留出空间 */
+}
+
+.tag-text {
+  font-size: 28rpx;
+  color: #fff;
+  margin-right: 8rpx;
+}
+
+.tag-close {
+  width: 45rpx;
+    height: 45rpx;
+    /* background-color: rgba(0, 0, 0, 0.2) ; */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rpx;
+    box-sizing: border-box;
+    position: absolute;
+    top: -22rpx;
+    right: 0rpx;
+}
+
+.add-tag-btn {
+  width: 150rpx;
+  height: 62rpx;
+  border: 1rpx dashed #4CAF50;
+  border-radius: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-icon {
+  width: 36rpx;
+  height: 36rpx;
+  opacity: 0.8;
+}
+
+/* 简介文本框 */
+.intro-item {
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 32rpx;
+  padding-bottom: 32rpx;
+}
+
+.intro-item .form-label {
+  margin-bottom: 24rpx;
+  width: 100%;
+}
+
+.form-textarea {
+  width: 100%;
+  font-size: 32rpx;
+  color: #333;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  min-height: 200rpx;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.form-textarea::placeholder {
+  color: #999;
+}
+
+/* 保存按钮 */
+.save-btn-container {
+  padding: 32rpx;
+}
+
+.save-btn {
+  width: 100%;
+  /* height: 96rpx; */
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  border-radius: 48rpx;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 8rpx 24rpx rgba(76, 175, 80, 0.3);
+}
+
+.save-btn:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(76, 175, 80, 0.3);
+}
+
+/* 弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.address-modal {
+  width: 600rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 0;
+  transform: scale(0.8);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.show .address-modal {
+  transform: scale(1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-close {
+  font-size: 40rpx;
+  color: #999;
+  line-height: 1;
+}
+
+.modal-content {
+  padding: 32rpx;
+}
+
+.address-textarea {
+  width: 100%;
+  min-height: 200rpx;
+  font-size: 32rpx;
+  color: #333;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.address-textarea::placeholder {
+  color: #999;
+}
+
+/* 标签输入框样式 */
+.tag-input {
+  width: 100%;
+  font-size: 32rpx;
+  color: #333;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.tag-input::placeholder {
+  color: #999;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 24rpx;
+  padding: 32rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  border: none;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.confirm-btn {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+/* 省市区选择器样式 */
+.region-selectors {
+  display: flex;
+  gap: 24rpx;
+  width: 100%;
+}
+
+.region-item {
+  flex: 1;
+  padding: 20rpx 24rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  border: 2rpx solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.region-item:active {
+  background: #e9ecef;
+  border-color: #007aff;
+}
+
+.region-text {
+  font-size: 28rpx;
+  color: #333;
+  text-align: center;
+  display: block;
+}
+
+.region-text.placeholder {
+  color: #999;
+}

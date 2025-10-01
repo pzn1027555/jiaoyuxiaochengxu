@@ -1,0 +1,90 @@
+<!--pages/student/survey/survey.wxml-->
+<view class="survey-container">
+  <custom-header title="调查问卷" show-back="{{true}}" bind:headerReady="onHeaderReady"></custom-header>
+  <scroll-view scroll-y="true" class="survey-scroll" style="padding-top: {{headerHeight}}px;">
+    <view class="form-section">
+      <view class="item">
+        <text class="label"><text class="required">*</text>1、姓名</text>
+        <input class="input" value="{{form.name}}" bindinput="onNameInput" disabled="{{readonly}}" placeholder="请输入姓名"/>
+      </view>
+      <view class="item">
+        <text class="label"><text class="required">*</text>2、性别</text>
+        <radio-group class="radios" bindchange="onGender" wx:if="{{!readonly}}">
+          <label class="radio"><radio class="mini-radio" value="1" checked="{{form.gender==1}}"/>男</label>
+          <label class="radio"><radio class="mini-radio" value="2" checked="{{form.gender==2}}"/>女</label>
+        </radio-group>
+        <text class="margin_l" wx:else>{{form.gender==1?'男':'女'}}</text>
+      </view>
+      <view class="item">
+        <text class="label"><text class="required">*</text>3、年级</text>
+        <picker mode="selector" range="{{grades}}" value="{{gradeIndex}}" bindchange="onGrade" wx:if="{{!readonly}}">
+          <view class="picker"><text class="picker-text">{{form.grade||'请选择年级'}}</text><text class="picker-arrow">▼</text></view>
+        </picker>
+        <text class="margin_l" wx:else>{{form.grade}}</text>
+      </view>
+      <view class="item">
+        <text class="label"><text class="required">*</text>4、学习科目</text>
+        <view wx:if="{{!readonly}}" class="subject-picker-entry" bindtap="openSubjectPicker">
+          <text class="picker-text">{{form.subjectName||'请选择学科'}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+        <text class="margin_l" wx:else>{{form.subjectName}}</text>
+      </view>
+      <view class="item">
+        <text class="label"><text class="required">*</text>5、目前水平</text>
+        <picker mode="selector" range="{{levels}}" value="{{levelIndex}}" bindchange="onLevel" wx:if="{{!readonly}}">
+          <view class="picker"><text class="picker-text">{{form.level||'请选择水平'}}</text><text class="picker-arrow">▼</text></view>
+        </picker>
+        <text class="margin_l" wx:else>{{form.level}}</text>
+      </view>
+      <view class="item">
+        <text class="label"><text class="required">*</text>6、想要老师讲解的章节/作业或错题</text>
+        <textarea class="textarea" value="{{form.wish}}" bindinput="onWishInput" placeholder="请描述" disabled="{{readonly}}"/>
+      </view>
+      <view class="item">
+        <text class="label">7、上传附件</text>
+        <button wx:if="{{!readonly}}" class="upload" bindtap="onUpload">+ 上传附件</button>
+        <view class="file" wx:for="{{files}}" wx:key="url">
+          <text class="file-name">{{item.name}}</text>
+          <text class="remove" wx:if="{{!readonly}}" data-url="{{item.url}}" bindtap="removeFile">✕</text>
+        </view>
+      </view>
+    </view>
+    <!-- 学生端非只读模式：只显示家长代付按钮 -->
+    <view class="footer" wx:if="{{isStudent && !readonly}}">
+      <button class="submit" bindtap="goParentPay">家长代付</button>
+    </view>
+    <!-- 教师端或只读模式：仅查看，不显示操作按钮 -->
+  </scroll-view>
+  <!-- 家长选择器弹窗（代付） - 只有学生身份才显示 -->
+  <view class="parent-picker-mask" wx:if="{{showParentPicker && isStudent}}" bindtap="hideParentPicker">
+    <view class="parent-picker" catchtap="">
+      <view class="picker-header">
+        <view class="picker-title">选择代付家长</view>
+        <view class="picker-close" bindtap="hideParentPicker">×</view>
+      </view>
+      <view class="parent-list">
+        <view class="parent-item {{selectedParent && selectedParent.parentId === item.parentId ? 'selected' : ''}}"
+              wx:for="{{parents}}" wx:key="parentId"
+              bindtap="selectParent" data-parentid="{{item.parentId}}">
+          <image class="parent-avatar" src="{{item.parentAvatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+          <view class="parent-details">
+            <view class="parent-name">{{item.parentName}}</view>
+            <view class="parent-phone">{{item.parentPhone}}</view>
+          </view>
+          <view class="parent-check" wx:if="{{selectedParent && selectedParent.parentId === item.parentId}}">✓</view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <subject-picker 
+    show="{{showSubjectPicker}}"
+    value="{{form.subjectId ? [{id: form.subjectId, name: form.subjectName}] : []}}"
+    multiple="{{false}}"
+    title="选择学习科目"
+    bind:confirm="onSubjectConfirm"
+    bind:cancel="onSubjectCancel"
+  />
+</view>
+
+

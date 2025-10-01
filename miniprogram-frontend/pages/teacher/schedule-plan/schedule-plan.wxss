@@ -1,0 +1,70 @@
+.edit-container{min-height:100vh;background:#fff}
+.form{padding:24rpx;padding-bottom:200rpx;margin-top:20rpx}
+.cell{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:12rpx;padding:28rpx 24rpx;margin-bottom:16rpx}
+.label{color:#333;font-size:30rpx}
+.value{color:#7b8b84}
+.value-right{margin-left:auto;color:#333;max-width:60%;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arrow-icon{width:24rpx;height:24rpx;margin-left:20rpx}
+.section-label{margin:24rpx 8rpx;color:#7b8b84;font-size:26rpx}
+.repeat-row{display:flex;flex-wrap:wrap;gap:16rpx;margin:8rpx 0 16rpx;padding: 0 18rpx;}
+.chip{border:1rpx solid #4CAF50;color:#4CAF50;background:#fff;border-radius:40rpx;font-size:26rpx;}
+.chip.on{background:#4CAF50;color:#fff}
+.avatars{display:flex;align-items:center;gap:24rpx;padding:12rpx 12rpx 16rpx 12rpx}
+.avatar{width:96rpx;height:96rpx;border-radius:50%}
+.avatar-item{display:flex;flex-direction:column;align-items:center}
+.name{font-size:24rpx;color:#666;margin-top:6rpx}
+.avatar-add{width:96rpx;height:96rpx;border-radius:50%;border:2rpx dashed #4CAF50;color:#4CAF50;display:flex;align-items:center;justify-content:center}
+.textarea{min-height:160rpx;background:#f5f6f7;border-radius:12rpx;padding:20rpx}
+.full-width{width:calc(100% - 40rpx)}
+.footer{position:fixed;left:0;right:0;bottom:0;background:#fff;padding:24rpx;padding-bottom:calc(24rpx + env(safe-area-inset-bottom));z-index:999}
+.ok{width:100%;border-radius:999px;background:#4CAF50;color:#fff}
+.radio-row{display:flex;gap:40rpx}
+.cover-preview{padding:12rpx 0}
+.cover-img{width:100%;height:240rpx;border-radius:12rpx}
+
+/* 课程标签样式（与编辑页一致） */
+.tags-row{ display:flex; flex-wrap:wrap; gap:12rpx; margin:10rpx 0 20rpx }
+.tag-chip{ display:inline-flex; align-items:center; gap:8rpx; padding:6rpx 14rpx; background:#e8f5e8; color:#2f8b3c; border-radius:20rpx; font-size:22rpx }
+.tag-chip .x{ margin-left:2rpx; color:#2f8b3c }
+.add-chip{ border:1rpx dashed #54B247; color:#54B247; background:#fff; padding:6rpx 14rpx; border-radius:20rpx;font-size: 24rpx; }
+
+/* 学生选择器（复用编辑页） */
+.student-mask{position:fixed;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999}
+.student-panel{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top-left-radius:24rpx;border-top-right-radius:24rpx;max-height:78vh;display:flex;flex-direction:column;z-index:1000;padding:0 12rpx}
+.sp-header{display:flex;align-items:center;justify-content:center;padding:24rpx 24rpx 12rpx;position:relative}
+.sp-title{font-weight:700;color:#333}
+.sp-close{position:absolute;right:24rpx;top:18rpx;color:#999}
+.sp-search{display:flex;align-items:center;margin:0 24rpx 16rpx;background:#f5f6f7;border-radius:24rpx;padding:8rpx 16rpx}
+.sp-search-icon{width:28rpx;height:28rpx;margin-right:8rpx}
+.sp-input{flex:1;height:64rpx;line-height:64rpx}
+.sp-list{flex:1;padding:0 12rpx;width: calc(100% - 26rpx);height: 50vh;overflow: auto}
+.sp-item{display:flex;align-items:center;padding:18rpx 12rpx;border-bottom:1rpx solid #f0f0f0}
+.sp-item.active{background:#f8fff8}
+.sp-avatar{width:72rpx;height:72rpx;border-radius:50%;margin-right:16rpx;background:#eee}
+.sp-meta{flex:1;display:flex;flex-direction:column}
+.sp-name{color:#333;font-weight:600}
+.sp-sub{color:#9aa19f;font-size:24rpx;margin-top:4rpx}
+.sp-check{width:40rpx;text-align:right;color:#4CAF50;font-weight:700}
+.sp-empty{color:#9aa19f;text-align:center;padding:24rpx}
+.sp-footer{display:flex;gap:16rpx;padding:16rpx 24rpx  calc(16rpx + env(safe-area-inset-bottom));border-top:1rpx solid #f0f0f0}
+.sp-btn{flex:1;border-radius:999px;background:#fff;color:#4CAF50;border:1rpx solid #4CAF50}
+.sp-btn.primary{background:#4CAF50;color:#fff}
+
+/* 时间弹窗（复用编辑页） */
+.mask{position:fixed;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,0.4);z-index:998}
+.sheet{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top-left-radius:24rpx;border-top-right-radius:24rpx;z-index:999;display:flex;flex-direction:column}
+.sheet-hd{padding:24rpx;text-align:center;font-weight:600}
+.sheet-picker{height:360rpx}
+.sheet-item{height:80rpx;display:flex;align-items:center;justify-content:center}
+.sheet-ft{display:flex;gap:16rpx;padding:16rpx 24rpx  calc(16rpx + env(safe-area-inset-bottom));border-top:1rpx solid #f0f0f0}
+.btn{flex:1;border-radius:999px;background:#fff;color:#4CAF50;border:1rpx solid #4CAF50}
+.btn.primary{background:#4CAF50;color:#fff}
+
+/* 科目选择弹窗 */
+.subject-list{flex:1;max-height:50vh;padding:12rpx 24rpx}
+.subject-group{margin-bottom:24rpx}
+.subject-parent{color:#333;font-weight:600;font-size:30rpx;margin-bottom:12rpx;padding-left:8rpx}
+.subject-children{display:flex;flex-wrap:wrap;gap:12rpx}
+.subject-child{background:#f5f6f7;color:#666;padding:16rpx 24rpx;border-radius:24rpx;font-size:26rpx;border:1rpx solid transparent}
+.subject-child.selected{background:#e8f5e8;color:#4CAF50;border-color:#4CAF50}
+

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "个人信息",
+  "usingComponents": {
+    "custom-header": "/components/custom-header/custom-header",
+    "subject-picker": "/components/subject-picker/subject-picker"
+  }
+}
+

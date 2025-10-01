@@ -1,0 +1,127 @@
+<!--pages/teacher/resources/resources.wxml-->
+<view class="resources-container">
+  <!-- 顶部标题 -->
+
+  <!-- 资源列表 -->
+  <view class="resources-list">
+    <view class="resource-item" wx:for="{{resources}}" wx:key="id">
+      <!-- 左侧预览图（支持封面/文件图标） -->
+      <image class="resource-thumb" src="{{item.preview}}" mode="aspectFill"></image>
+
+      <!-- 右侧内容 -->
+      <view class="resource-right">
+        <view class="title-row">{{item.title}}</view>
+        <view class="meta-row">
+          <text class="meta-time">{{item.createTime}}</text>
+          <text class="meta-sep">|</text>
+          <text class="meta-size">{{item.fileSizeText}}</text>
+        </view>
+        <view class="price-row" wx:if="{{item.price > 0}}">¥ {{item.price}}</view>
+        <view class="action-row">
+          <button class="btn delete" bindtap="deleteResource" data-id="{{item.id}}">删除</button>
+          <button class="btn edit" bindtap="reuploadResource" data-id="{{item.id}}">重新上传</button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-resources" wx:if="{{!resources.length && !loading}}">
+      <image class="empty-icon" src="/images/empty/no-resources.png" mode="aspectFit"></image>
+      <text class="empty-text">暂无资源文件</text>
+      <text class="empty-desc">点击下方按钮上传您的教学资源</text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 上传按钮 -->
+  <view class="upload-fab" bindtap="showUploadOptions">
+    <!-- ➕ 切图位置3：上传按钮图标 建议尺寸：56rpx × 56rpx -->
+    <view class="fab-icon">+</view>
+    <text class="fab-text">上传资料</text>
+  </view>
+</view>
+
+<!-- 上传选项弹窗 -->
+<view class="modal-overlay {{showUploadModal ? 'show' : ''}}" bindtap="hideUploadModal">
+  <view class="upload-modal" catchtap="preventClose">
+    <view class="modal-header">
+      <text class="modal-title">选择上传类型</text>
+      <text class="modal-close" bindtap="hideUploadModal">×</text>
+    </view>
+    
+    <view class="upload-options">
+      <view class="upload-option" bindtap="selectUploadType" data-type="document">
+        <image class="option-icon" src="/images/icons/document.png" mode="aspectFit"></image>
+        <text class="option-text">文档资料</text>
+        <text class="option-desc">支持 PDF、Word、PPT 等格式</text>
+      </view>
+      
+      <view class="upload-option" bindtap="selectUploadType" data-type="video">
+        <image class="option-icon" src="/images/icons/video.png" mode="aspectFit"></image>
+        <text class="option-text">视频课程</text>
+        <text class="option-desc">支持 MP4、AVI 等格式</text>
+      </view>
+      
+      <view class="upload-option" bindtap="selectUploadType" data-type="image">
+        <image class="option-icon" src="/images/icons/image.png" mode="aspectFit"></image>
+        <text class="option-text">图片资源</text>
+        <text class="option-desc">支持 JPG、PNG 等格式</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 资源详情弹窗 -->
+<view class="modal-overlay {{showDetailModal ? 'show' : ''}}" bindtap="hideDetailModal">
+  <view class="detail-modal" catchtap="preventClose">
+    <view class="modal-header">
+      <text class="modal-title">资源详情</text>
+      <text class="modal-close" bindtap="hideDetailModal">×</text>
+    </view>
+    
+    <view class="detail-content" wx:if="{{selectedResource}}">
+      <view class="detail-preview">
+        <image class="detail-image" src="{{selectedResource.preview}}" mode="aspectFit"></image>
+      </view>
+      
+      <view class="detail-info">
+        <view class="detail-title">{{selectedResource.title}}</view>
+        <view class="detail-meta">
+          <view class="meta-item">
+            <text class="meta-label">文件大小：</text>
+            <text class="meta-value">{{selectedResource.fileSize}}</text>
+          </view>
+          <view class="meta-item">
+            <text class="meta-label">上传时间：</text>
+            <text class="meta-value">{{selectedResource.uploadTime}}</text>
+          </view>
+          <view class="meta-item">
+            <text class="meta-label">资源类型：</text>
+            <text class="meta-value">{{selectedResource.typeName}}</text>
+          </view>
+          <view class="meta-item" wx:if="{{selectedResource.price > 0}}">
+            <text class="meta-label">资源价格：</text>
+            <text class="meta-value price">¥{{selectedResource.price}}</text>
+          </view>
+        </view>
+        
+        <view class="detail-description" wx:if="{{selectedResource.description}}">
+          <text class="desc-label">资源描述：</text>
+          <text class="desc-content">{{selectedResource.description}}</text>
+        </view>
+      </view>
+      
+      <view class="detail-actions">
+        <button class="detail-btn secondary" bindtap="downloadResource">下载资源</button>
+        <button class="detail-btn primary" bindtap="editResource">编辑信息</button>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 底部角色导航 -->
+<role-tabbar></role-tabbar>

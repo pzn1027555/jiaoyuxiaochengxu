@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.MiniIncomeMapper">
+
+    <!-- 今日收入：订单支付时间为今天，且订单状态已支付/已完成，汇总teacher_income -->
+    <select id="sumTodayIncome" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(teacher_income), 0)
+        FROM order_info
+        WHERE teacher_id = #{teacherId}
+          AND order_status IN (2,3)
+          AND DATE(pay_time) = CURRENT_DATE
+    </select>
+
+    <!-- 总收入：订单状态已支付/已完成，汇总teacher_income -->
+    <select id="sumTotalIncome" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(teacher_income), 0)
+        FROM order_info
+        WHERE teacher_id = #{teacherId}
+          AND order_status IN (2,3)
+    </select>
+
+    <!-- 本月收入：按yearMonth统计teacher_income -->
+    <select id="sumMonthlyIncome" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(teacher_income), 0)
+        FROM order_info
+        WHERE teacher_id = #{teacherId}
+          AND order_status IN (2,3)
+          AND DATE_FORMAT(pay_time, '%Y-%m') = #{yearMonth}
+    </select>
+
+    <!-- 月度订单收入明细：按yearMonth筛选（格式YYYY-MM） -->
+    <select id="listMonthlyOrderIncome" resultType="java.util.HashMap">
+        SELECT 
+            id AS record_id,
+            '授课收入' AS type,
+            pay_time AS time,
+            teacher_income AS amount
+        FROM order_info
+        WHERE teacher_id = #{teacherId}
+          AND order_status IN (2,3)
+          AND DATE_FORMAT(pay_time, '%Y-%m') = #{yearMonth}
+        ORDER BY pay_time DESC
+    </select>
+
+    <!-- 月度结算（打款）明细：按yearMonth筛选，显示为负向支出（便于收入概览区分） -->
+    <select id="listMonthlySettlementPayout" resultType="java.util.HashMap">
+        SELECT 
+            id AS record_id,
+            '工资结算' AS type,
+            payment_time AS time,
+            - final_amount AS amount
+        FROM financial_settlement
+        WHERE teacher_id = #{teacherId}
+          AND settlement_status = 2
+          AND payment_time IS NOT NULL
+          AND DATE_FORMAT(payment_time, '%Y-%m') = #{yearMonth}
+        ORDER BY payment_time DESC
+    </select>
+
+</mapper>
+
+

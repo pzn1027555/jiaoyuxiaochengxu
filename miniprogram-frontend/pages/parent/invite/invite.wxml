@@ -1,0 +1,12 @@
+<view class="invite-page">
+  <view class="card">
+    <image class="avatar" src="{{avatarFull || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+    <view class="code-title">绑定码</view>
+    <view class="code">{{inviteCode}}</view>
+  </view>
+  <view class="input-block">
+    <input class="code-input" placeholder="填写对方的绑定码（6位数字）" bindinput="onInputCode" value="{{inputCode}}" />
+    <button class="btn submit" bindtap="submitInvite" disabled="{{!inputCode || inputCode===inviteCode || inputCode.length!==6}}">提交</button>
+  </view>
+</view>
+

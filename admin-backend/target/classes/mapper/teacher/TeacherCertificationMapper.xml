@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.teacher.mapper.TeacherCertificationMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.teacher.entity.TeacherCertification">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="teacher_id" property="teacherId" jdbcType="BIGINT"/>
+        <result column="real_name" property="realName" jdbcType="VARCHAR"/>
+        <result column="gender" property="gender" jdbcType="TINYINT"/>
+        <result column="id_card_front" property="idCardFront" jdbcType="VARCHAR"/>
+        <result column="id_card_back" property="idCardBack" jdbcType="VARCHAR"/>
+        <result column="graduate_school" property="graduateSchool" jdbcType="VARCHAR"/>
+        <result column="education" property="education" jdbcType="VARCHAR"/>
+        <result column="diploma_certs" property="diplomaCerts" jdbcType="VARCHAR"/>
+        <result column="teacher_certs" property="teacherCerts" jdbcType="VARCHAR"/>
+        <result column="award_certs" property="awardCerts" jdbcType="VARCHAR"/>
+        <result column="bank_card" property="bankCard" jdbcType="VARCHAR"/>
+        <result column="bank_name" property="bankName" jdbcType="VARCHAR"/>
+        <result column="certification_status" property="certificationStatus" jdbcType="TINYINT"/>
+        <result column="submit_time" property="submitTime" jdbcType="TIMESTAMP"/>
+        <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP"/>
+        <result column="audit_user_id" property="auditUserId" jdbcType="BIGINT"/>
+        <result column="audit_user_name" property="auditUserName" jdbcType="VARCHAR"/>
+        <result column="audit_reason" property="auditReason" jdbcType="VARCHAR"/>
+        <result column="interview_time" property="interviewTime" jdbcType="TIMESTAMP"/>
+        <result column="interview_result" property="interviewResult" jdbcType="VARCHAR"/>
+        <result column="teacher_level" property="teacherLevel" jdbcType="VARCHAR"/>
+        <result column="grade_time" property="gradeTime" jdbcType="TIMESTAMP"/>
+        <result column="grade_user_id" property="gradeUserId" jdbcType="BIGINT"/>
+        <result column="grade_user_name" property="gradeUserName" jdbcType="VARCHAR"/>
+        <result column="grade_reason" property="gradeReason" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 认证响应结果映射 -->
+    <resultMap id="CertificationResponseMap" type="com.education.admin.modules.teacher.dto.TeacherCertificationResponse">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="teacher_id" property="teacherId" jdbcType="BIGINT"/>
+        <result column="teacher_name" property="teacherName" jdbcType="VARCHAR"/>
+        <result column="teacher_phone" property="teacherPhone" jdbcType="VARCHAR"/>
+        <result column="real_name" property="realName" jdbcType="VARCHAR"/>
+        <result column="gender" property="gender" jdbcType="TINYINT"/>
+        <result column="id_card_front" property="idCardFront" jdbcType="VARCHAR"/>
+        <result column="id_card_back" property="idCardBack" jdbcType="VARCHAR"/>
+        <result column="graduate_school" property="graduateSchool" jdbcType="VARCHAR"/>
+        <result column="education" property="education" jdbcType="VARCHAR"/>
+        <result column="diploma_certs" property="diplomaCerts" jdbcType="VARCHAR"/>
+        <result column="teacher_certs" property="teacherCerts" jdbcType="VARCHAR"/>
+        <result column="award_certs" property="awardCerts" jdbcType="VARCHAR"/>
+        <result column="bank_card" property="bankCard" jdbcType="VARCHAR"/>
+        <result column="bank_name" property="bankName" jdbcType="VARCHAR"/>
+        <result column="certification_status" property="certificationStatus" jdbcType="TINYINT"/>
+        <result column="submit_time" property="submitTime" jdbcType="TIMESTAMP"/>
+        <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP"/>
+        <result column="audit_user_name" property="auditUserName" jdbcType="VARCHAR"/>
+        <result column="audit_reason" property="auditReason" jdbcType="VARCHAR"/>
+        <result column="interview_time" property="interviewTime" jdbcType="TIMESTAMP"/>
+        <result column="interview_result" property="interviewResult" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 插入认证记录 -->
+    <insert id="insertCertification" parameterType="com.education.admin.modules.teacher.entity.TeacherCertification">
+        INSERT INTO teacher_certification (
+            teacher_id, real_name, gender, id_card_front, id_card_back,
+            graduate_school, education, diploma_certs, teacher_certs, award_certs,
+            bank_card, bank_name, certification_status, submit_time, create_time, update_time
+        ) VALUES (
+            #{teacherId}, #{realName}, #{gender}, #{idCardFront}, #{idCardBack},
+            #{graduateSchool}, #{education}, #{diplomaCerts,jdbcType=VARCHAR}, 
+            #{teacherCerts}, #{awardCerts}, #{bankCard}, #{bankName}, #{certificationStatus}, 
+            #{submitTime}, #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <!-- 根据ID更新认证记录 -->
+    <update id="updateCertificationById" parameterType="com.education.admin.modules.teacher.entity.TeacherCertification">
+        UPDATE teacher_certification 
+        SET real_name = #{realName},
+            gender = #{gender},
+            id_card_front = #{idCardFront},
+            id_card_back = #{idCardBack},
+            graduate_school = #{graduateSchool},
+            education = #{education},
+            diploma_certs = #{diplomaCerts,jdbcType=VARCHAR},
+            teacher_certs = #{teacherCerts},
+            award_certs = #{awardCerts},
+            bank_card = #{bankCard},
+            bank_name = #{bankName},
+            certification_status = #{certificationStatus},
+            submit_time = #{submitTime},
+            audit_time = #{auditTime},
+            audit_user_id = #{auditUserId},
+            audit_user_name = #{auditUserName},
+            audit_reason = #{auditReason},
+            interview_time = #{interviewTime},
+            interview_result = #{interviewResult},
+            teacher_level = #{teacherLevel},
+            grade_time = #{gradeTime},
+            grade_user_id = #{gradeUserId},
+            grade_user_name = #{gradeUserName},
+            grade_reason = #{gradeReason},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID删除认证记录 -->
+    <delete id="deleteCertificationById">
+        DELETE FROM teacher_certification WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ID查询认证记录 -->
+    <select id="selectCertificationById" resultMap="BaseResultMap">
+        SELECT * FROM teacher_certification WHERE id = #{id}
+    </select>
+
+    <!-- 分页查询教师认证列表 -->
+    <select id="selectCertificationPage" resultMap="CertificationResponseMap">
+        SELECT 
+            tc.id,
+            tc.teacher_id,
+            ti.teacher_name,
+            ti.phone AS teacher_phone,
+            tc.real_name,
+            tc.gender,
+            tc.id_card_front,
+            tc.id_card_back,
+            tc.graduate_school,
+            tc.education,
+            tc.diploma_certs,
+            tc.teacher_certs,
+            tc.award_certs,
+            tc.bank_card,
+            tc.bank_name,
+            tc.certification_status,
+            tc.submit_time,
+            tc.audit_time,
+            tc.audit_user_name,
+            tc.audit_reason,
+            tc.interview_time,
+            tc.interview_result
+        FROM teacher_certification tc
+        LEFT JOIN teacher_info ti ON tc.teacher_id = ti.id
+        WHERE 1=1
+        <if test="teacherName != null and teacherName != ''">
+            AND ti.teacher_name LIKE CONCAT('%', #{teacherName}, '%')
+        </if>
+        <if test="realName != null and realName != ''">
+            AND tc.real_name LIKE CONCAT('%', #{realName}, '%')
+        </if>
+        <if test="certificationStatus != null">
+            AND tc.certification_status = #{certificationStatus}
+        </if>
+        ORDER BY tc.submit_time DESC
+    </select>
+
+    <!-- 根据认证ID查询认证详情 -->
+    <select id="selectCertificationDetailById" resultMap="CertificationResponseMap">
+        SELECT 
+            tc.id,
+            tc.teacher_id,
+            ti.teacher_name,
+            ti.phone AS teacher_phone,
+            tc.real_name,
+            tc.gender,
+            tc.id_card_front,
+            tc.id_card_back,
+            tc.graduate_school,
+            tc.education,
+            tc.diploma_certs,
+            tc.teacher_certs,
+            tc.award_certs,
+            tc.bank_card,
+            tc.bank_name,
+            tc.certification_status,
+            tc.submit_time,
+            tc.audit_time,
+            tc.audit_user_name,
+            tc.audit_reason,
+            tc.interview_time,
+            tc.interview_result
+        FROM teacher_certification tc
+        LEFT JOIN teacher_info ti ON tc.teacher_id = ti.id
+        WHERE tc.id = #{id}
+    </select>
+
+    <!-- 根据教师ID查询最新认证记录 -->
+    <select id="selectLatestByTeacherId" resultMap="BaseResultMap">
+        SELECT * FROM teacher_certification 
+        WHERE teacher_id = #{teacherId} 
+        ORDER BY create_time DESC 
+        LIMIT 1
+    </select>
+
+</mapper>

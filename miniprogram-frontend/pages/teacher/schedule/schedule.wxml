@@ -1,0 +1,81 @@
+<view class="schedule-container">
+  <custom-header title="排课安排" bind:headerReady="onHeaderReady" />
+
+  <!-- 月历 -->
+  <view class="calendar" style="padding-top: {{headerHeight}}px;">
+    <view class="calendar-bar">
+      <view class="arrow" bindtap="prevMonth">‹</view>
+      <view class="month-text">{{year}}年{{month}}月</view>
+      <view class="arrow" bindtap="nextMonth">›</view>
+    </view>
+    <view class="ms-week">
+      <text wx:for="{{['一','二','三','四','五','六','日']}}" wx:key="*this" class="ms-wd">{{item}}</text>
+    </view>
+    <view class="ms-grid">
+      <view class="ms-cell" wx:for="{{days}}" wx:key="index" data-index="{{index}}" bindtap="onSelectDay">
+        <text class="ms-date {{item.isToday ? 'today' : ''}} {{item.selected ? 'selected' : ''}}">{{item.date}}</text>
+        <view class="ms-dot {{item.hasCourse ? 'on' : ''}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 当天课程时间线 -->
+  <view class="day-title">{{selectedDate}}</view>
+  <view class="timeline">
+    <view class="slot" wx:for="{{items}}" wx:key="id" data-index="{{index}}">
+      <view class="time">{{item.startTimeText}} ~ {{item.endTimeText}}</view>
+      <view class="card">
+        <image wx:if="{{item.classType==='big_class' && item.coverFullUrl}}" class="cover" src="{{item.coverFullUrl}}" mode="aspectFill" />
+        <view class="info">
+          <view class="row">
+            <view class="title">{{item.title}}</view>
+            <view class="tag" wx:if="{{item.classType==='big_class'}}">班课</view>
+          </view>
+          <view class="sub">第{{item.lessonNo || 1}}课 / 共{{item.totalLessons || 1}}节课</view>
+          <!-- 学生头像展示规则：班课最多3个+总人数；一对一展示全部头像+姓名 -->
+          <view class="students">
+            <block wx:if="{{item.classType==='big_class'}}">
+              <image class="avatar" wx:for="{{item.displayStudents}}" wx:key="id" src="{{item.avatar || item.url || item.cover || item.avatarUrl || item.headimg || item.icon || item.photo || item.portrait || item.img || item.image || item.head || item.headUrl || item.logo || item.pic || item.picture || item.headimgurl || item.headImgUrl || item.avatar_url || item.headImg}}" />
+              <text class="meta">{{item.studentCount || (item.students && item.students.length) || 0}} 人</text>
+            </block>
+            <block wx:else>
+              <view class="s-all" wx:for="{{item.displayStudents}}" wx:key="id">
+                <image class="avatar" src="{{item.avatar}}" />
+                <text class="name">{{item.name}}</text>
+              </view>
+            </block>
+          </view>
+        </view>
+        <view class="ops">
+          <button class="op" bindtap="onChangeTime" data-id="{{item.id}}">修改时间</button>
+          <button class="op" bindtap="onEdit" data-id="{{item.id}}" data-index="{{index}}">编辑</button>
+        </view>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{!items.length && !loading}}">当天暂无课程</view>
+  </view>
+
+  <view class="footer">
+    <button class="add" bindtap="onAddPlan">添加课程</button>
+  </view>
+
+  <!-- 内联开始时间弹窗（与编辑页风格一致） -->
+  <view class="mask" wx:if="{{showInlinePicker}}" bindtap="closeInlinePicker"></view>
+  <view class="sheet" wx:if="{{showInlinePicker}}" catchtouchmove="noop">
+    <view class="sheet-hd">请选择开始时间</view>
+    <picker-view class="sheet-picker" value="{{timeIndex}}" indicator-style="height: 40px;" bindchange="onInlineTimeChange">
+      <picker-view-column>
+        <view wx:for="{{hours}}" wx:key="*this" class="sheet-item">{{item}}</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view wx:for="{{minutes}}" wx:key="*this" class="sheet-item">{{item}}</view>
+      </picker-view-column>
+    </picker-view>
+    <view class="sheet-ft">
+      <button class="btn ghost" bindtap="closeInlinePicker">取消</button>
+      <button class="btn primary" bindtap="confirmInlineTime">确定</button>
+    </view>
+  </view>
+</view>
+
+

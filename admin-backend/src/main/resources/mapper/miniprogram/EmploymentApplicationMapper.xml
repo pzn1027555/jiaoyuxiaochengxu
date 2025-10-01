@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.EmploymentApplicationMapper">
+    <insert id="insert" parameterType="com.education.admin.modules.miniprogram.entity.EmploymentApplication" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO employment_application(post_id, teacher_id, resume_url, resume_name, resume_size, create_time)
+        VALUES(#{postId}, #{teacherId}, #{resumeUrl}, #{resumeName}, #{resumeSize}, NOW())
+    </insert>
+
+    <select id="listAll" resultType="com.education.admin.modules.miniprogram.entity.EmploymentApplication">
+        SELECT id, post_id, teacher_id, resume_url, resume_name, resume_size, create_time
+        FROM employment_application
+        ORDER BY create_time DESC, id DESC
+    </select>
+</mapper>
+
+

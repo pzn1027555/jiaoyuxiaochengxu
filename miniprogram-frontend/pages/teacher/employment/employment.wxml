@@ -1,0 +1,6 @@
+<view class="page">
+  <post-list type="employment" />
+</view>
+
+
+

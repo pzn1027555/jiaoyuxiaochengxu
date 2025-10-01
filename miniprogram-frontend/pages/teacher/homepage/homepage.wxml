@@ -1,0 +1,85 @@
+<!-- 我的主页 -->
+<view class="homepage-container">
+  <!-- 顶部自定义标题栏 -->
+  <custom-header title="我的主页" bind:back="onBack" bind:headerReady="onHeaderReady"></custom-header>
+
+  <!-- 顶部封面：使用头像填满顶部，并预留标题高度 -->
+  <view class="cover-section" style="padding-top: {{headerHeight}}px;">
+    <image class="cover-image" src="{{coverUrl || '/images/workspace/default-avatar.png'}}" mode="aspectFill"></image>
+  </view>
+
+  <!-- 头像 + 名称 + 标签 + 科目 + 简介 -->
+  <view class="profile-card">
+    <image class="avatar" src="{{user.avatar || '/images/workspace/default-avatar.png'}}" mode="aspectFill"></image>
+    <view class="info">
+      <view class="name-row">
+        <text class="name">{{user.name}}</text>
+        <image class="gender-icon" wx:if="{{user.genderSymbol}}" src="{{user.genderSymbol=='♀' ? '/images/student/female.png' : '/images/student/male.png'}}" mode="widthFix"></image>
+      </view>
+      <view class="tags">
+        <view class="tag" wx:for="{{user.tags}}" wx:key="*this">{{item}}</view>
+      </view>
+      <view class="subjects">
+        <text class="label">所授科目：</text>
+        <text class="value">{{user.subjectsText}}</text>
+      </view>
+      <view class="intro">{{user.introduction}}</view>
+    </view>
+    <view class="edit-btn" bindtap="goEditProfile" wx:if="{{isTeacher}}">编辑</view>
+    <view class="fav-entry" wx:if="{{isStudent}}" bindtap="toggleFavorite">
+      <block wx:if="{{!isFav}}">
+        <image class="fav-icon" src="/images/follow.png" mode="aspectFit"></image>
+      </block>
+      <block wx:else>
+        <view class="fav-pill">已收藏</view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 顶部分段切换 Tab -->
+  <view class="tabs">
+    <view class="tab {{currentTab==='trial'?'active':''}}" data-key="trial" bindtap="onTabTap">试听视频</view>
+    <view class="tab {{currentTab==='materials'?'active':''}}" data-key="materials" bindtap="onTabTap">学习资料</view>
+    <view class="tab {{currentTab==='certs'?'active':''}}" data-key="certs" bindtap="onTabTap">资质证书</view>
+  </view>
+
+  <!-- 列表区：不同 tab 展示不同网格 -->
+  <view class="grid-area">
+    <view wx:if="{{currentTab==='trial'}}" class="grid-list video-list">
+      <view class="card video-card" wx:for="{{trialVideos}}" wx:key="id">
+        <view class="thumb-wrap" bindtap="onTrialTap" data-id="{{item.id}}">
+          <image class="thumb" src="{{item.coverFull || item.cover || '/images/profile/video-thumb-placeholder.png'}}" mode="aspectFill"></image>
+          <view class="play-icon">▶</view>
+        </view>
+        <view class="title">{{item.title}}</view>
+        <view class="upload-time">{{item.timeText}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{currentTab==='materials'}}" class="grid-list doc-list">
+      <view class="card doc-card" wx:for="{{materials}}" wx:key="id">
+        <view class="thumb-wrap" bindtap="onMaterialPreview" data-id="{{item.id}}">
+          <image class="thumb" src="{{item.coverFull || '/images/profile/doc-thumb-placeholder.png'}}" mode="aspectFill"></image>
+        </view>
+        <view class="title">{{item.title}}</view>
+        <view class="upload-time">{{item.timeText}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{currentTab==='certs'}}" class="grid-list cert-list">
+      <view class="card cert-card" wx:for="{{certs}}" wx:key="id" bindtap="previewCert" data-url="{{item.coverFull || item.coverUrl || item.image}}">
+        <!-- 预留证书切图 -->
+        <image class="thumb" src="{{item.coverFull || item.coverUrl || item.image || '/images/profile/cert-thumb-placeholder.png'}}" mode="aspectFit"></image>
+        <view class="title">{{item.title}}</view>
+        <view class="upload-time">{{item.timeText}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部预约按钮（仅学生显示） -->
+  <view class="footer-bar" wx:if="{{isStudent}}">
+    <button class="book-btn" bindtap="bookCourse">预约课程</button>
+  </view>
+
+</view>
+

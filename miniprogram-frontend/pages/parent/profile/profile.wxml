@@ -1,0 +1,58 @@
+<!--pages/parent/profile/profile.wxml-->
+<view class="profile-container">
+  <view class="background-gradient">
+    <image class="background-image" src="/images/profile/bg.png" mode="scaleToFill"></image>
+  </view>
+
+  <view class="user-profile-section">
+    <view class="user-avatar">
+      <image class="avatar-image" src="{{userProfile.avatar}}" mode="aspectFill"></image>
+    </view>
+    <view class="user-info">
+      <view class="user-name-row">
+        <text class="user-name">{{userProfile.name}}</text>
+        <image class="gender-icon" wx:if="{{userProfile.gender}}" src="{{userProfile.gender==='♀' ? '/images/student/female.png' : '/images/student/male.png'}}" mode="widthFix"></image>
+        <view class="tag parent-tag fixed">家长</view>
+      </view>
+    </view>
+  </view>
+  <!-- 余额概览模块（位于“我的功能”上方） -->
+  <view class="balance-overview">
+    <image class="income-background" src="/images/profile/moneyBg.png" mode="scaleToFill"></image>
+    <view class="income-content">
+      <view class="income-header">
+        <text class="income-title">账户余额（元）</text>
+        <view class="view-more" bindtap="viewBalance"><text>查看</text><image class="next-icon" src="/images/workspace/next.png" mode="aspectFit"></image></view>
+      </view>
+      <view class="income-center">
+        <text class="income-center-amount">{{balanceData.available}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="my-functions-section">
+    <view class="section-title"><view class="title-bar"></view><text class="title-text">我的功能</text></view>
+    <view class="functions-grid">
+      <view class="function-item" wx:for="{{myFunctions}}" wx:key="id" bindtap="onFunctionTap" data-action="{{item.action}}">
+        <image class="function-icon" src="{{item.iconSrc}}" mode="aspectFit"></image>
+        <text class="function-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="teacher-services-section">
+    <view class="section-title"><view class="title-bar"></view><text class="title-text">家长服务</text></view>
+    <view class="services-grid">
+      <view class="service-item" wx:for="{{parentServices}}" wx:key="id" bindtap="onServiceTap" data-action="{{item.action}}">
+        <view class="service-icon-wrapper">
+          <image class="service-icon" src="{{item.iconSrc}}" mode="aspectFit"></image>
+          <badge-indicator badge-key="{{item.action}}" visible="{{badgeStatus[item.action] && badgeStatus[item.action].visible}}" count="{{badgeStatus[item.action] ? badgeStatus[item.action].count : 0}}" size="medium"></badge-indicator>
+        </view>
+        <text class="service-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="logout-section"><button class="logout-btn" bindtap="logout">退出登录</button></view>
+  <role-tabbar></role-tabbar>
+</view>

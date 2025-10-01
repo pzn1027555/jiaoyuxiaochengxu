@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "老师",
+  "usingComponents": {
+    "role-tabbar": "/custom-tab-bar/index"
+  }
+}
+

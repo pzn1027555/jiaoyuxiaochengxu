@@ -1,0 +1,14 @@
+<view class="head-list">
+  <custom-header title="班主任" show-back="{{true}}"></custom-header>
+  <view class="content">
+    <block wx:if="{{list && list.length}}">
+      <view class="item" wx:for="{{list}}" wx:key="studentId">
+        <view class="title">{{item.studentName}}的班主任</view>
+        <image class="qr" src="{{item.wechatQrUrlFull}}" mode="aspectFit"></image>
+        <view class="wx">微信号：{{item.phone}}</view>
+      </view>
+    </block>
+    <view class="empty" wx:else>暂无数据</view>
+  </view>
+</view>
+

@@ -1,0 +1,125 @@
+<!--pages/community/community.wxml-->
+<view class="community-page">
+  <!-- 背景图 -->
+  <image class="bg-image" src="/images/student/shequbeijing.png" mode="widthFix" />
+  <!-- 头部搜索与统计 -->
+  <view class="header">
+    <view class="search-bar">
+      <view class="search-input-wrap">
+        <image class="icon-img" src="/images/searchicon.png" mode="widthFix"></image>
+        <input class="search-input" placeholder="搜索帖子内容" confirm-type="search" bindinput="onKeywordInput" bindconfirm="onSearch" value="{{query.keyword}}" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 资源下载块 -->
+  <view class="resource-box">
+    <view class="rb-header">
+      <view class="left-bar"></view>
+      <text class="rb-title">资源下载</text>
+      <view class="rb-more" bindtap="goMoreResources">更多<image src="/images/workspace/next.png" mode="widthFix" class="more-icon"/></view>
+    </view>
+    <view class="rb-item" wx:for="{{topResources}}" wx:key="id">
+      <text class="rb-text">{{item.title}}</text>
+      <image class="dl-icon" src="/images/student/download.png" mode="widthFix" bindtap="onDownload" data-url="{{item.fileUrl}}" data-id="{{item.id}}" />
+    </view>
+  </view>
+
+  <!-- 老师动态（关注） -->
+  <view class="teacher-feed">
+    <view class="tf-title"><view class="left-bar"></view><text>老师动态</text></view>
+    <scroll-view class="tf-scroll" scroll-x>
+      <view class="tf-card" wx:for="{{followingResources}}" wx:key="id" bindtap="openResource" data-url="{{item.fileUrl}}" data-id="{{item.id}}">
+        <image class="tf-thumb" src="{{item.coverUrl || '/images/profile/doc-thumb-placeholder.png'}}" mode="aspectFill" />
+        <view class="tf-name">{{item.title}}</view>
+      </view>
+    </scroll-view>
+    <view class="tf-empty" wx:if="{{!followingResources || followingResources.length===0}}">您关注的老师还没有更新动态哦</view>
+  </view>
+
+  <!-- 科目一级分类 -->
+  <scroll-view class="subject-tabs" scroll-x="true" show-scrollbar="false">
+    <view class="tabs-track">
+      <view class="tab {{activeSubject==='全部'?'active':''}}" data-key="全部" bindtap="switchSubject">全部</view>
+      <view class="tab {{activeSubject===item?'active':''}}" wx:for="{{subjectTabs}}" wx:key="*this" wx:if="{{item!=='全部'}}" data-key="{{item}}" bindtap="switchSubject">{{item}}</view>
+    </view>
+  </scroll-view>
+
+  <!-- 二级分类 -->
+  <view class="sub-tabs">
+    <view class="sub sub-btn {{subType==='question'?'active':''}}" data-key="question" bindtap="switchSub">问答</view>
+    <view class="sub sub-btn {{subType==='high'?'active':''}}" data-key="high" bindtap="switchSub">高分</view>
+    <view class="sub sub-btn {{subType==='experience'?'active':''}}" data-key="experience" bindtap="switchSub">经验</view>
+  </view>
+
+  <!-- 移除原分类条：筛选基于科目tabs与二级分类 -->
+
+  <!-- 瀑布流/列表 -->
+  <view class="post-list">
+    <!-- 加载骨架 -->
+    <block wx:if="{{loading && posts.length === 0}}">
+      <view class="skeleton" wx:for="{{[1,2,3]}}" wx:key="*this">
+        <view class="skeleton-title"></view>
+        <view class="skeleton-subtitle"></view>
+      </view>
+    </block>
+
+    <!-- 空态 -->
+    <block wx:if="{{!loading && posts.length === 0}}">
+      <view class="empty">
+        <image class="empty-img" src="@community/empty.png" mode="aspectFit" />
+        <text class="empty-text">暂无帖子</text>
+      </view>
+    </block>
+
+    <!-- 列表项 -->
+    <block wx:for="{{posts}}" wx:key="id">
+      <view class="post-card" data-id="{{item.id}}" bindtap="goDetail">
+        <view class="post-header">
+          <image class="avatar" src="{{item.authorAvatar || '/images/workspace/default-avatar.png'}}" mode="aspectFill" />
+          <view class="meta">
+            <view class="name-row">
+              <text class="author">{{item.authorName}}</text>
+              <image class="gender" wx:if="{{item.authorGender}}" src="{{item.authorGender==2?'/images/student/female.png':'/images/student/male.png'}}" mode="widthFix" />
+            </view>
+            <view class="sub">{{item.authorGrade || ''}}</view>
+          </view>
+        </view>
+        <view id="text-{{item.id}}" class="post-text {{item.expanded?'full':'clamp'}}">{{item.fullContent || item.content}}</view>
+        <!-- 隐藏用于测量的完整文本 -->
+        <view id="measure-{{item.id}}" class="post-text full measure">{{item.fullContent || item.content}}</view>
+        <view class="show-more" wx:if="{{!item.expanded && item.showMore}}" data-id="{{item.id}}" catchtap="toggleExpand">展示全文</view>
+        <view class="media-row" wx:if="{{item.media && item.media.length}}">
+          <block wx:for="{{item.media}}" wx:key="*this">
+            <image wx:if="{{item.type==='image'}}" class="media-img" src="{{item.url}}" mode="aspectFill" />
+            <view wx:if="{{item.type==='video'}}" class="media-video"></view>
+          </block>
+        </view>
+        <view class="post-footer">
+          <text class="time">{{item.relativeTime}}</text>
+          <view class="actions">
+            <view class="act {{item.liked?'liked':''}}" catchtap="likePost" data-id="{{item.id}}"><image class="small-icon" src="{{item.liked?'/images/student/likeChecked.png':'/images/student/like.png'}}" />{{item.likeCount||0}}</view>
+            <view class="act" catchtap="goDetail" data-id="{{item.id}}"><image class="small-icon" src="{{item.commented?'/images/student/hascomment.png':'/images/student/comment.png'}}" />{{item.commentCount||0}}</view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 上拉加载更多 -->
+    <view class="load-more" wx:if="{{loadingMore}}">加载中...</view>
+    <view class="load-end" wx:if="{{noMore && posts.length>0}}">没有更多了</view>
+  </view>
+
+  <!-- 底部角色导航 -->
+  <role-tabbar></role-tabbar>
+
+  <!-- 可拖拽发布按钮 -->
+  <movable-area class="fab-area">
+    <movable-view class="floating-create" x="{{fabX}}" y="{{fabY}}" direction="all" inertia="true" out-of-bounds="true" bindchange="onFabChange" bindtouchend="onFabRelease" bindtap="goCreate">
+      <view class="circle">
+        <image class="fatie" src="/images/student/fatie.png" mode="widthFix" />
+        <text class="create-text">发布</text>
+      </view>
+    </movable-view>
+  </movable-area>
+</view>

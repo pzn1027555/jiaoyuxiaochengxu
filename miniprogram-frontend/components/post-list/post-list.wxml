@@ -1,0 +1,29 @@
+<view class="list-container">
+  <block wx:if="{{loading}}">
+    <view class="loading">加载中...</view>
+  </block>
+
+  <block wx:if="{{!loading && items.length === 0}}">
+    <view class="empty">
+      <image class="empty-img" src="/images/common/no-data.png" mode="aspectFit" />
+      <text class="empty-text">暂无数据</text>
+    </view>
+  </block>
+
+  <block wx:for="{{items}}" wx:key="id">
+    <view class="card" bindtap="onViewDetail" data-id="{{item.id}}">
+      <image class="banner" src="{{type == 'employment' ? '/images/employment/banner.png' : '/images/research/banner.png'}}" mode="aspectFill" />
+      <view class="content">
+        <view class="title">{{item.title}}</view>
+        <view class="desc">{{item.description}}</view>
+        <view class="footer">
+          <text class="time">{{item.publishTime}}</text>
+          <button class="detail-btn" size="mini">查看详情</button>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>
+
+
+

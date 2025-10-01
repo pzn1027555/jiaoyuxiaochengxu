@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.student.mapper.StudentMapper">
+
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.student.entity.Student">
+        <id column="id" property="id"/>
+        <result column="student_no" property="studentNo"/>
+        <result column="student_name" property="studentName"/>
+        <result column="phone" property="phone"/>
+        <result column="wx_openid" property="wxOpenid"/>
+        <result column="wx_unionid" property="wxUnionid"/>
+        <result column="nickname" property="nickname"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="last_login_ip" property="lastLoginIp"/>
+        <result column="is_first_login" property="isFirstLogin"/>
+        <!-- register_source 已移除 -->
+        <result column="email" property="email"/>
+        <result column="avatar" property="avatar"/>
+        <result column="gender" property="gender"/>
+        <result column="birth_date" property="birthDate"/>
+        <result column="grade" property="grade"/>
+        <result column="school" property="school"/>
+        <!-- parent_name/parent_phone 从家长绑定表获取，不再映射基础表字段 -->
+        <result column="address" property="address"/>
+        <result column="introduction" property="introduction"/>
+        <result column="student_tags" property="studentTags" jdbcType="VARCHAR" typeHandler="com.education.admin.config.JsonTypeHandler"/>
+        <result column="subjects" property="subjects" jdbcType="VARCHAR" typeHandler="com.education.admin.config.JsonTypeHandler"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="district" property="district"/>
+        <result column="student_level" property="studentLevel"/>
+        <result column="total_courses" property="totalCourses"/>
+        <result column="remaining_courses" property="remainingCourses"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="avg_unit_price" property="avgUnitPrice"/>
+        <result column="last_course_time" property="lastCourseTime"/>
+        <result column="renewal_reminder_sent" property="renewalReminderSent"/>
+        <result column="renewal_reminder_time" property="renewalReminderTime"/>
+        <result column="complaint_count" property="complaintCount"/>
+        <!-- satisfaction_score 已移除 -->
+        <result column="referral_count" property="referralCount"/>
+        <!-- status 已移除 -->
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, student_no, student_name, phone, wx_openid, wx_unionid, nickname, 
+        last_login_time, last_login_ip, is_first_login, email, avatar, 
+        gender, birth_date, grade, school, address, 
+        introduction, student_tags, subjects, province, city, district, student_level,
+        total_amount, avg_unit_price, last_course_time, renewal_reminder_sent, 
+        renewal_reminder_time, complaint_count, referral_count, 
+        create_time, update_time
+    </sql>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT 
+          s.id, s.student_no, s.student_name, s.phone, s.wx_openid, s.wx_unionid, s.nickname,
+          s.last_login_time, s.last_login_ip, s.is_first_login, s.email, s.avatar,
+          s.gender, s.birth_date, s.grade, s.school, s.address,
+          s.introduction, s.student_tags, s.subjects, s.province, s.city, s.district, s.student_level,
+          -- 计算课时
+          (SELECT COUNT(1) FROM teacher_schedule_student tss WHERE tss.student_id = s.id) AS total_courses,
+          (SELECT COUNT(1) FROM teacher_schedule ts INNER JOIN teacher_schedule_student tss2 ON ts.id = tss2.schedule_id
+             WHERE tss2.student_id = s.id AND ts.start_time > NOW()) AS remaining_courses,
+          s.complaint_count, s.referral_count,
+          s.create_time, s.update_time
+        FROM student_info s
+        WHERE s.id = #{id}
+    </select>
+
+    <select id="findByPhone" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM student_info
+        WHERE phone = #{phone}
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT 
+          s.id, s.student_no, s.student_name, s.phone, s.wx_openid, s.wx_unionid, s.nickname,
+          s.last_login_time, s.last_login_ip, s.is_first_login, s.email, s.avatar,
+          s.gender, s.birth_date, s.grade, s.school, s.address,
+          s.introduction, s.student_tags, s.subjects, s.province, s.city, s.district, s.student_level,
+          (SELECT COUNT(1) FROM teacher_schedule_student tss WHERE tss.student_id = s.id) AS total_courses,
+          (SELECT COUNT(1) FROM teacher_schedule ts INNER JOIN teacher_schedule_student tss2 ON ts.id = tss2.schedule_id
+             WHERE tss2.student_id = s.id AND ts.start_time > NOW()) AS remaining_courses,
+          s.complaint_count, s.referral_count,
+          s.create_time, s.update_time
+        FROM student_info s
+        ORDER BY s.create_time DESC
+    </select>
+
+    <select id="findByPage" resultMap="BaseResultMap">
+        SELECT 
+          s.id, s.student_no, s.student_name, s.phone, s.wx_openid, s.wx_unionid, s.nickname,
+          s.last_login_time, s.last_login_ip, s.is_first_login, s.email, s.avatar,
+          s.gender, s.birth_date, s.grade, s.school, s.address,
+          s.introduction, s.student_tags, s.subjects, s.province, s.city, s.district, s.student_level,
+          (SELECT COUNT(1) FROM teacher_schedule_student tss WHERE tss.student_id = s.id) AS total_courses,
+          (SELECT COUNT(1) FROM teacher_schedule ts INNER JOIN teacher_schedule_student tss2 ON ts.id = tss2.schedule_id
+             WHERE tss2.student_id = s.id AND ts.start_time > NOW()) AS remaining_courses,
+          s.complaint_count, s.referral_count,
+          s.create_time, s.update_time
+        FROM student_info s
+        <where>
+            <if test="studentName != null and studentName != ''">
+                AND s.student_name LIKE CONCAT('%', #{studentName}, '%')
+            </if>
+            <if test="studentLevel != null and studentLevel != ''">
+                AND s.student_level = #{studentLevel}
+            </if>
+            <if test="phone != null and phone != ''">
+                AND s.phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="province != null and province != ''">
+                AND s.province = #{province}
+            </if>
+            <if test="city != null and city != ''">
+                AND s.city = #{city}
+            </if>
+            <if test="district != null and district != ''">
+                AND s.district = #{district}
+            </if>
+            <if test="startTime != null">
+                AND s.create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND s.create_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY s.create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO student_info
+        (student_no, student_name, phone, wx_openid, wx_unionid, nickname, 
+         last_login_time, last_login_ip, is_first_login, email, avatar,
+         gender, birth_date, grade, school, address,
+         province, city, district, student_level,
+         total_amount, avg_unit_price, last_course_time, renewal_reminder_sent,
+         renewal_reminder_time, complaint_count, referral_count,
+         create_time, update_time)
+        VALUES
+        (#{studentNo}, #{studentName}, #{phone}, #{wxOpenid}, #{wxUnionid}, #{nickname},
+         #{lastLoginTime}, #{lastLoginIp}, #{isFirstLogin}, #{email}, #{avatar},
+         #{gender}, #{birthDate}, #{grade}, #{school}, #{address},
+         #{province}, #{city}, #{district}, #{studentLevel},
+         #{totalAmount}, #{avgUnitPrice}, #{lastCourseTime}, #{renewalReminderSent},
+         #{renewalReminderTime}, #{complaintCount}, #{referralCount},
+         #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="update">
+        UPDATE student_info
+        SET student_no = #{studentNo},
+            student_name = #{studentName},
+            phone = #{phone},
+            wx_openid = #{wxOpenid},
+            wx_unionid = #{wxUnionid},
+            nickname = #{nickname},
+            last_login_time = #{lastLoginTime},
+            last_login_ip = #{lastLoginIp},
+            is_first_login = #{isFirstLogin},
+            email = #{email},
+            avatar = #{avatar},
+            gender = #{gender},
+            birth_date = #{birthDate,jdbcType=DATE},
+            grade = #{grade},
+            school = #{school},
+            
+            address = #{address},
+            introduction = #{introduction},
+            student_tags = #{studentTags, typeHandler=com.education.admin.config.JsonTypeHandler},
+            subjects = #{subjects, typeHandler=com.education.admin.config.JsonTypeHandler},
+            province = #{province},
+            city = #{city},
+            district = #{district},
+            student_level = #{studentLevel},
+            complaint_count = #{complaintCount},
+            referral_count = #{referralCount},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateLevel">
+        UPDATE student_info SET student_level = #{studentLevel} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM student_info WHERE id = #{id}
+    </delete>
+
+</mapper>

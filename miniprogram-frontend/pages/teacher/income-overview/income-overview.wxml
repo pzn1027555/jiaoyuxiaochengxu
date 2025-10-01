@@ -1,0 +1,69 @@
+<!--pages/teacher/income-overview/income-overview.wxml-->
+<view class="income-overview-container">
+  <!-- 自定义头部 -->
+  <custom-header 
+    title="收入概览" 
+    show-back="{{true}}"
+    bind:headerReady="onHeaderReady"
+  ></custom-header>
+  
+  <!-- 页面内容 -->
+  <view class="content-wrapper" style="padding-top: {{headerHeight}}px;">
+    
+    <!-- 顶部总收入区域 -->
+    <view class="total-income-section">
+      <view class="total-income-header">
+        <text class="total-income-title">总收入</text>
+      </view>
+      
+      <view class="total-income-stats">
+        <view class="income-stat-item">
+          <text class="income-amount">{{totalIncomeData.month}}</text>
+          <text class="income-label">本月</text>
+        </view>
+        <view class="income-stat-item">
+          <text class="income-amount total">{{totalIncomeData.total}}</text>
+          <text class="income-label">总</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 年月选择器 -->
+    <view class="date-filter-section">
+      <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange" fields="month">
+        <view class="date-picker">
+          <text class="date-text">{{selectedYearMonth}}</text>
+          <image class="dropdown-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 收入明细列表 -->
+    <view class="income-details-section">
+      <scroll-view class="income-list" scroll-y="true">
+        <!-- 按月分组显示 -->
+        <view class="month-group" wx:for="{{incomeGroups}}" wx:key="month">
+          <view class="month-header">
+            <text class="month-title">{{item.month}}</text>
+          </view>
+          
+          <!-- 该月的收入明细 -->
+          <view class="income-item" wx:for="{{item.records}}" wx:key="id" wx:for-item="record">
+            <view class="income-info">
+              <view class="income-type">{{record.type}}</view>
+              <view class="income-time">{{record.time}}</view>
+            </view>
+            <view class="income-amount {{record.amount >= 0 ? 'positive' : 'negative'}}">
+              {{record.amount >= 0 ? '+' : ''}}{{record.amount}}
+            </view>
+          </view>
+        </view>
+
+        <!-- 无数据提示 -->
+        <view class="no-data" wx:if="{{incomeGroups.length === 0}}">
+          <text class="no-data-text">暂无收入记录</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</view>

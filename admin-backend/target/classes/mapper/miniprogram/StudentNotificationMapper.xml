@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.StudentNotificationMapper">
+
+  <select id="list" parameterType="map" resultType="map">
+    SELECT id, student_id AS studentId, user_type AS userType, type, title, content, related_id AS relatedId,
+           is_read AS isRead, read_time AS readTime, create_time AS createTime
+    FROM student_notification
+    <where>
+      <choose>
+        <when test="userType == 'parent' and studentIds != null and studentIds.size() > 0">
+          student_id IN
+          <foreach collection="studentIds" item="sid" open="(" separator="," close=")">#{sid}</foreach>
+        </when>
+        <otherwise>
+          student_id = #{studentId}
+        </otherwise>
+      </choose>
+      AND user_type = COALESCE(#{userType}, 'student')
+    </where>
+    ORDER BY create_time DESC
+  </select>
+
+  <update id="markRead" parameterType="map">
+    UPDATE student_notification SET is_read = 1, read_time = NOW()
+    <where>
+      id = #{id}
+      AND user_type = COALESCE(#{userType}, 'student')
+      <choose>
+        <when test="userType == 'parent' and studentIds != null and studentIds.size() > 0">
+          AND student_id IN
+          <foreach collection="studentIds" item="sid" open="(" separator="," close=")">#{sid}</foreach>
+        </when>
+        <otherwise>
+          AND student_id = #{studentId}
+        </otherwise>
+      </choose>
+    </where>
+  </update>
+
+  <update id="markAll" parameterType="map">
+    UPDATE student_notification SET is_read = 1, read_time = NOW()
+    <where>
+      user_type = COALESCE(#{userType}, 'student') AND is_read = 0
+      <choose>
+        <when test="userType == 'parent' and studentIds != null and studentIds.size() > 0">
+          AND student_id IN
+          <foreach collection="studentIds" item="sid" open="(" separator="," close=")">#{sid}</foreach>
+        </when>
+        <otherwise>
+          AND student_id = #{studentId}
+        </otherwise>
+      </choose>
+    </where>
+  </update>
+
+  <insert id="insert">
+    INSERT INTO student_notification(student_id, user_type, type, title, content, related_id, is_read, create_time, update_time)
+    VALUES(#{studentId}, #{userType}, #{type}, #{title}, #{content}, #{relatedId}, 0, NOW(), NOW())
+  </insert>
+
+</mapper>
+

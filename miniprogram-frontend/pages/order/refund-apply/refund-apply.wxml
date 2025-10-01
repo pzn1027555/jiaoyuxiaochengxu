@@ -1,0 +1,29 @@
+<view class="refund-page">
+  <view class="header">
+    <image class="cover" src="{{order.coverFullUrl}}" mode="aspectFill"></image>
+    <view class="h-info">
+      <view class="title">{{order.courseName}}</view>
+      <view class="teacher"><image class="t-avatar" src="{{order.teacherAvatarFull}}" mode="aspectFill"></image>{{order.teacherName}}</view>
+      <view class="price">¥ {{order.actualAmount}}</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="row"><text class="star">*</text>售后方式</view>
+    <view class="row">
+      <image class="check" src="/images/checked.png" mode="widthFix"></image>
+      <text>退款</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="row"><text class="star">*</text>申请原因</view>
+    <textarea class="reason-input" placeholder="请填写申请原因" bindinput="onReasonInput" />
+  </view>
+
+  <view class="footer">
+    <button class="submit-btn" bindtap="submit">提交申请</button>
+  </view>
+</view>
+
+

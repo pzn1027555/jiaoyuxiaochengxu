@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.RefundMapper">
+
+  <insert id="insert">
+    INSERT INTO order_refund(
+      order_id, refund_type, reason, status, create_time, update_time
+    ) VALUES(
+      #{orderId}, #{refundType}, #{reason}, 'applied', NOW(), NOW()
+    )
+  </insert>
+
+  <select id="findLatestByOrderId" resultType="map">
+    SELECT id, order_id AS orderId, refund_type AS refundType, reason,
+           status, create_time AS createTime, update_time AS updateTime
+    FROM order_refund
+    WHERE order_id = #{orderId}
+    ORDER BY id DESC
+    LIMIT 1
+  </select>
+
+  <delete id="revoke">
+    DELETE FROM order_refund WHERE order_id = #{orderId}
+  </delete>
+
+  <!-- 管理端：列表 -->
+  <select id="adminList" resultType="map">
+    SELECT 
+      r.id,
+      r.order_id AS orderId,
+      COALESCE(r.refund_type, '') AS refundType,
+      COALESCE(r.reason, '') AS reason,
+      COALESCE(r.status, '') AS status,
+      r.create_time AS createTime,
+      r.update_time AS updateTime,
+      COALESCE(o.order_no, '') AS orderNo,
+      COALESCE(o.actual_amount, 0) AS amount,
+      COALESCE(s.student_name, '') AS studentName,
+      COALESCE(t.teacher_name, '') AS teacherName,
+      COALESCE(ts.title, o.course_name, '') AS courseName
+    FROM order_refund r
+    LEFT JOIN order_info o ON r.order_id = o.id
+    LEFT JOIN student_info s ON o.student_id = s.id
+    LEFT JOIN teacher_info t ON o.teacher_id = t.id
+    LEFT JOIN teacher_schedule ts ON o.schedule_id = ts.id
+    <where>
+      <if test="status != null and status != ''"> r.status = #{status} </if>
+    </where>
+    ORDER BY r.create_time DESC
+    <if test="pageSize != null and offset != null"> LIMIT #{pageSize} OFFSET #{offset} </if>
+  </select>
+
+  <select id="adminCount" resultType="int">
+    SELECT COUNT(1) FROM order_refund r
+    <where>
+      <if test="status != null and status != ''"> r.status = #{status} </if>
+    </where>
+  </select>
+
+  <!-- 管理端：更新状态 -->
+  <update id="updateStatus">
+    UPDATE order_refund SET status=#{status}, update_time=NOW() WHERE id=#{id}
+  </update>
+
+  <!-- 详情查找 -->
+  <select id="findById" resultType="map">
+    SELECT r.id,
+           r.order_id AS orderId,
+           COALESCE(r.refund_type, '') AS refundType,
+           COALESCE(r.reason, '') AS reason,
+           COALESCE(r.status, '') AS status,
+           r.create_time AS createTime,
+           r.update_time AS updateTime,
+           COALESCE(o.order_no, '') AS orderNo,
+           COALESCE(o.actual_amount, 0) AS amount,
+           o.student_id AS studentId,
+           o.teacher_id AS teacherId,
+           COALESCE(s.student_name, '') AS studentName,
+           COALESCE(t.teacher_name, '') AS teacherName,
+           COALESCE(ts.title, o.course_name, '') AS courseName
+    FROM order_refund r
+    LEFT JOIN order_info o ON r.order_id = o.id
+    LEFT JOIN student_info s ON o.student_id = s.id
+    LEFT JOIN teacher_info t ON o.teacher_id = t.id
+    LEFT JOIN teacher_schedule ts ON o.schedule_id = ts.id
+    WHERE r.id = #{id}
+  </select>
+
+  <select id="findOrderById" resultType="map">
+    SELECT o.id AS orderId,
+           o.order_no AS orderNo,
+           o.actual_amount AS actualAmount,
+           o.student_id AS studentId,
+           o.teacher_id AS teacherId,
+           o.schedule_id AS scheduleId,
+           s.parent_phone
+    FROM order_info o
+    LEFT JOIN student_info s ON o.student_id = s.id
+    WHERE o.id = #{orderId}
+  </select>
+
+  <!-- 查找学生的主要家长 -->
+  <select id="findPrimaryParentIdByStudent" resultType="long">
+    SELECT ps.parent_id
+    FROM parent_student_relation ps
+    WHERE ps.student_id = #{studentId}
+    ORDER BY ps.is_primary DESC, ps.id ASC
+    LIMIT 1
+  </select>
+
+  <!-- 给家长钱包加钱（余额增加）；若不存在则插入 -->
+  <update id="upsertParentWallet">
+    INSERT INTO parent_wallet(parent_id, balance, create_time, update_time)
+    VALUES(#{parentId}, #{amount}, NOW(), NOW())
+    ON DUPLICATE KEY UPDATE balance = balance + VALUES(balance), update_time = NOW()
+  </update>
+
+  <insert id="insertParentWalletTxn">
+    INSERT INTO parent_wallet_txn(parent_id, type, title, amount, order_id, create_time)
+    VALUES(#{parentId}, 'refund', #{title}, #{amount}, #{orderId}, NOW())
+  </insert>
+
+  <!-- 驳回原因更新（保留在 reason 字段后追加） -->
+  <update id="updateReject">
+    UPDATE order_refund
+    SET status='revoked', reason = CONCAT(COALESCE(reason,''), '\n驳回：', #{reason}), update_time=NOW()
+    WHERE id=#{id}
+  </update>
+
+</mapper>
+
+

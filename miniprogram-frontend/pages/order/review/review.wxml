@@ -1,0 +1,53 @@
+<view class="review-page">
+  <!-- 课程信息 -->
+  <view class="course-info">
+    <view class="course-name">{{courseName}}</view>
+    <view class="teacher-name">授课教师：{{teacherName}}</view>
+  </view>
+
+  <!-- 评分 -->
+  <view class="rating-section">
+    <view class="rating-title">课程评分</view>
+    <view class="stars">
+      <view class="star {{index < rating ? 'active' : ''}}" 
+            wx:for="{{5}}" 
+            wx:key="*this"
+            data-rating="{{index + 1}}"
+            bindtap="onRatingTap">★</view>
+    </view>
+  </view>
+
+  <!-- 评价内容 -->
+  <view class="field">
+    <textarea 
+      class="content-input" 
+      placeholder="分享您的学习体验和感受..." 
+      auto-height 
+      value="{{form.reviewContent}}" 
+      bindinput="onContentInput" 
+      disabled="{{readonly}}" />
+  </view>
+
+  <!-- 图片上传 -->
+  <view class="uploader">
+    <view class="add" bindtap="onChooseImage" wx:if="{{!readonly && images.length < 3}}">+</view>
+    <block wx:for="{{images}}" wx:key="*this">
+      <view class="image-item">
+        <image class="thumb" src="{{item.url}}" mode="aspectFill" data-index="{{index}}" bindtap="onPreview" />
+        <view class="delete-btn" data-index="{{index}}" bindtap="onDeleteImage" wx:if="{{!readonly}}">×</view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 匿名选项 -->
+  <view class="anonymous-option">
+    <checkbox-group bindchange="onAnonymousChange">
+      <label>
+        <checkbox value="anonymous" checked="{{form.isAnonymous}}" disabled="{{readonly}}"/>
+        <text class="anonymous-text">匿名评价</text>
+      </label>
+    </checkbox-group>
+  </view>
+
+  <button class="submit" bindtap="onSubmit" wx:if="{{!readonly}}">提交评价</button>
+</view>

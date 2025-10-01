@@ -1,0 +1,84 @@
+# 应用配置
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# Spring配置
+spring:
+  application:
+    name: education-admin-backend
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  
+  # 数据源配置
+  datasource:
+    # url: jdbc:mysql://localhost:3306/education_admin?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    # username: root
+    # password: 123456
+    url: jdbc:mysql://nj-cdb-phxtkejx.sql.tencentcdb.com:28269/education_admin?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: oad%S&ssdssd*&D
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+  # Jackson配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    default-property-inclusion: non_null
+
+# MyBatis配置
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.education.admin.modules.auth.entity,com.education.admin.modules.teacher.entity,com.education.admin.modules.student.entity,com.education.admin.modules.parent.entity,com.education.admin.modules.course.entity,com.education.admin.modules.order.entity,com.education.admin.modules.community.entity,com.education.admin.modules.system.entity,com.education.admin.modules.miniprogram.entity,com.education.admin.modules.badge.entity,com.education.admin.modules.operation.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    lazy-loading-enabled: true
+    aggressive-lazy-loading: false
+
+# 分页插件配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+# JWT配置
+jwt:
+  secret: your_jwt_secret_key_here_should_be_very_long_and_secure_at_least_32_chars
+  expiration: 604800
+
+# CORS配置
+cors:
+  allowed-origins: http://localhost:3000,http://localhost:8081,http://127.0.0.1:3000,http://127.0.0.1:8081
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+  max-age: 3600
+
+# 小程序配置
+miniprogram:
+  wx:
+    appid: your_wechat_appid
+    secret: your_wechat_secret
+  sms:
+    provider: mock
+    template:
+      login: SMS_123456789
+    expire-minutes: 5
+    max-send-per-day: 10
+
+# 日志配置
+logging:
+  level:
+    com.education.admin: DEBUG
+    org.springframework.security: DEBUG
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
+  file:
+    name: logs/admin-backend.log
+    max-size: 100MB
+    max-history: 30

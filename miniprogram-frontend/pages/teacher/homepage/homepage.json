@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "我的主页",
+  "navigationStyle": "custom",
+  "backgroundColor": "#f8f8f8",
+  "usingComponents": {
+    "custom-header": "/components/custom-header/custom-header"
+  }
+}
+

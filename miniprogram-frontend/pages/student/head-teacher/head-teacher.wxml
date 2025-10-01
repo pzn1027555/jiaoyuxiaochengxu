@@ -1,0 +1,9 @@
+<view class="ht-page">
+  <view class="card">
+    <image class="qr" src="{{qrUrl}}" mode="aspectFit"></image>
+    <view class="desc">扫二维码添加班主任企业微信</view>
+    <view class="info" wx:if="{{name}}">{{name}} {{phone}}</view>
+  </view>
+</view>
+
+

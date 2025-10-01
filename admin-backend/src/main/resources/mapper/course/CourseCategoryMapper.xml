@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.course.mapper.CourseCategoryMapper">
+
+  <resultMap id="BaseResultMap" type="com.education.admin.modules.course.entity.CourseCategory">
+    <id column="id" property="id" />
+    <result column="parent_id" property="parentId" />
+    <result column="level" property="level" />
+    <result column="category_name" property="categoryName" />
+    <result column="category_code" property="categoryCode" />
+    <result column="category_icon" property="categoryIcon" />
+    <result column="sort_order" property="sortOrder" />
+    <result column="description" property="description" />
+    <result column="status" property="status" />
+    <result column="create_time" property="createTime" />
+    <result column="update_time" property="updateTime" />
+  </resultMap>
+
+  <sql id="Base_Columns">id, parent_id, level, category_name, category_code, category_icon, sort_order, description, status, create_time, update_time</sql>
+
+  <select id="findById" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Columns"/> FROM course_category WHERE id = #{id}
+  </select>
+
+  <select id="findByParentId" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Columns"/> FROM course_category WHERE parent_id = #{parentId} ORDER BY sort_order ASC, id ASC
+  </select>
+
+  <select id="findLevel1Categories" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Columns"/> FROM course_category WHERE (parent_id IS NULL OR parent_id = 0) ORDER BY sort_order ASC, id ASC
+  </select>
+
+  <select id="findLevel2Categories" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Columns"/> FROM course_category WHERE parent_id IS NOT NULL AND parent_id &lt;&gt; 0 ORDER BY sort_order ASC, id ASC
+  </select>
+
+  <select id="findAllEnabledCategories" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Columns"/> FROM course_category WHERE status = 1 ORDER BY sort_order ASC, id ASC
+  </select>
+
+  <select id="findByCategoryCode" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Columns"/> FROM course_category WHERE category_code = #{categoryCode} LIMIT 1
+  </select>
+
+  <select id="findByNameAndParent" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Columns"/> FROM course_category WHERE category_name = #{categoryName}
+    <if test="parentId == null"> AND (parent_id IS NULL OR parent_id = 0)</if>
+    <if test="parentId != null"> AND parent_id = #{parentId}</if>
+    LIMIT 1
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO course_category(parent_id, level, category_name, category_code, category_icon, sort_order, description, status, create_time, update_time)
+    VALUES(#{parentId}, #{level}, #{categoryName}, #{categoryCode}, #{categoryIcon}, #{sortOrder}, #{description}, #{status}, NOW(), NOW())
+  </insert>
+
+  <update id="update">
+    UPDATE course_category
+    <set>
+      <if test="parentId != null">parent_id = #{parentId},</if>
+      <if test="level != null">level = #{level},</if>
+      <if test="categoryName != null">category_name = #{categoryName},</if>
+      <if test="categoryCode != null">category_code = #{categoryCode},</if>
+      <if test="categoryIcon != null">category_icon = #{categoryIcon},</if>
+      <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+      <if test="description != null">description = #{description},</if>
+      <if test="status != null">status = #{status},</if>
+      update_time = NOW()
+    </set>
+    WHERE id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    DELETE FROM course_category WHERE id = #{id}
+  </delete>
+
+  <select id="findByPage" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Columns"/> FROM course_category
+    <where>
+      <if test="categoryName != null and categoryName != ''">
+        AND category_name LIKE CONCAT('%', #{categoryName}, '%')
+      </if>
+      <if test="level != null">
+        AND level = #{level}
+      </if>
+      <if test="status != null">
+        AND status = #{status}
+      </if>
+    </where>
+    ORDER BY sort_order ASC, id ASC
+  </select>
+
+  <select id="countTotal" resultType="int">
+    SELECT COUNT(1) FROM course_category
+    <where>
+      <if test="categoryName != null and categoryName != ''">
+        AND category_name LIKE CONCAT('%', #{categoryName}, '%')
+      </if>
+      <if test="level != null">
+        AND level = #{level}
+      </if>
+      <if test="status != null">
+        AND status = #{status}
+      </if>
+    </where>
+  </select>
+
+  <select id="findByStatus" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Columns"/> FROM course_category WHERE status = #{status} ORDER BY sort_order ASC, id ASC
+  </select>
+
+  <update id="updateStatus">
+    UPDATE course_category SET status = #{status}, update_time = NOW() WHERE id = #{id}
+  </update>
+
+  <update id="updateSortOrder">
+    UPDATE course_category SET sort_order = #{sortOrder}, update_time = NOW() WHERE id = #{id}
+  </update>
+
+  <update id="moveParent">
+    UPDATE course_category SET parent_id = #{newParentId}, level = #{newLevel}, update_time = NOW() WHERE id = #{id}
+  </update>
+
+</mapper>

@@ -1,0 +1,62 @@
+<view class="booking-container">
+  <custom-header title="磨课" show-back="{{true}}" bind:headerReady="onHeaderReady"></custom-header>
+
+  <view class="content" style="padding-top: {{headerHeight}}px;">
+
+    <!-- 申请进度卡片：有状态时展示；可再次申请时显示按钮 -->
+    <view class="booking-item" wx:if="{{applyStatus}}">
+      <image class="avatar" src="/images/profile/mooc.png" mode="aspectFit"></image>
+      <view class="meta">
+        <view class="row1">
+          <text class="name">磨课申请</text>
+          <text class="desc">{{applyStatus.desc}}</text>
+        </view>
+        <view class="row-bottom">
+          <text class="time">{{applyStatus.timeDesc}}</text>
+          <view class="actions">
+            <button class="btn approve" size="mini" bindtap="onApply" disabled="{{!applyStatus.canApply || applying}}">{{applyStatus.canApply ? '申请磨课' : '申请中'}}</button>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 小组二维码展示（若已配置） -->
+    <view class="booking-item" wx:if="{{qrcodeUrl}}">
+      <image class="avatar" src="/images/profile/mooc.png" mode="aspectFit"></image>
+      <view class="meta">
+        <view class="row1">
+          <text class="name">磨课群二维码</text>
+          <text class="desc">请扫码加入磨课群</text>
+        </view>
+        <view class="row-bottom">
+          <image src="{{qrcodeUrl}}" style="width:160px;height:160px;border:1px solid #eee;border-radius:4px" mode="aspectFit"></image>
+          <view class="actions"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 邀请通知列表 -->
+    <block wx:if="{{notiList.length}}">
+      <view class="booking-item" wx:for="{{notiList}}" wx:key="id" bindtap="onRead" data-id="{{item.id}}">
+        <image class="avatar" src="/images/profile/mooc.png" mode="aspectFit"></image>
+        <view class="meta">
+          <view class="row1">
+            <text class="name">磨课邀请</text>
+            <text class="desc">{{item.title}}</text>
+          </view>
+          <view class="row-bottom">
+            <text class="time">{{item.timeDesc}}</text>
+            <view class="actions"></view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <view class="empty" wx:if="{{!applyStatus && notiList.length===0}}">
+      <image class="empty-img" src="/images/common/no-data.png" mode="aspectFit"></image>
+      <text class="empty-text">暂无磨课通知</text>
+    </view>
+  </view>
+</view>
+
+

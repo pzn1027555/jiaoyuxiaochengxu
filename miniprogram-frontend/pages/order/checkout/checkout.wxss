@@ -1,0 +1,192 @@
+.checkout-page{ background:#f8faf7; min-height:100vh; padding-bottom:140rpx }
+.header{ display:flex; padding:24rpx }
+.cover{ width:200rpx; height:150rpx; border-radius:12rpx; margin-right:16rpx }
+.h-info{ flex:1 }
+.title{ font-size:32rpx; font-weight:700; color:#183314 }
+.teacher{ color:#597259; margin:6rpx 0; display:flex; align-items:center; gap:8rpx }
+.t-avatar{ width:36rpx; height:36rpx; border-radius:50% }
+.price{ color:#ff6655; font-size:30rpx; font-weight:700 }
+.section{ margin: 16rpx 24rpx; border-radius:16rpx; padding:20rpx }
+.sec-title{ font-size:30rpx; color:#183314; font-weight:700; margin-bottom:10rpx }
+
+/* 家长选择器样式 */
+.parent-selector {
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-top: 10rpx;
+}
+
+.parent-info, .no-parent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.parent-info {
+  gap: 16rpx;
+}
+
+.parent-avatar {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.parent-details {
+  flex: 1;
+}
+
+.parent-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4rpx;
+}
+
+.parent-relation {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.arrow {
+  font-size: 32rpx;
+  color: #999;
+}
+
+.no-parent {
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 家长选择器弹窗样式 */
+.parent-picker-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+}
+
+.parent-picker {
+  background-color: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  width: 100%;
+  max-height: 70vh;
+  animation: slideUp 0.3s ease-out;
+  padding-bottom: 40rpx;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.picker-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.picker-close {
+  font-size: 48rpx;
+  color: #999;
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parent-list {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.parent-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 30rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+  position: relative;
+}
+
+.parent-item:last-child {
+  border-bottom: none;
+}
+
+.parent-item.selected {
+  background-color: #f8fff8;
+}
+
+.parent-item .parent-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  margin-right: 20rpx;
+}
+
+.parent-item .parent-details {
+  flex: 1;
+}
+
+.parent-item .parent-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.parent-phone {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 4rpx;
+}
+
+.parent-item .parent-relation {
+  font-size: 24rpx;
+  color: #54B247;
+}
+
+.parent-check {
+  color: #54B247;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.pay-item{ display:flex; align-items:center; gap:10rpx }
+.pay-item.active .check{ color:#54B247 }
+.wx-icon{ width:36rpx; height:36rpx }
+.amount-row{ display:flex; justify-content:space-between; color:#597259 }
+.amount{ color:#ff6655 }
+.total-row{ text-align:right; margin-top:12rpx }
+.total{ color:#ff6655; font-size:32rpx; font-weight:700 }
+.footer{ position:fixed; left:0; right:0; bottom:30rpx; background:#fff; padding:16rpx 24rpx; box-shadow:0 -6rpx 14rpx rgba(0,0,0,0.06); display:flex; gap:20rpx }
+.pay-btn{ flex:1; background:#54B247; color:#fff ;border-radius: 32rpx;max-height: 80rpx;line-height: 80rpx;}
+.cancel-btn{ background:#fff; color:#54B247; border:1rpx solid #54B247 }
+.evaluate-btn{ background:#54B247; }
+
+/* 售后时间轴样式 */
+.timeline{ padding: 10rpx 0 0 0 }
+.tl-item{ display:flex; align-items:center; margin: 18rpx 0 }
+.dot{ width:20rpx; height:20rpx; border-radius:50%; background:#54B247; margin-right:20rpx }
+.tl-text{ display:flex; gap:16rpx; color:#183314 }
+.tl-time{ width: 160rpx }
+.tl-label{ color:#183314 }
+

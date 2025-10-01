@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.ResearchApplicationMapper">
+    <insert id="insert" parameterType="com.education.admin.modules.miniprogram.entity.ResearchApplication" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO research_application(post_id, teacher_id, create_time)
+        VALUES(#{postId}, #{teacherId}, NOW())
+    </insert>
+    <select id="listAll" resultType="com.education.admin.modules.miniprogram.entity.ResearchApplication">
+        SELECT id, post_id, teacher_id, create_time
+        FROM research_application
+        ORDER BY create_time DESC, id DESC
+    </select>
+</mapper>
+
+

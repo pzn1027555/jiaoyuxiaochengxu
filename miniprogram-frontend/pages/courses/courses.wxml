@@ -1,0 +1,86 @@
+<view class="course-home">
+  <view class="search-wrap">
+    <view class="search-input" bindtap="goSearchCourse">
+      <image class="icon-img" src="/images/searchicon.png" mode="widthFix"></image>
+      <view style="color:#9aa89a">搜索课程</view>
+    </view>
+  </view>
+
+  <view class="hero-banner">
+    <swiper class="hero-swiper" circular autoplay interval="5000" duration="500" indicator-dots indicator-active-color="#54B247" indicator-color="#d9e8d9">
+      <block wx:for="{{banners.length ? banners : [{ imageUrl: '/images/banner.png' }]}}" wx:key="id">
+        <swiper-item>
+          <image class="hero-bg" src="{{item.imageUrl || item.image_url}}" mode="aspectFill" data-item="{{item}}" bindtap="onBannerTap"></image>
+        </swiper-item>
+      </block>
+    </swiper>
+  </view>
+
+  <view class="quick-row">
+    <view class="quick-card topic" bindtap="goHotTopics">
+      <image class="qc-bg" src="/images/remen1.png" mode="aspectFill"></image>
+      <text class="q-title">热门话题</text>
+      <text class="q-sub">留学热点议题</text>
+    </view>
+    <view class="quick-card material" bindtap="goResources">
+      <image class="qc-bg" src="/images/remen2.png" mode="aspectFill"></image>
+      <text class="q-title">学习资料</text>
+      <text class="q-sub">精选优质内容</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="sec-hd">
+      <view class="sec-title-wrap">
+        <image class="sec-icon" src="/images/hot.png" mode="widthFix"></image>
+        <text class="sec-title">热门老师</text>
+      </view>
+      <view>
+        <text class="sec-more" bindtap="goMoreTeachers">查看更多</text>
+      <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+      </view>
+
+
+    </view>
+    <scroll-view class="teacher-cards" scroll-x="true" show-scrollbar="false" enable-flex="true">
+      <view class="t-track">
+        <view class="t-card" wx:for="{{hotTeachers}}" wx:key="id" bindtap="goHotTeachersPage">
+          <image class="avatar" src="{{item.avatarFull || item.avatar}}" mode="aspectFill"></image>
+          <text class="name">{{item.teacherName}}</text>
+          <view class="tags" wx:if="{{item.tags && item.tags.length}}">
+            <text class="tag" wx:for="{{item.tags}}" wx:key="*this" wx:if="{{index<2}}">{{item}}</text>
+          </view>
+          <text class="intro">{{item.intro}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="section">
+    <view class="sec-hd small">
+      <text class="sec-title dark">推荐课程</text>
+    </view>
+    <scroll-view class="tabs" scroll-x="true" show-scrollbar="false" enable-flex="true">
+      <view class="tabs-track">
+        <text class="tab {{activeTab==='全部'?'active':''}}" data-key="全部" bindtap="switchTab">全部</text>
+        <text class="tab {{activeTab===item?'active':''}}" wx:for="{{subjectTabs}}" wx:key="*this" data-key="{{item}}" bindtap="switchTab">{{item}}</text>
+      </view>
+    </scroll-view>
+    <view class="course-list">
+      <view class="c-item" wx:for="{{courses}}" wx:key="id" bindtap="goCourseDetail" data-id="{{item.id}}">
+        <image class="cover" src="{{item.coverFullUrl || item.coverUrl}}" mode="aspectFill" bindtap="goCourseDetail" data-id="{{item.id}}"></image>
+        <view class="c-info">
+          <text class="title">{{item.title}}</text>
+          <view class="meta-line"><text class="meta-label">课程简介：</text><text class="meta-desc">{{item.intro || '精选精品课程'}}</text></view>
+          <view class="tags" wx:if="{{item.tags && item.tags.length}}">
+            <text class="tag" wx:for="{{item.tags}}" wx:key="*this" wx:if="{{index<3}}">{{item}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="loading" wx:if="{{loading}}">加载中...</view>
+      <view class="loading" wx:if="{{finished && (!courses || !courses.length)}}">暂无更多</view>
+    </view>
+  </view>
+
+  <role-tabbar></role-tabbar>
+</view>

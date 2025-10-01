@@ -1,0 +1,102 @@
+<!-- miniprogram-frontend/pages/orders/orders.wxml -->
+<view class="orders-page">
+  <!-- 顶部页签 -->
+  <view class="tab-bar">
+    <view 
+      class="tab-item {{currentTab === index ? 'active' : ''}}" 
+      wx:for="{{tabs}}" 
+      wx:key="*this"
+      bindtap="switchTab" 
+      data-index="{{index}}">
+      {{item}}
+    </view>
+  </view>
+
+  <!-- 订单列表 -->
+  <view class="order-list">
+    <view class="order-card" wx:for="{{orders.list}}" wx:key="id">
+      <!-- 订单头部 -->
+      <view class="order-header">
+          <!-- 学生标注（家长端进入时可见） -->
+          <view class="student-badge" wx:if="{{userType==='parent'}}">
+          <image class="student-avatar" src="{{item.studentAvatarFull || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+          <text class="student-name">{{item.studentName}}</text>
+        </view>
+        <view class="order-time">{{item.createTimeFormatted}}</view>
+        <view class="order-status" style="color: {{item.statusColor}}">{{item.orderStatusText}}</view>
+      </view>
+
+      <!-- 课程信息 -->
+      <view class="course-info">
+    
+        <!-- 课程头像 -->
+        <view class="course-image-container">
+          <image 
+            class="course-image" 
+            src="{{item.coverUrlFull || '/images/default-course.png'}}" 
+            mode="aspectFill">
+          </image>
+        </view>
+        
+        <view class="course-details">
+          <view class="course-title-row">
+            <text class="course-title">{{item.courseName}}</text>
+            <view class="course-type-tag">{{item.courseTypeText}}</view>
+          </view>
+          <view class="teacher-info">
+            <image class="teacher-avatar" src="{{item.teacherAvatarFull || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+            <text class="teacher-name">{{item.teacherName}}</text>
+          </view>
+          <view class="price-info">
+            <view class="current-price">¥{{item.actualAmount}}</view>
+            <view class="original-price" wx:if="{{item.discountAmount > 0}}">¥{{item.totalAmount}}</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 订单信息 -->
+      <!-- <view class="order-info" wx:if="{{item.payTime}}">
+        <view class="pay-info">
+          支付时间：{{item.payTimeFormatted}}
+        </view>
+      </view> -->
+
+      <!-- 操作按钮 -->
+      <view class="order-actions">
+        <button 
+          class="action-btn {{action.type === 'primary' ? 'primary' : 'default'}}"
+          wx:for="{{item.actions}}" 
+          wx:key="action"
+          wx:for-item="action"
+          bindtap="onOrderAction"
+          data-action="{{action.action}}"
+          data-orderid="{{item.id}}">
+          {{action.text}}
+        </button>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!orders.loading && orders.list.length === 0}}">
+      <image class="empty-icon" src="/images/empty-orders.png" mode="aspectFit"></image>
+      <view class="empty-text">暂无订单</view>
+      <view class="empty-desc">您还没有任何订单记录</view>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{orders.loading && orders.list.length === 0}}">
+      <view class="loading-icon"></view>
+      <view class="loading-text">加载中...</view>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{orders.list.length > 0 && orders.hasMore}}">
+      <view class="load-more-text">加载更多...</view>
+    </view>
+
+    <!-- 没有更多 -->
+    <view class="no-more" wx:if="{{orders.list.length > 0 && !orders.hasMore}}">
+      <view class="no-more-text">没有更多订单了</view>
+    </view>
+  </view>
+</view>

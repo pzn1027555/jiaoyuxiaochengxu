@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "我的学生",
+  "navigationStyle": "custom",
+  "backgroundTextStyle": "light",
+  "backgroundColor": "#f8f8f8",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "custom-header": "/components/custom-header/custom-header"
+  }
+}

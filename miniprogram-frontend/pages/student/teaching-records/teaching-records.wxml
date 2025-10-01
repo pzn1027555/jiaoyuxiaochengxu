@@ -1,0 +1,56 @@
+<view class="teaching-records-container">
+  <view class="content-wrapper" >
+    <view class="date-selector-container">
+      <view class="date-selector">
+        <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange" fields="year">
+          <view class="date-item"><text class="date-text">{{selectedYear}}年</text><text class="date-arrow">▼</text></view>
+        </picker>
+        <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange" fields="month">
+          <view class="date-item"><text class="date-text">{{selectedMonth}}月</text><text class="date-arrow">▼</text></view>
+        </picker>
+        <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange" fields="day">
+          <view class="date-item"><text class="date-text">{{selectedDay}}日</text><text class="date-arrow">▼</text></view>
+        </picker>
+      </view>
+    </view>
+
+    <scroll-view class="course-list" scroll-y="true">
+      <view class="course-item" wx:for="{{courseList}}" wx:key="id">
+        <view class="time-section"><text class="time-text">{{item.startTime}} ~ {{item.endTime}}</text></view>
+        <view class="course-card" data-course-type="{{item.classType}}">
+          <view class="course-cover" wx:if="{{item.classType==='big_class'}}">
+            <image class="cover-image" src="{{item.coverFullUrl}}" mode="aspectFill"></image>
+          </view>
+          <view class="course-info">
+            <view class="course-title">{{item.courseTitle}}<text class="class-tag" wx:if="{{item.classType==='big_class'}}">班课</text></view>
+            <view class="course-progress"><text class="progress-text">第{{item.lessonNumber}}课</text><text class="total-lessons">/共{{item.totalLessons}}节课</text></view>
+          </view>
+          <view class="action-buttons">
+            <button class="action-btn view-feedback-btn" wx:if="{{item.hasReview}}" bindtap="viewReview" data-id="{{item.id}}">查看评价</button>
+            <button class="action-btn feedback-btn" wx:else bindtap="writeReview" data-id="{{item.id}}">写评价</button>
+          </view>
+        </view>
+      </view>
+      <view class="no-data" wx:if="{{courseList.length === 0}}"><text class="no-data-text">暂无上课记录</text></view>
+    </scroll-view>
+  </view>
+
+  <!-- 复用学习中心评价弹窗样式 -->
+  <view class="mask" wx:if="{{showReviewModal}}" bindtap="closeRv"></view>
+  <view class="rv-card" wx:if="{{showReviewModal}}" catchtouchmove="noop">
+    <image class="rv-emoji" src="/images/student/smileface.png" mode="aspectFit"></image>
+    <view class="rv-title">给老师一个好评吧~</view>
+    <view class="rv-stars">
+      <text class="rv-star {{rvStar>=1?'on':'off'}}" data-star="1" catchtap="onRvStarChange">★</text>
+      <text class="rv-star {{rvStar>=2?'on':'off'}}" data-star="2" catchtap="onRvStarChange">★</text>
+      <text class="rv-star {{rvStar>=3?'on':'off'}}" data-star="3" catchtap="onRvStarChange">★</text>
+      <text class="rv-star {{rvStar>=4?'on':'off'}}" data-star="4" catchtap="onRvStarChange">★</text>
+      <text class="rv-star {{rvStar>=5?'on':'off'}}" data-star="5" catchtap="onRvStarChange">★</text>
+    </view>
+    <textarea class="rv-input" placeholder="请填写评价内容（选填）" value="{{rvContent}}" bindinput="onRvInput" disabled="{{rvView}}"></textarea>
+    <button class="rv-submit" wx:if="{{!rvView}}" bindtap="submitRv">提交</button>
+    <button class="rv-submit ghost" wx:else bindtap="closeRv">关闭</button>
+  </view>
+</view>
+
+

@@ -1,0 +1,17 @@
+<!--components/teacher-tabbar/teacher-tabbar.wxml-->
+<view class="teacher-tabbar">
+  <view class="tabbar-item {{currentTab === 'workspace' ? 'active' : ''}}" bindtap="switchTab" data-tab="workspace">
+    <image class="tabbar-icon" src="/images/icons/workspace{{currentTab === 'workspace' ? '-active' : ''}}.png" mode="aspectFit"></image>
+    <text class="tabbar-text">工作台</text>
+  </view>
+  
+  <view class="tabbar-item {{currentTab === 'resources' ? 'active' : ''}}" bindtap="switchTab" data-tab="resources">
+    <image class="tabbar-icon" src="/images/icons/resources{{currentTab === 'resources' ? '-active' : ''}}.png" mode="aspectFit"></image>
+    <text class="tabbar-text">资源中心</text>
+  </view>
+  
+  <view class="tabbar-item {{currentTab === 'profile' ? 'active' : ''}}" bindtap="switchTab" data-tab="profile">
+    <image class="tabbar-icon" src="/images/icons/teacher-profile{{currentTab === 'profile' ? '-active' : ''}}.png" mode="aspectFit"></image>
+    <text class="tabbar-text">我的</text>
+  </view>
+</view>

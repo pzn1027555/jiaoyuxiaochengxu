@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.ParentStudentRelationMapper">
+
+  <!-- 获取学生绑定的家长列表 -->
+  <select id="getParentsByStudentId" resultType="map">
+    SELECT 
+      p.id AS parentId,
+      p.parent_name AS parentName,
+      p.phone AS parentPhone,
+      p.avatar AS parentAvatar,
+      p.gender AS parentGender,
+      psr.relation_type AS relationType,
+      psr.is_primary AS isPrimary,
+      psr.create_time AS bindTime
+    FROM parent_student_relation psr
+    INNER JOIN parent_info p ON psr.parent_id = p.id
+    WHERE psr.student_id = #{studentId}
+      AND psr.status = 1
+      AND p.status = 1
+    ORDER BY psr.is_primary DESC, psr.create_time ASC
+  </select>
+
+  <!-- 检查家长和学生的绑定关系 -->
+  <select id="checkParentStudentRelation" resultType="int">
+    SELECT COUNT(1)
+    FROM parent_student_relation
+    WHERE parent_id = #{parentId}
+      AND student_id = #{studentId}
+      AND status = 1
+  </select>
+
+  <!-- 根据家长ID获取第一个学生ID -->
+  <select id="findFirstStudentIdByParentId" resultType="java.lang.Long">
+    SELECT student_id
+    FROM parent_student_relation
+    WHERE parent_id = #{parentId}
+      AND status = 1
+    ORDER BY is_primary DESC, create_time ASC
+    LIMIT 1
+  </select>
+
+  <!-- 根据家长ID获取所有学生ID列表 -->
+  <select id="findStudentIdsByParentId" resultType="java.lang.Long">
+    SELECT student_id
+    FROM parent_student_relation
+    WHERE parent_id = #{parentId}
+      AND status = 1
+    ORDER BY is_primary DESC, create_time ASC
+  </select>
+
+  <!-- 插入绑定关系（若已存在则更新为正常状态） -->
+  <insert id="insertRelation">
+    INSERT INTO parent_student_relation(parent_id, student_id, relation_type, is_primary, status, create_time, update_time)
+    VALUES(#{parentId}, #{studentId}, COALESCE(#{relationType}, 'parent'), COALESCE(#{isPrimary}, 0), 1, NOW(), NOW())
+    ON DUPLICATE KEY UPDATE status=1, relation_type=VALUES(relation_type), is_primary=VALUES(is_primary), update_time=NOW()
+  </insert>
+
+  <!-- 家长绑定的学生列表 -->
+  <select id="getStudentsByParentId" resultType="map">
+    SELECT s.id AS studentId, s.student_name AS studentName, s.phone AS studentPhone,
+           s.avatar AS studentAvatar, s.gender AS studentGender
+    FROM parent_student_relation psr
+    INNER JOIN student_info s ON psr.student_id = s.id
+    WHERE psr.parent_id = #{parentId} AND psr.status = 1
+    ORDER BY psr.is_primary DESC, psr.create_time ASC
+  </select>
+
+  <!-- 根据学生ID获取所有家长ID列表 -->
+  <select id="findParentIdsByStudentId" resultType="java.lang.Long">
+    SELECT parent_id
+    FROM parent_student_relation
+    WHERE student_id = #{studentId}
+      AND status = 1
+    ORDER BY is_primary DESC, create_time ASC
+  </select>
+
+</mapper>

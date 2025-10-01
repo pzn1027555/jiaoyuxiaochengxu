@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.system.mapper.TeacherLevelConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.system.entity.TeacherLevelConfig">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="level_key" property="levelKey" jdbcType="VARCHAR"/>
+        <result column="display_name" property="displayName" jdbcType="VARCHAR"/>
+        <result column="hourly_rate" property="hourlyRate" jdbcType="DECIMAL"/>
+        <result column="commission_rate" property="commissionRate" jdbcType="DECIMAL"/>
+        <result column="is_enabled" property="isEnabled" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, level_key, display_name, hourly_rate, commission_rate, is_enabled, remark, create_time, update_time
+    </sql>
+
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM teacher_level_config
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByLevelKey" parameterType="string" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM teacher_level_config
+        WHERE level_key = #{levelKey}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM teacher_level_config
+        ORDER BY id ASC
+    </select>
+
+    <insert id="insert" parameterType="com.education.admin.modules.system.entity.TeacherLevelConfig" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO teacher_level_config
+        (level_key, display_name, hourly_rate, commission_rate, is_enabled, remark, create_time, update_time)
+        VALUES
+        (#{levelKey}, #{displayName}, #{hourlyRate}, #{commissionRate}, #{isEnabled}, #{remark}, NOW(), NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.education.admin.modules.system.entity.TeacherLevelConfig">
+        UPDATE teacher_level_config
+        <set>
+            <if test="levelKey != null">level_key = #{levelKey},</if>
+            <if test="displayName != null">display_name = #{displayName},</if>
+            <if test="hourlyRate != null">hourly_rate = #{hourlyRate},</if>
+            <if test="commissionRate != null">commission_rate = #{commissionRate},</if>
+            <if test="isEnabled != null">is_enabled = #{isEnabled},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM teacher_level_config WHERE id = #{id}
+    </delete>
+
+</mapper>
+
+

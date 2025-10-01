@@ -1,0 +1,9 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "custom-header": "/components/custom-header/custom-header",
+    "role-tabbar": "/custom-tab-bar/index"
+  }
+}
+
+

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.parent.mapper.ParentMapper">
+    
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.parent.entity.Parent">
+        <id column="id" property="id"/>
+        <result column="parent_no" property="parentNo"/>
+        <result column="parent_name" property="parentName"/>
+        <result column="phone" property="phone"/>
+        <result column="wx_openid" property="wxOpenid"/>
+        <result column="wx_unionid" property="wxUnionid"/>
+        <result column="nickname" property="nickname"/>
+        <result column="email" property="email"/>
+        <result column="avatar" property="avatar"/>
+        <result column="gender" property="gender"/>
+        <result column="birth_date" property="birthDate"/>
+        <result column="id_card" property="idCard"/>
+        <result column="occupation" property="occupation"/>
+        <result column="education" property="education"/>
+        <result column="address" property="address"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="district" property="district"/>
+        <result column="emergency_contact" property="emergencyContact"/>
+        <result column="emergency_phone" property="emergencyPhone"/>
+        <result column="introduction" property="introduction"/>
+        <result column="parent_tags" property="parentTags" jdbcType="VARCHAR" typeHandler="com.education.admin.config.JsonTypeHandler"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="last_login_ip" property="lastLoginIp"/>
+        <result column="is_first_login" property="isFirstLogin"/>
+        <result column="register_source" property="registerSource"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, parent_no, parent_name, phone, wx_openid, wx_unionid, nickname, email, 
+        avatar, gender, birth_date, id_card, occupation, education, address, 
+        province, city, district, emergency_contact, emergency_phone, 
+        introduction, parent_tags, last_login_time, last_login_ip, is_first_login, register_source, 
+        status, create_time, update_time
+    </sql>
+    
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM parent_info
+        WHERE id = #{id}
+    </select>
+    
+    <select id="findByPhone" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM parent_info
+        WHERE phone = #{phone}
+    </select>
+    
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM parent_info
+        ORDER BY create_time DESC
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO parent_info
+        (parent_no, parent_name, phone, wx_openid, wx_unionid, nickname, email,
+         avatar, gender, birth_date, id_card, occupation, education, address,
+         province, city, district, emergency_contact, emergency_phone,
+         last_login_time, last_login_ip, is_first_login, register_source,
+         status, create_time, update_time)
+        VALUES
+        (#{parentNo}, #{parentName}, #{phone}, #{wxOpenid}, #{wxUnionid}, #{nickname}, #{email},
+         #{avatar}, #{gender}, #{birthDate}, #{idCard}, #{occupation}, #{education}, #{address},
+         #{province}, #{city}, #{district}, #{emergencyContact}, #{emergencyPhone},
+         #{lastLoginTime}, #{lastLoginIp}, #{isFirstLogin}, #{registerSource},
+         #{status}, #{createTime}, #{updateTime})
+    </insert>
+    
+    <update id="update">
+        UPDATE parent_info
+        SET parent_no = #{parentNo},
+            parent_name = #{parentName},
+            phone = #{phone},
+            wx_openid = #{wxOpenid},
+            wx_unionid = #{wxUnionid},
+            nickname = #{nickname},
+            email = #{email},
+            avatar = #{avatar},
+            gender = #{gender},
+            birth_date = #{birthDate},
+            id_card = #{idCard},
+            occupation = #{occupation},
+            education = #{education},
+            address = #{address},
+            province = #{province},
+            city = #{city},
+            district = #{district},
+            emergency_contact = #{emergencyContact},
+            emergency_phone = #{emergencyPhone},
+            introduction = #{introduction},
+            parent_tags = #{parentTags, typeHandler=com.education.admin.config.JsonTypeHandler},
+            last_login_time = #{lastLoginTime},
+            last_login_ip = #{lastLoginIp},
+            is_first_login = #{isFirstLogin},
+            register_source = #{registerSource},
+            status = #{status},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        DELETE FROM parent_info WHERE id = #{id}
+    </delete>
+    
+</mapper>

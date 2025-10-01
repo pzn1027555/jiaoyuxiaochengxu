@@ -1,0 +1,149 @@
+<!--pages/teacher/teaching-records/teaching-records.wxml-->
+<view class="teaching-records-container">
+  <!-- 自定义头部 -->
+  <custom-header 
+    title="授课记录" 
+    show-back="{{true}}"
+    bind:headerReady="onHeaderReady"
+  ></custom-header>
+  
+  <!-- 页面内容 -->
+  <view class="content-wrapper" style="padding-top: {{headerHeight}}px;">
+    <!-- 日期选择器 -->
+    <view class="date-selector-container">
+    <view class="date-selector">
+      <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange" fields="year">
+        <view class="date-item">
+          <text class="date-text">{{selectedYear}}年</text>
+          <text class="date-arrow">▼</text>
+        </view>
+      </picker>
+      
+      <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange" fields="month">
+        <view class="date-item">
+          <text class="date-text">{{selectedMonth}}月</text>
+          <text class="date-arrow">▼</text>
+        </view>
+      </picker>
+      
+      <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange" fields="day">
+        <view class="date-item">
+          <text class="date-text">{{selectedDay}}日</text>
+          <text class="date-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+  
+  <!-- 课程列表 -->
+  <scroll-view class="course-list" scroll-y="true">
+    <view class="course-item" wx:for="{{courseList}}" wx:key="id">
+      <!-- 时间段 -->
+      <view class="time-section">
+        <text class="time-text">{{item.startTime}} ~ {{item.endTime}}</text>
+      </view>
+      
+      <!-- 课程信息卡片 -->
+      <view class="course-card" data-course-type="{{item.classType}}">
+        <!-- 左侧：仅班课显示封面 -->
+        <view class="course-cover" wx:if="{{item.classType==='big_class'}}">
+          <image class="cover-image" src="{{item.coverFullUrl}}" mode="aspectFill"></image>
+        </view>
+        
+        <!-- 右侧：课程详情 -->
+        <view class="course-info">
+          <!-- 课程标题 -->
+          <view class="course-title">
+            {{item.courseName || item.courseTitle}}
+            <text class="class-tag" wx:if="{{item.classType==='big_class'}}">班课</text>
+          </view>
+          
+          <!-- 课程进度 -->
+          <view class="course-progress">
+            <text class="progress-text">第{{item.currentLesson}}课</text>
+            <text class="total-lessons">/共{{item.totalLessons}}节课</text>
+          </view>
+          
+          <!-- 学生展示：班课最多3个+人数；一对一全部头像+姓名 -->
+          <view class="class-students">
+            <block wx:if="{{item.classType==='big_class'}}">
+              <image class="student-avatar" wx:for="{{item.displayStudents}}" wx:key="id" src="{{item.avatar}}" />
+              <text class="student-count">{{item.studentCount}} 人</text>
+            </block>
+            <block wx:else>
+              <view class="student-all" wx:for="{{item.displayStudents}}" wx:key="id">
+                <image class="student-avatar" src="{{item.avatar}}" />
+                <text class="student-name">{{item.name}}</text>
+              </view>
+            </block>
+          </view>
+        </view>
+        
+        <!-- 操作按钮 -->
+        <view class="action-buttons">
+          <!-- 填写反馈按钮 -->
+          <button class="action-btn feedback-btn" wx:if="{{item.canWriteFeedback && !item.hasFeedback}}" bindtap="writeFeedback" data-course-id="{{item.id}}">填写反馈</button>
+          <button class="action-btn view-feedback-btn" wx:else bindtap="viewFeedback" data-course-id="{{item.id}}">查看反馈</button>
+          
+          <!-- 中期报告按钮 -->
+          <button 
+            class="action-btn report-btn" 
+            wx:if="{{item.canWriteReport}}"
+            bindtap="writeMidtermReport"
+            data-course-id="{{item.id}}"
+          >
+            中期报告
+          </button>
+          
+          <!-- 查看中期报告按钮 -->
+          <button 
+            class="action-btn view-report-btn" 
+            wx:if="{{item.hasReport && !item.canWriteReport}}"
+            bindtap="viewMidtermReport"
+            data-course-id="{{item.id}}"
+          >
+            查看中期报告
+          </button>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 无数据提示 -->
+    <view class="no-data" wx:if="{{courseList.length === 0}}">
+      <text class="no-data-text">暂无授课记录</text>
+    </view>
+  </scroll-view>
+  </view>
+</view>
+
+<!-- 反馈弹窗 -->
+<view class="modal-overlay {{showFeedbackModal ? 'show' : ''}}" bindtap="hideFeedbackModal">
+  <view class="feedback-modal" catchtap="preventClose">
+    <!-- 弹窗标题 -->
+    <view class="modal-header">
+      <text class="modal-title">{{feedbackModalTitle}}</text>
+    </view>
+    
+    <!-- 反馈内容 -->
+    <view class="modal-content">
+      <textarea 
+        class="feedback-textarea"
+        value="{{tempFeedbackContent}}"
+        placeholder="{{isViewMode ? '' : '请填写反馈内容'}}"
+        placeholderClass="textarea-placeholder"
+        bindinput="onFeedbackInput"
+        maxlength="{{500}}"
+        auto-height="{{true}}"
+        readonly="{{isViewMode}}"
+        cursor-spacing="{{20}}"
+      ></textarea>
+      <view class="char-count" wx:if="{{!isViewMode}}">{{tempFeedbackContent.length}}/500</view>
+    </view>
+    
+    <!-- 弹窗底部按钮 -->
+    <view class="modal-actions">
+      <button class="modal-btn cancel-btn" bindtap="hideFeedbackModal">{{isViewMode ? '关闭' : '取消'}}</button>
+      <button class="modal-btn confirm-btn" wx:if="{{!isViewMode}}" bindtap="confirmFeedback">确定</button>
+    </view>
+  </view>
+</view>

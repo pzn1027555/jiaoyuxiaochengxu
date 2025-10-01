@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.dashboard.mapper.DashboardMapper">
+
+    <!-- 获取用户统计数据 -->
+    <select id="getUserStatistics" resultType="java.util.Map">
+        SELECT
+            (SELECT COUNT(*) FROM student_info) as totalStudents,
+            (SELECT COUNT(*) FROM teacher_info WHERE status = 1) as totalTeachers,
+            (SELECT COUNT(*) FROM parent_info WHERE status = 1) as totalParents,
+            (SELECT COUNT(*) FROM student_info) + (SELECT COUNT(*) FROM teacher_info WHERE status = 1) + (SELECT COUNT(*) FROM parent_info WHERE status = 1) as totalUsers,
+            (SELECT COUNT(*) FROM teacher_certification WHERE certification_status = 0) as pendingAuditCount,
+            (SELECT COUNT(*) FROM teacher_info WHERE risk_level > 1) as riskTeacherCount
+    </select>
+
+    <!-- 获取订单统计数据 -->
+    <select id="getOrderStatistics" resultType="java.util.Map">
+        SELECT
+            (SELECT COUNT(*) FROM order_info) as totalOrders,
+            (SELECT COUNT(*) FROM order_info WHERE DATE(create_time) = CURDATE()) as todayOrders,
+            (SELECT SUM(actual_amount) FROM order_info) as totalRevenue,
+            (SELECT SUM(actual_amount) FROM order_info WHERE DATE(create_time) = CURDATE()) as todayRevenue,
+            (SELECT AVG(actual_amount) FROM order_info WHERE actual_amount &gt; 0) as avgOrderAmount
+    </select>
+
+    <!-- 获取课程统计数据 -->
+    <select id="getCourseStatistics" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            (SELECT COUNT(*) FROM course_category) as totalCourses,
+            (SELECT COUNT(*) FROM course_category WHERE status = 1) as onlineCourses,
+            (SELECT COUNT(*) FROM course_category WHERE status = 0) as pendingCourses,
+            (SELECT AVG(rating) FROM (
+                SELECT AVG(star_rating) as rating FROM order_review
+                GROUP BY order_id
+            ) t) as avgRating,
+            (SELECT SUM(actual_amount) FROM order_info
+             WHERE DATE(create_time) >= DATE_FORMAT(NOW(), '%Y-%m-01')
+               AND DATE(create_time) <= LAST_DAY(NOW())) as monthRevenue
+        ]]>
+    </select>
+
+    <!-- 获取今日实时数据 -->
+    <select id="getRealtimeData" resultType="java.util.Map">
+        SELECT
+            #{onlineUsers} as onlineUsers,
+            (SELECT COUNT(*) FROM student_info WHERE DATE(create_time) = CURDATE()) as todayNewUsers,
+            (SELECT COUNT(*) FROM order_info WHERE DATE(create_time) = CURDATE()) as todayOrders,
+            (SELECT SUM(actual_amount) FROM order_info WHERE DATE(create_time) = CURDATE()) as todayRevenue
+    </select>
+
+    <!-- 获取用户增长趋势数据 -->
+    <select id="getUserGrowthTrend" resultType="java.util.Map">
+        SELECT
+            date,
+            newUsers,
+            0 as totalUsers
+        FROM (
+            SELECT
+                DATE(create_time) as date,
+                COUNT(*) as newUsers
+            FROM student_info si
+            WHERE DATE(create_time) BETWEEN #{startDate} AND #{endDate}
+            GROUP BY DATE(create_time)
+        ) daily_stats
+        ORDER BY date
+    </select>
+
+    <!-- 获取收入趋势数据 -->
+    <select id="getRevenueTrend" resultType="java.util.Map">
+        SELECT
+            DATE(create_time) as date,
+            SUM(actual_amount) as revenue,
+            COUNT(*) as orders
+        FROM order_info
+        WHERE DATE(create_time) BETWEEN #{startDate} AND #{endDate}
+          AND order_status &gt;= 2
+        GROUP BY DATE(create_time)
+        ORDER BY date
+    </select>
+
+    <!-- 获取地区分布数据 -->
+    <select id="getRegionDistribution" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            province as name,
+            COUNT(*) as value,
+            COUNT(CASE WHEN user_type = 'student' THEN 1 END) as students,
+            COUNT(CASE WHEN user_type = 'teacher' THEN 1 END) as teachers
+        FROM (
+            SELECT province, 'student' as user_type
+            FROM student_info
+            WHERE province IS NOT NULL AND province != ''
+
+            UNION ALL
+
+            SELECT province, 'teacher' as user_type
+            FROM teacher_info
+            WHERE province IS NOT NULL AND province != '' AND status = 1
+        ) t
+        GROUP BY province
+        HAVING COUNT(*) > 0
+        ORDER BY value DESC
+        LIMIT 20
+        ]]>
+    </select>
+
+    <!-- 获取城市渗透率分析数据 -->
+    <select id="getCityPenetrationAnalysis" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            CONCAT(province, '-', city) as city,
+            COUNT(*) as userCount,
+            ROUND((COUNT(*) / (SELECT COUNT(*) FROM (
+                SELECT province, city
+                FROM student_info
+                WHERE province IS NOT NULL AND city IS NOT NULL AND province != '' AND city != ''
+
+                UNION
+
+                SELECT province, city
+                FROM teacher_info
+                WHERE province IS NOT NULL AND city IS NOT NULL AND province != '' AND city != '' AND status = 1
+            ) total_users) * 100), 2) as penetrationRate
+        FROM (
+            SELECT province, city
+            FROM student_info
+            WHERE province IS NOT NULL AND city IS NOT NULL AND province != '' AND city != ''
+
+            UNION
+
+            SELECT province, city
+            FROM teacher_info
+            WHERE province IS NOT NULL AND city IS NOT NULL AND province != '' AND city != '' AND status = 1
+        ) t
+        GROUP BY province, city
+        HAVING COUNT(*) > 0
+        ORDER BY userCount DESC
+        LIMIT 20
+        ]]>
+    </select>
+
+    <!-- 获取教师审核面板数据 -->
+    <select id="getTeacherAuditPanelData" resultType="java.util.Map">
+        SELECT
+            (SELECT COUNT(*) FROM teacher_certification WHERE certification_status = 0) as pendingAuditCount,
+            (SELECT COUNT(*) FROM teacher_info WHERE risk_level > 1 AND status = 1) as riskTeacherCount,
+            (SELECT COUNT(*) FROM teacher_certification WHERE DATE(submit_time) = CURDATE()) as newApplications,
+            (SELECT COUNT(*) FROM teacher_certification WHERE certification_status = 1 AND DATE(audit_time) = CURDATE()) as auditedToday,
+            (SELECT COUNT(*) FROM teacher_certification WHERE certification_status = 2 AND DATE(audit_time) = CURDATE()) as rejectedToday
+    </select>
+
+    <!-- 获取投诉面板数据 -->
+    <select id="getComplaintPanelData" resultType="java.util.Map">
+        SELECT
+            (SELECT COUNT(*) FROM complaint_record WHERE complaint_status = 0) as pendingComplaints,
+            (SELECT COUNT(*) FROM complaint_record WHERE complaint_status = 1) as processingComplaints,
+            (SELECT COUNT(*) FROM complaint_record WHERE DATE(create_time) = CURDATE()) as todayComplaints,
+            (SELECT COUNT(*) FROM complaint_record) as totalComplaints,
+            (SELECT COUNT(*) FROM complaint_record WHERE DATE(process_time) = CURDATE()) as resolvedToday
+    </select>
+
+    <!-- 获取课程销售排行 -->
+    <select id="getCourseRanking" resultType="java.util.Map">
+        SELECT
+            @rank := @rank + 1 as rank,
+            cc.category_name as courseName,
+            COUNT(*) as salesCount,
+            AVG(CASE WHEN orr.star_rating IS NOT NULL THEN orr.star_rating END) as avgRating,
+            SUM(oi.actual_amount) as revenue
+        FROM course_category cc
+        LEFT JOIN order_info oi ON cc.id = oi.course_id
+        LEFT JOIN order_review orr ON oi.id = orr.order_id,
+        (SELECT @rank := 0) r
+        GROUP BY cc.id, cc.category_name
+        ORDER BY salesCount DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取教师排行 -->
+    <select id="getTeacherRanking" resultType="java.util.Map">
+        SELECT
+            @rank := @rank + 1 as rank,
+            ti.teacher_name as teacherName,
+            COUNT(oi.id) as studentCount,
+            AVG(CASE WHEN orr.star_rating IS NOT NULL THEN orr.star_rating END) as avgRating,
+            SUM(oi.teacher_income) as revenue
+        FROM teacher_info ti
+        LEFT JOIN order_info oi ON ti.id = oi.teacher_id AND oi.order_status &gt;= 2
+        LEFT JOIN order_review orr ON oi.id = orr.order_id,
+        (SELECT @rank := 0) r
+        WHERE ti.status = 1
+        GROUP BY ti.id, ti.teacher_name
+        ORDER BY studentCount DESC, revenue DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取学生等级分布 -->
+    <select id="getStudentLevelDistribution" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            student_level as level,
+            COUNT(*) as count
+        FROM student_info
+        GROUP BY student_level
+        ORDER BY
+            CASE student_level
+                WHEN 'bronze' THEN 1
+                WHEN 'silver' THEN 2
+                WHEN 'gold' THEN 3
+                ELSE 4
+            END
+        ]]>
+    </select>
+
+    <!-- 获取客单价趋势 -->
+    <select id="getOrderAmountTrend" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            DATE(create_time) as date,
+            SUM(actual_amount) as totalAmount,
+            COUNT(*) as orderCount,
+            AVG(actual_amount) as avgOrderAmount
+        FROM order_info
+        WHERE DATE(create_time) BETWEEN #{startDate} AND #{endDate}
+          AND order_status >= 2
+        GROUP BY DATE(create_time)
+        ORDER BY date
+        ]]>
+    </select>
+
+    <!-- 获取今日新用户数 -->
+    <select id="getTodayNewUsers" resultType="int">
+        SELECT COUNT(*) FROM student_info WHERE DATE(create_time) = CURDATE()
+    </select>
+
+    <!-- 获取今日新订单数 -->
+    <select id="getTodayNewOrders" resultType="int">
+        SELECT COUNT(*) FROM order_info WHERE DATE(create_time) = CURDATE()
+    </select>
+
+    <!-- 获取今日收入 -->
+    <select id="getTodayRevenue" resultType="java.math.BigDecimal">
+        SELECT SUM(actual_amount) FROM order_info
+        WHERE DATE(create_time) = CURDATE() AND order_status &gt;= 2
+    </select>
+
+    <!-- 获取在线用户数（模拟数据，实际需要WebSocket或缓存实现） -->
+    <select id="getOnlineUsers" resultType="int">
+        /* 这里返回一个模拟的在线用户数，实际实现需要WebSocket连接或缓存机制 */
+        SELECT FLOOR(RAND() * 200 + 50) as onlineUsers
+    </select>
+
+    <!-- 获取待审核教师列表 -->
+    <select id="getPendingTeachers" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            tc.id,
+            ti.teacher_name as name,
+            JSON_UNQUOTE(JSON_EXTRACT(ti.subjects, '$[0]')) as subject,
+            tc.submit_time as applyTime,
+            CASE
+                WHEN tc.certification_status = 0 THEN '待审核'
+                WHEN tc.certification_status = 1 THEN '审核通过'
+                WHEN tc.certification_status = 2 THEN '审核拒绝'
+                ELSE '未知'
+            END as status,
+            CASE
+                WHEN DATEDIFF(NOW(), tc.submit_time) > 7 THEN '高'
+                WHEN DATEDIFF(NOW(), tc.submit_time) > 3 THEN '中'
+                ELSE '低'
+            END as urgency
+        FROM teacher_certification tc
+        LEFT JOIN teacher_info ti ON tc.teacher_id = ti.id
+        WHERE tc.certification_status = 0
+        ORDER BY tc.submit_time ASC
+        LIMIT 10
+        ]]>
+    </select>
+
+    <!-- 获取最近投诉列表 -->
+    <select id="getRecentComplaints" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            cr.id,
+            si.student_name as studentName,
+            ti.teacher_name as teacherName,
+            JSON_UNQUOTE(JSON_EXTRACT(ti.subjects, '$[0]')) as subject,
+            cr.complaint_type as type,
+            cr.create_time as createTime,
+            CASE
+                WHEN cr.complaint_status = 0 THEN '待处理'
+                WHEN cr.complaint_status = 1 THEN '处理中'
+                WHEN cr.complaint_status = 2 THEN '已解决'
+                WHEN cr.complaint_status = 3 THEN '已关闭'
+                ELSE '未知'
+            END as status
+        FROM complaint_record cr
+        LEFT JOIN student_info si ON cr.complainant_id = si.id AND cr.complainant_type = 'student'
+        LEFT JOIN teacher_info ti ON cr.complained_id = ti.id AND cr.complained_type = 'teacher'
+        ORDER BY cr.create_time DESC
+        LIMIT 10
+        ]]>
+    </select>
+
+    <!-- 获取平均处理时间 -->
+    <select id="getAvgProcessTime" resultType="java.math.BigDecimal">
+        <![CDATA[
+        SELECT
+            AVG(DATEDIFF(audit_time, submit_time)) as avgDays
+        FROM teacher_certification
+        WHERE certification_status IN (1, 2) AND audit_time IS NOT NULL
+        ]]>
+    </select>
+
+    <!-- 获取平均响应时间 -->
+    <select id="getAvgResponseTime" resultType="java.math.BigDecimal">
+        <![CDATA[
+        SELECT
+            AVG(TIMESTAMPDIFF(HOUR, create_time, process_time)) as avgHours
+        FROM complaint_record
+        WHERE process_time IS NOT NULL
+        ]]>
+    </select>
+
+</mapper>

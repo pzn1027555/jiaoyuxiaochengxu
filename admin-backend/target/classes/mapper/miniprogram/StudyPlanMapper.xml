@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.StudyPlanMapper">
+
+    <resultMap id="StudyPlanResultMap" type="com.education.admin.modules.miniprogram.entity.StudyPlan">
+        <id column="id" property="id"/>
+        <result column="plan_code" property="planCode"/>
+        <result column="teacher_id" property="teacherId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="title" property="title"/>
+        <result column="total_lessons" property="totalLessons"/>
+        <result column="unit_price" property="unitPrice"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="confirmation_status" property="confirmationStatus"/>
+        <result column="order_id" property="orderId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="teacher_name" property="teacherName"/>
+        <result column="subject_id" property="subjectId"/>
+        <result column="subject_name" property="subjectName"/>
+        <result column="start_date" property="startDate"/>
+        <result column="start_time" property="startTime"/>
+        <result column="duration_minutes" property="durationMinutes"/>
+        <result column="repeat_type" property="repeatType"/>
+        <result column="class_type" property="classType"/>
+        <result column="teach_mode" property="teachMode"/>
+        <result column="cover_url" property="coverUrl"/>
+        <result column="tags" property="tags"/>
+        <result column="intro" property="intro"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.education.admin.modules.miniprogram.entity.StudyPlan">
+        INSERT INTO study_plan (
+            plan_code, teacher_id, student_id, title, total_lessons,
+            unit_price, total_amount, confirmation_status, order_id,
+            subject_id, subject_name, start_date, start_time, duration_minutes,
+            repeat_type, class_type, teach_mode, cover_url, tags, intro
+        ) VALUES (
+            #{planCode}, #{teacherId}, #{studentId}, #{title}, #{totalLessons},
+            #{unitPrice}, #{totalAmount}, #{confirmationStatus}, #{orderId},
+            #{subjectId}, #{subjectName}, #{startDate}, #{startTime}, #{durationMinutes},
+            #{repeatType}, #{classType}, #{teachMode}, #{coverUrl}, #{tags}, #{intro}
+        )
+        <selectKey keyProperty="id" resultType="Long" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <select id="findById" resultMap="StudyPlanResultMap">
+        SELECT sp.*, t.teacher_name
+        FROM study_plan sp
+        LEFT JOIN teacher_info t ON sp.teacher_id = t.id
+        WHERE sp.id = #{id}
+    </select>
+
+    <select id="findByPlanCode" resultMap="StudyPlanResultMap">
+        SELECT sp.*, t.teacher_name
+        FROM study_plan sp
+        LEFT JOIN teacher_info t ON sp.teacher_id = t.id
+        WHERE sp.plan_code = #{planCode}
+    </select>
+
+    <select id="findByStudentId" resultMap="StudyPlanResultMap">
+        SELECT sp.*, t.teacher_name
+        FROM study_plan sp
+        LEFT JOIN teacher_info t ON sp.teacher_id = t.id
+        WHERE sp.student_id = #{studentId}
+        ORDER BY sp.create_time DESC
+    </select>
+
+    <select id="findByTeacherId" resultMap="StudyPlanResultMap">
+        SELECT sp.*, t.teacher_name
+        FROM study_plan sp
+        LEFT JOIN teacher_info t ON sp.teacher_id = t.id
+        WHERE sp.teacher_id = #{teacherId}
+        ORDER BY sp.create_time DESC
+    </select>
+
+    <update id="updateConfirmationStatus">
+        UPDATE study_plan 
+        SET confirmation_status = #{status}, order_id = #{orderId}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateById" parameterType="com.education.admin.modules.miniprogram.entity.StudyPlan">
+        UPDATE study_plan
+        SET title = #{title},
+            total_lessons = #{totalLessons},
+            unit_price = #{unitPrice},
+            total_amount = #{totalAmount},
+            confirmation_status = #{confirmationStatus},
+            order_id = #{orderId},
+            subject_id = #{subjectId},
+            subject_name = #{subjectName},
+            start_date = #{startDate},
+            start_time = #{startTime},
+            duration_minutes = #{durationMinutes},
+            repeat_type = #{repeatType},
+            class_type = #{classType},
+            teach_mode = #{teachMode},
+            cover_url = #{coverUrl},
+            tags = #{tags},
+            intro = #{intro}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM study_plan WHERE id = #{id}
+    </delete>
+
+</mapper>

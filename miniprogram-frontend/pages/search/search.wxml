@@ -1,0 +1,57 @@
+<view class="search-page">
+  <view class="top-bar">
+    <view class="search-input-wrap">
+      <image class="icon-img" src="/images/searchicon.png" mode="widthFix"></image>
+      <input class="search-input" placeholder="{{type==='teacher'?'搜索老师':'搜索课程'}}" confirm-type="search" bindinput="onInput" bindconfirm="onSearch" value="{{keyword}}"/>
+      <view class="btn" bindtap="onSearch">搜索</view>
+    </view>
+  </view>
+
+  <view wx:if="{{mode==='history'}}" class="history-section">
+    <view class="section-hd">
+      <text class="title">搜索历史</text>
+      <text class="clear" bindtap="clearHistory">清空</text>
+    </view>
+    <view class="history-list">
+      <view class="h-item" wx:for="{{history}}" wx:key="*this" bindtap="tapHistory" data-key="{{item}}">{{item}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{mode==='result' && type==='teacher'}}" class="result-list">
+    <view class="teacher-card" wx:for="{{teachers}}" wx:key="id" bindtap="goTeacher" data-id="{{item.id}}">
+      <view class="card-row">
+        <image class="avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+        <view class="content-right">
+          <view class="title-row">
+            <text class="name">{{item.name}}</text>
+            <image class="gender-icon" wx:if="{{item.genderSymbol}}" src="{{item.genderSymbol=='♀' ? '/images/student/female.png' : '/images/student/male.png'}}" mode="widthFix"></image>
+            <text class="district" wx:if="{{item.district}}">{{item.district}}</text>
+          </view>
+          <view class="tag-row">
+            <text class="badge" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
+          </view>
+          <view class="subjects">所授科目：<text class="subjects-strong">{{item.subjectsText}}</text></view>
+          <view class="desc">{{item.intro}}</view>
+          <view class="price-row">
+            <text class="price"><text class="price-num">¥ {{item.price}}</text><text class="price-unit"> /小时</text></text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{mode==='result' && type==='course'}}" class="result-list">
+    <view class="c-item" wx:for="{{courses}}" wx:key="id" bindtap="goCourse" data-id="{{item.id}}">
+      <image class="cover" src="{{item.coverFullUrl || item.coverUrl}}" mode="aspectFill"></image>
+      <view class="c-info">
+        <text class="title">{{item.title}}</text>
+        <view class="meta-line"><text class="meta-label">课程简介：</text><text class="meta-desc">{{item.intro || '精选精品课程'}}</text></view>
+        <view class="tags" wx:if="{{item.tags && item.tags.length}}">
+          <text class="tag" wx:for="{{item.tags}}" wx:key="*this" wx:if="{{index<3}}">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+

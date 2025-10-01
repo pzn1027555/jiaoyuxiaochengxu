@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.StudentSurveyMapper">
+  <resultMap id="BaseResultMap" type="com.education.admin.modules.miniprogram.entity.StudentSurvey">
+    <id property="id" column="id"/>
+    <result property="teacherId" column="teacher_id"/>
+    <result property="studentId" column="student_id"/>
+    <result property="detailId" column="detail_id"/>
+    <result property="filesJson" column="files_json"/>
+    <result property="status" column="status"/>
+    <result property="rejectReason" column="reject_reason"/>
+    <result property="courseId" column="course_id"/>
+    <result property="courseTitle" column="course_title"/>
+    <result property="bookingDate" column="booking_date"/>
+    <result property="bookingStartTime" column="booking_start_time"/>
+    <result property="bookingDuration" column="booking_duration"/>
+    <result property="bookingPrice" column="booking_price"/>
+    <result property="bookingType" column="booking_type"/>
+    <result property="paid" column="paid"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+
+  <select id="findById" parameterType="long" resultMap="BaseResultMap">
+    select * from student_survey where id = #{id}
+  </select>
+
+  <select id="findByTeacherAndStudent" resultMap="BaseResultMap">
+    select * from student_survey where teacher_id = #{teacherId} and student_id = #{studentId} limit 1
+  </select>
+
+  <insert id="insert" parameterType="com.education.admin.modules.miniprogram.entity.StudentSurvey" useGeneratedKeys="true" keyProperty="id">
+    insert into student_survey(teacher_id, student_id, detail_id, files_json, status, reject_reason, course_id, course_title, 
+                               booking_date, booking_start_time, booking_duration, booking_price, booking_type, paid, create_time, update_time)
+    values(#{teacherId}, #{studentId}, #{detailId}, #{filesJson}, #{status}, #{rejectReason}, #{courseId}, #{courseTitle}, 
+           #{bookingDate}, #{bookingStartTime}, #{bookingDuration}, #{bookingPrice}, #{bookingType}, #{paid}, now(), now())
+  </insert>
+
+  <update id="update" parameterType="com.education.admin.modules.miniprogram.entity.StudentSurvey">
+    update student_survey set
+      detail_id = #{detailId},
+      files_json = #{filesJson},
+      status = #{status},
+      reject_reason = #{rejectReason},
+      course_id = #{courseId},
+      course_title = #{courseTitle},
+      booking_date = #{bookingDate},
+      booking_start_time = #{bookingStartTime},
+      booking_duration = #{bookingDuration},
+      booking_price = #{bookingPrice},
+      booking_type = #{bookingType},
+      paid = #{paid},
+      update_time = now()
+    where id = #{id}
+  </update>
+
+  <!-- 列表：用于课程预约页，直接联表带出学生基础信息 -->
+  <select id="findByTeacher" resultType="map">
+    select s.id,
+           s.teacher_id as teacherId,
+           s.student_id as studentId,
+           s.course_title as courseTitle,
+           s.status,
+           s.reject_reason as rejectReason,
+           s.booking_date as bookingDate,
+           s.booking_start_time as bookingStartTime,
+           s.booking_duration as bookingDuration,
+           s.booking_price as bookingPrice,
+           s.booking_type as bookingType,
+           s.paid as paid,
+           s.create_time as createTime,
+           DATE_FORMAT(s.create_time, '%Y-%m-%d %H:%i:%s') as timeDesc,
+           s.update_time as updateTime,
+           st.student_name as name,
+           st.avatar as avatar
+    from student_survey s
+    left join student_info st on st.id = s.student_id
+    where s.teacher_id = #{teacherId}
+    order by GREATEST(IFNULL(s.update_time, '1970-01-01'), IFNULL(s.create_time,'1970-01-01')) desc
+  </select>
+
+  <select id="countByTeacherAndStudent" resultType="int">
+    select count(*) from student_survey 
+    where teacher_id = #{teacherId} and student_id = #{studentId}
+    <if test="bookingType != null and bookingType != ''">
+      and booking_type = #{bookingType}
+    </if>
+  </select>
+
+  <select id="findLatestUnpaidTrialByTeacherAndStudent" resultMap="BaseResultMap">
+    select * from student_survey 
+    where teacher_id = #{teacherId} and student_id = #{studentId} 
+    and booking_type = 'trial' and paid = 0
+    order by create_time desc 
+    limit 1
+  </select>
+
+  <select id="findLatestByTeacherAndStudent" resultMap="BaseResultMap">
+    select * from student_survey 
+    where teacher_id = #{teacherId} and student_id = #{studentId}
+    order by create_time desc 
+    limit 1
+  </select>
+</mapper>
+
+

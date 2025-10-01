@@ -1,0 +1,44 @@
+/* components/teacher-tabbar/teacher-tabbar.wxss */
+
+.teacher-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  background: #fff;
+  border-top: 1rpx solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 1000;
+}
+
+.tabbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100rpx;
+  transition: all 0.3s ease;
+}
+
+.tabbar-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-bottom: 8rpx;
+}
+
+.tabbar-text {
+  font-size: 20rpx;
+  color: #8a8a8a;
+  line-height: 1;
+}
+
+.tabbar-item.active .tabbar-text {
+  color: #4CAF50;
+  font-weight: 500;
+}

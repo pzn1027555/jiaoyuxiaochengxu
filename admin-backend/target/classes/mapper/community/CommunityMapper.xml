@@ -1,0 +1,628 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.community.mapper.CommunityMapper">
+
+
+
+    <!-- 兼容无 userId 的查询（用于不传 userId 的详情接口） -->
+    <select id="getPostById" resultType="map">
+        SELECT 
+            p.id,
+            p.post_title AS title,
+            p.post_content AS content,
+            p.category_id AS categoryId,
+            p.view_count AS viewCount,
+            p.like_count AS likeCount,
+            p.comment_count AS commentCount,
+            DATE_FORMAT(p.create_time, '%Y-%m-%d %H:%i') AS createTime,
+            COALESCE(t.teacher_name, pinfo.parent_name, s.student_name) AS authorName,
+            COALESCE(t.avatar, pinfo.avatar, s.avatar)                  AS authorAvatar,
+            CASE WHEN p.author_type = 'student' THEN s.gender ELSE NULL END AS authorGender,
+            CASE WHEN p.author_type = 'student' THEN s.grade  ELSE NULL END AS authorGrade,
+            p.images AS images,
+            p.attachments AS attachments
+        FROM community_post p
+        LEFT JOIN student_info s ON (p.author_type = 'student' AND s.id = p.author_id)
+        LEFT JOIN teacher_info t ON (p.author_type = 'teacher' AND t.id = p.author_id)
+        LEFT JOIN parent_info  pinfo ON (p.author_type = 'parent'  AND pinfo.id = p.author_id)
+        WHERE p.id = #{id}
+    </select>
+
+    <select id="pagePosts" resultType="map">
+        SELECT 
+            p.id,
+            p.post_title       AS title,
+            SUBSTRING(p.post_content,1,120) AS content,
+            p.category_id      AS categoryId,
+            p.view_count       AS viewCount,
+            p.like_count       AS likeCount,
+            p.comment_count    AS commentCount,
+            DATE_FORMAT(p.create_time, '%Y-%m-%d %H:%i') AS createTime,
+            COALESCE(t.teacher_name, pinfo.parent_name, s.student_name) AS authorName,
+            COALESCE(t.avatar, pinfo.avatar, s.avatar)                  AS authorAvatar,
+            CASE WHEN p.author_type = 'student' THEN s.gender ELSE NULL END AS authorGender,
+            CASE WHEN p.author_type = 'student' THEN s.grade  ELSE NULL END AS authorGrade
+        FROM community_post p
+        LEFT JOIN student_info s ON (p.author_type = 'student' AND s.id = p.author_id)
+        LEFT JOIN teacher_info t ON (p.author_type = 'teacher' AND t.id = p.author_id)
+        LEFT JOIN parent_info  pinfo ON (p.author_type = 'parent'  AND pinfo.id = p.author_id)
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (p.post_title LIKE CONCAT('%', #{keyword}, '%') OR p.post_content LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="categoryId != null">
+                AND p.category_id = #{categoryId}
+            </if>
+            AND p.status = 1
+        </where>
+        ORDER BY p.is_pinned DESC, p.create_time DESC
+    </select>
+
+    <!-- 后台：分页帖子（含状态映射与筛选） -->
+    <select id="adminPagePosts" resultType="map">
+        SELECT 
+            p.id,
+            p.post_title       AS title,
+            p.post_content     AS content,
+            p.category_id      AS categoryId,
+            cc.category_name   AS categoryName,
+            p.view_count       AS viewCount,
+            p.like_count       AS likeCount,
+            p.comment_count    AS commentCount,
+            p.audit_status     AS auditStatus,
+            /* 前端postStatus：0草稿(无)，1待审核，2已发布，3已下架，4已删除 */
+            CASE 
+              WHEN p.status = 0 THEN 4
+              WHEN p.status = 2 THEN 3
+              WHEN p.audit_status = 0 THEN 1
+              WHEN p.status = 1 AND p.audit_status = 1 THEN 2
+              ELSE 1
+            END               AS postStatus,
+            p.is_pinned        AS isTop,
+            p.is_featured      AS isEssence,
+            p.author_type      AS authorType,
+            COALESCE(t.teacher_name, pinfo.parent_name, s.student_name) AS authorName,
+            DATE_FORMAT(p.create_time, '%Y-%m-%d %H:%i:%s') AS createTime
+        FROM community_post p
+        LEFT JOIN student_info s ON (p.author_type = 'student' AND s.id = p.author_id)
+        LEFT JOIN teacher_info t ON (p.author_type = 'teacher' AND t.id = p.author_id)
+        LEFT JOIN parent_info  pinfo ON (p.author_type = 'parent'  AND pinfo.id = p.author_id)
+        LEFT JOIN course_category cc ON cc.id = p.category_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (p.post_title LIKE CONCAT('%', #{keyword}, '%') OR p.post_content LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="authorName != null and authorName != ''">
+                AND (
+                    (p.author_type = 'teacher' AND t.teacher_name LIKE CONCAT('%', #{authorName}, '%'))
+                    OR (p.author_type = 'student' AND s.student_name LIKE CONCAT('%', #{authorName}, '%'))
+                    OR (p.author_type = 'parent' AND pinfo.parent_name LIKE CONCAT('%', #{authorName}, '%'))
+                )
+            </if>
+            <if test="postStatus != null">
+                <choose>
+                    <when test="postStatus == 4">AND p.status = 0</when>
+                    <when test="postStatus == 3">AND p.status = 2</when>
+                    <when test="postStatus == 2">AND p.status = 1 AND p.audit_status = 1</when>
+                    <when test="postStatus == 1">AND p.audit_status = 0</when>
+                </choose>
+            </if>
+            <if test="auditStatus != null">
+                AND p.audit_status = #{auditStatus}
+            </if>
+        </where>
+        ORDER BY p.is_pinned DESC, p.create_time DESC
+    </select>
+
+    <select id="adminGetPostDetail" resultType="map">
+        SELECT 
+            p.id,
+            p.post_title   AS title,
+            p.post_content AS content,
+            p.category_id  AS categoryId,
+            cc.category_name AS categoryName,
+            p.view_count   AS viewCount,
+            p.like_count   AS likeCount,
+            p.comment_count AS commentCount,
+            p.audit_status AS auditStatus,
+            p.audit_reason AS takeDownReason,
+            CASE 
+              WHEN p.status = 0 THEN 4
+              WHEN p.status = 2 THEN 3
+              WHEN p.audit_status = 0 THEN 1
+              WHEN p.status = 1 AND p.audit_status = 1 THEN 2
+              ELSE 1
+            END            AS postStatus,
+            p.is_pinned     AS isTop,
+            p.is_featured   AS isEssence,
+            p.author_type   AS authorType,
+            COALESCE(t.teacher_name, pinfo.parent_name, s.student_name) AS authorName,
+            DATE_FORMAT(p.create_time, '%Y-%m-%d %H:%i:%s') AS createTime
+        FROM community_post p
+        LEFT JOIN student_info s ON (p.author_type = 'student' AND s.id = p.author_id)
+        LEFT JOIN teacher_info t ON (p.author_type = 'teacher' AND t.id = p.author_id)
+        LEFT JOIN parent_info  pinfo ON (p.author_type = 'parent'  AND pinfo.id = p.author_id)
+        LEFT JOIN course_category cc ON cc.id = p.category_id
+        WHERE p.id = #{id}
+    </select>
+
+    <select id="getPostByIdWithUser" resultType="map">
+        SELECT 
+            p.id,
+            p.post_title AS title,
+            p.post_content AS content,
+            p.category_id AS categoryId,
+            p.view_count AS viewCount,
+            p.like_count AS likeCount,
+            p.comment_count AS commentCount,
+            DATE_FORMAT(p.create_time, '%Y-%m-%d %H:%i') AS createTime,
+            COALESCE(t.teacher_name, pinfo.parent_name, s.student_name) AS authorName,
+            COALESCE(t.avatar, pinfo.avatar, s.avatar)                  AS authorAvatar,
+            CASE WHEN p.author_type = 'student' THEN s.gender ELSE NULL END AS authorGender,
+            CASE WHEN p.author_type = 'student' THEN s.grade  ELSE NULL END AS authorGrade,
+            p.images AS images,
+            p.attachments AS attachments,
+            /* 当前用户是否点赞：需要传入 userId/userType，可选 */
+            CASE WHEN #{userId} IS NOT NULL AND #{userId} != 0 THEN EXISTS(
+                SELECT 1 FROM community_post_like l WHERE l.post_id = p.id AND l.user_id = #{userId}
+            ) ELSE 0 END AS liked
+        FROM community_post p
+        LEFT JOIN student_info s ON (p.author_type = 'student' AND s.id = p.author_id)
+        LEFT JOIN teacher_info t ON (p.author_type = 'teacher' AND t.id = p.author_id)
+        LEFT JOIN parent_info  pinfo ON (p.author_type = 'parent'  AND pinfo.id = p.author_id)
+        WHERE p.id = #{id}
+    </select>
+
+    <select id="getStatistics" resultType="map">
+        SELECT 
+            (SELECT COUNT(*) FROM community_post WHERE status = 1) AS totalPosts,
+            (SELECT IFNULL(SUM(comment_count),0) FROM community_post WHERE status = 1) AS totalComments,
+            (SELECT COUNT(DISTINCT author_id) FROM community_post WHERE status = 1) AS activeUsers,
+            (SELECT COUNT(*) FROM community_post WHERE DATE(create_time)=CURDATE()) AS todayPosts,
+            (SELECT IFNULL(SUM(comment_count),0) FROM community_post WHERE DATE(update_time)=CURDATE()) AS todayComments,
+            (SELECT COUNT(*) FROM community_post WHERE audit_status = 0) AS pendingPosts,
+            (SELECT COUNT(*) FROM community_post WHERE status = 1 AND like_count > 100) AS reportedPosts
+        FROM DUAL
+    </select>
+
+    <insert id="insertPost" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO community_post(
+            post_title, post_content, post_type, author_id, author_type,
+            category_id, tags, images, attachments, view_count, like_count, comment_count,
+            is_pinned, is_featured, audit_status, status, create_time, update_time
+        ) VALUES (
+            #{post_title}, #{post_content}, #{post_type}, #{author_id}, #{author_type},
+            #{category_id}, #{tags}, #{images}, #{attachments}, 0, 0, 0,
+            0, 0, 1, 1, NOW(), NOW()
+        )
+    </insert>
+
+    <update id="incrementView">
+        UPDATE community_post SET view_count = view_count + 1, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="incrementLike">
+        UPDATE community_post SET like_count = like_count + 1, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="softDelete">
+        UPDATE community_post SET status = 0, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <!-- 审核状态更新 -->
+    <update id="updateAuditStatus">
+        UPDATE community_post 
+        SET audit_status = #{auditStatus},
+            audit_reason = #{auditRemark},
+            audit_time   = NOW(),
+            audit_user_id = #{auditUserId},
+            update_time  = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="batchUpdateAuditStatus">
+        UPDATE community_post 
+        SET audit_status = #{auditStatus},
+            audit_reason = #{auditRemark},
+            audit_time   = NOW(),
+            audit_user_id = #{auditUserId},
+            update_time  = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+    </update>
+
+    <!-- 发布/下架/置顶/精华/删除 -->
+    <update id="publishPost">
+        UPDATE community_post SET status = 1, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="takeDownPost">
+        UPDATE community_post SET status = 2, audit_reason = #{reason}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateTop">
+        UPDATE community_post SET is_pinned = #{isTop}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateEssence">
+        UPDATE community_post SET is_featured = #{isEssence}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="deletePost">
+        UPDATE community_post SET status = 0, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <delete id="hardDeletePost">
+        DELETE FROM community_post WHERE id = #{id}
+    </delete>
+
+    <!-- ===== Admin: Resource management (community_resource, teacher_resource) ===== -->
+    <select id="adminPageCommunityResources" resultType="map">
+        SELECT r.id,
+               r.title,
+               r.description,
+               r.file_url  AS fileUrl,
+               r.cover_url AS coverUrl,
+               r.file_type AS fileType,
+               COALESCE(r.price, 0) AS price,
+               r.download_count AS downloadCount,
+               DATE_FORMAT(r.create_time, '%Y-%m-%d %H:%i:%s') AS createTime,
+               u.real_name   AS uploaderName,
+               'community'   AS source,
+               r.status      AS status,
+               CASE WHEN r.status = 1 THEN 2 WHEN r.status = 0 THEN 3 ELSE 4 END AS resourceStatus
+        FROM community_resource r
+        LEFT JOIN sys_user u ON u.id = r.publisher_user_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (r.title LIKE CONCAT('%',#{keyword},'%') OR r.description LIKE CONCAT('%',#{keyword},'%'))
+            </if>
+            <if test="fileType != null and fileType != ''">
+                AND r.file_type = #{fileType}
+            </if>
+            <if test="uploaderName != null and uploaderName != ''">
+                AND u.real_name LIKE CONCAT('%',#{uploaderName},'%')
+            </if>
+        </where>
+        ORDER BY r.id DESC
+    </select>
+
+    <select id="adminPageTeacherResources" resultType="map">
+        SELECT r.id,
+               r.title,
+               r.description,
+               r.file_url  AS fileUrl,
+               r.cover_url AS coverUrl,
+               r.type      AS fileType,
+               r.view_count AS viewCount,
+               r.like_count AS likeCount,
+               DATE_FORMAT(r.create_time, '%Y-%m-%d %H:%i:%s') AS createTime,
+               t.teacher_name AS uploaderName,
+               'teacher'      AS source,
+               r.is_published AS status,
+               CASE WHEN r.is_published = 1 THEN 2 ELSE 3 END AS resourceStatus
+        FROM teacher_resource r
+        LEFT JOIN teacher_info t ON t.id = r.teacher_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (r.title LIKE CONCAT('%',#{keyword},'%') OR r.description LIKE CONCAT('%',#{keyword},'%'))
+            </if>
+            <if test="fileType != null and fileType != ''">
+                AND r.type = #{fileType}
+            </if>
+            <if test="uploaderName != null and uploaderName != ''">
+                AND t.teacher_name LIKE CONCAT('%',#{uploaderName},'%')
+            </if>
+            AND r.is_published = 1
+        </where>
+        ORDER BY r.id DESC
+    </select>
+
+    <select id="adminGetCommunityResourceDetail" resultType="map">
+        SELECT r.id,
+               r.title,
+               r.description,
+               r.file_url  AS fileUrl,
+               r.cover_url AS coverUrl,
+               r.file_type AS fileType,
+               COALESCE(r.price, 0) AS price,
+               r.download_count AS downloadCount,
+               r.status    AS status,
+               DATE_FORMAT(r.create_time, '%Y-%m-%d %H:%i:%s') AS createTime,
+               u.real_name AS uploaderName
+        FROM community_resource r
+        LEFT JOIN sys_user u ON u.id = r.publisher_user_id
+        WHERE r.id = #{id}
+    </select>
+
+    <select id="adminGetTeacherResourceDetail" resultType="map">
+        SELECT r.id,
+               r.title,
+               r.description,
+               r.file_url  AS fileUrl,
+               r.cover_url AS coverUrl,
+               r.type      AS fileType,
+               r.view_count AS viewCount,
+               r.like_count AS likeCount,
+               r.is_published AS status,
+               DATE_FORMAT(r.create_time, '%Y-%m-%d %H:%i:%s') AS createTime,
+               t.teacher_name AS uploaderName
+        FROM teacher_resource r
+        LEFT JOIN teacher_info t ON t.id = r.teacher_id
+        WHERE r.id = #{id}
+    </select>
+
+    <select id="getCommunityResourceFileUrl" resultType="string">
+        SELECT file_url FROM community_resource WHERE id = #{id}
+    </select>
+
+    <select id="getTeacherResourceFileUrl" resultType="string">
+        SELECT file_url FROM teacher_resource WHERE id = #{id}
+    </select>
+
+    <update id="updateCommunityResource">
+        UPDATE community_resource
+        SET title = #{title},
+            description = #{description},
+            file_url = #{fileUrl},
+            cover_url = #{coverUrl},
+            file_type = #{fileType},
+            price = COALESCE(#{price}, price),
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateTeacherResource">
+        UPDATE teacher_resource
+        SET title = #{title},
+            description = #{description},
+            file_url = #{fileUrl},
+            cover_url = #{coverUrl},
+            type = #{fileType},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="markCommunityResourceDeleted">
+        UPDATE community_resource SET status = 0, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="markTeacherResourceDeleted">
+        UPDATE teacher_resource SET is_published = 0, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <delete id="hardDeleteCommunityResource">
+        DELETE FROM community_resource WHERE id = #{id}
+    </delete>
+
+    <delete id="hardDeleteTeacherResource">
+        DELETE FROM teacher_resource WHERE id = #{id}
+    </delete>
+
+    <insert id="insertCommunityResource">
+        INSERT INTO community_resource(
+            title, description, file_url, cover_url, file_type, price,
+            publisher_user_id, download_count, status, create_time, update_time
+        ) VALUES (
+            #{title}, #{description}, #{fileUrl}, #{coverUrl}, #{fileType}, #{price},
+            #{publisherUserId}, 0, 1, NOW(), NOW()
+        )
+    </insert>
+
+    <!-- comments -->
+    <select id="listComments" resultType="map">
+        SELECT 
+            c.id,
+            c.post_id    AS postId,
+            c.parent_id  AS parentId,
+            c.content,
+            c.like_count AS likeCount,
+            c.status,
+            DATE_FORMAT(c.create_time, '%Y-%m-%d %H:%i') AS createTime,
+            COALESCE(t.teacher_name, pinfo.parent_name, s.student_name) AS userName,
+            COALESCE(t.avatar, pinfo.avatar, s.avatar)                  AS userAvatar
+        FROM community_post_comment c
+        LEFT JOIN student_info s ON (c.user_type = 'student' AND s.id = c.user_id)
+        LEFT JOIN teacher_info t ON (c.user_type = 'teacher' AND t.id = c.user_id)
+        LEFT JOIN parent_info  pinfo ON (c.user_type = 'parent'  AND pinfo.id = c.user_id)
+        WHERE c.post_id = #{postId} AND c.status = 1
+        <if test="parentId != null">AND (c.parent_id = #{parentId})</if>
+        ORDER BY c.id DESC
+    </select>
+
+    <insert id="insertComment" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO community_post_comment(
+            post_id, parent_id, user_id, user_type, content, like_count, status, create_time, update_time
+        ) VALUES (
+            #{postId}, #{parentId}, #{userId}, #{userType}, #{content}, 0, 1, NOW(), NOW()
+        )
+    </insert>
+
+    <update id="softDeleteComment">
+        UPDATE community_post_comment SET status = 0, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="incrementPostComment">
+        UPDATE community_post SET comment_count = comment_count + 1 WHERE id = #{postId}
+    </update>
+
+    <update id="decrementPostComment">
+        UPDATE community_post SET comment_count = IF(comment_count>0, comment_count-1, 0) WHERE id = #{postId}
+    </update>
+
+    <!-- likes with idempotency -->
+    <select id="countLike" resultType="int">
+        SELECT COUNT(1) FROM community_post_like WHERE post_id = #{postId} AND user_id = #{userId} AND user_type = #{userType}
+    </select>
+
+    <insert id="insertLike">
+        INSERT INTO community_post_like(post_id, user_id, user_type, create_time)
+        VALUES(#{postId}, #{userId}, #{userType}, NOW())
+    </insert>
+
+    <delete id="deleteLike">
+        DELETE FROM community_post_like WHERE post_id = #{postId} AND user_id = #{userId} AND user_type = #{userType}
+    </delete>
+
+    <update id="decrementLike">
+        UPDATE community_post SET like_count = IF(like_count>0, like_count-1, 0) WHERE id = #{postId}
+    </update>
+
+    <!-- comment likes with idempotency -->
+    <select id="countCommentLike" resultType="int">
+        SELECT COUNT(1) FROM community_comment_like WHERE comment_id = #{commentId} AND user_id = #{userId} AND user_type = #{userType}
+    </select>
+
+    <insert id="insertCommentLike">
+        INSERT INTO community_comment_like(comment_id, user_id, user_type, create_time)
+        VALUES(#{commentId}, #{userId}, #{userType}, NOW())
+    </insert>
+
+    <delete id="deleteCommentLike">
+        DELETE FROM community_comment_like WHERE comment_id = #{commentId} AND user_id = #{userId} AND user_type = #{userType}
+    </delete>
+
+    <update id="incrementCommentLike">
+        UPDATE community_post_comment SET like_count = like_count + 1 WHERE id = #{commentId}
+    </update>
+
+    <update id="decrementCommentLike">
+        UPDATE community_post_comment SET like_count = IF(like_count>0, like_count-1, 0) WHERE id = #{commentId}
+    </update>
+
+    <!-- comments with user like status -->
+    <select id="listCommentsWithLikeStatus" resultType="map">
+        SELECT 
+            c.id,
+            c.post_id    AS postId,
+            c.parent_id  AS parentId,
+            c.content,
+            c.like_count AS likeCount,
+            c.status,
+            DATE_FORMAT(c.create_time, '%Y-%m-%d %H:%i') AS createTime,
+            COALESCE(t.teacher_name, pinfo.parent_name, s.student_name) AS userName,
+            COALESCE(t.avatar, pinfo.avatar, s.avatar)                  AS userAvatar,
+            CASE WHEN #{userId} IS NOT NULL AND #{userId} != 0 THEN EXISTS(
+                SELECT 1 FROM community_comment_like cl WHERE cl.comment_id = c.id AND cl.user_id = #{userId} AND cl.user_type = #{userType}
+            ) ELSE 0 END AS liked
+        FROM community_post_comment c
+        LEFT JOIN student_info s ON (c.user_type = 'student' AND s.id = c.user_id)
+        LEFT JOIN teacher_info t ON (c.user_type = 'teacher' AND t.id = c.user_id)
+        LEFT JOIN parent_info  pinfo ON (c.user_type = 'parent'  AND pinfo.id = c.user_id)
+        WHERE c.post_id = #{postId} AND c.status = 1
+        <if test="parentId != null">AND (c.parent_id = #{parentId})</if>
+        ORDER BY c.id DESC
+    </select>
+
+    <!-- resources for download block -->
+    <select id="listTopResources" resultType="map">
+        SELECT id, title, description, file_url AS fileUrl, cover_url AS coverUrl,
+               file_type AS fileType
+        FROM community_resource
+        WHERE status = 1
+        ORDER BY id DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- following teachers' resources for student -->
+    <select id="listFollowingResources" resultType="map">
+        SELECT r.id,
+               r.title,
+               r.description,
+               r.file_url  AS fileUrl,
+               r.cover_url AS coverUrl,
+               r.type AS fileType,
+               t.teacher_name AS teacherName
+        FROM teacher_resource r
+        JOIN student_teacher_favorite f ON f.teacher_id = r.teacher_id AND f.student_id = #{studentId}
+        JOIN teacher_info t ON t.id = r.teacher_id
+        WHERE r.is_published = 1
+          AND r.type IN ('trial_video','material')
+        ORDER BY r.id DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- posts filter by subject and subtype (question/high/experience) -->
+    <select id="pagePostsFiltered" resultType="map">
+        SELECT p.id,
+               p.post_title AS title,
+               SUBSTRING(p.post_content,1,120) AS content,
+               p.category_id AS categoryId,
+               p.view_count AS viewCount,
+               p.like_count AS likeCount,
+               p.comment_count AS commentCount,
+               DATE_FORMAT(p.create_time, '%Y-%m-%d %H:%i') AS createTime,
+               COALESCE(t.teacher_name, pinfo.parent_name, s.student_name) AS authorName,
+               COALESCE(t.avatar, pinfo.avatar, s.avatar)                  AS authorAvatar,
+               CASE WHEN p.author_type = 'student' THEN s.gender ELSE NULL END AS authorGender,
+               CASE WHEN p.author_type = 'student' THEN s.grade  ELSE NULL END AS authorGrade,
+               p.images AS images,
+               p.attachments AS attachments,
+               CASE WHEN #{userId} IS NOT NULL AND #{userId} != 0 THEN EXISTS(
+                    SELECT 1 FROM community_post_like l
+                    WHERE l.post_id = p.id AND l.user_id = #{userId} AND l.user_type = #{userType}
+               ) ELSE 0 END AS liked
+        FROM community_post p
+        LEFT JOIN student_info s ON (p.author_type = 'student' AND s.id = p.author_id)
+        LEFT JOIN teacher_info t ON (p.author_type = 'teacher' AND t.id = p.author_id)
+        LEFT JOIN parent_info  pinfo ON (p.author_type = 'parent'  AND pinfo.id = p.author_id)
+        <where>
+            AND p.status = 1
+            <if test="subjectId != null">AND p.category_id = #{subjectId}</if>
+            <if test="subType != null and subType != ''">
+                <choose>
+                    <when test="subType == 'question'">AND p.post_type = 'question'</when>
+                    <when test="subType == 'high'">AND p.like_count &gt;= 20</when>
+                    <when test="subType == 'experience'">AND p.post_type = 'share'</when>
+                </choose>
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (p.post_title LIKE CONCAT('%',#{keyword},'%') OR p.post_content LIKE CONCAT('%',#{keyword},'%'))
+            </if>
+            <if test="categoryId != null">AND p.category_id = #{categoryId}</if>
+        </where>
+        ORDER BY p.is_pinned DESC, p.create_time DESC
+    </select>
+
+    <!-- resources list with keyword search -->
+    <select id="listResources" resultType="map">
+        SELECT r.id,
+               r.title,
+               r.description,
+               r.file_url  AS fileUrl,
+               r.cover_url AS coverUrl,
+               r.file_type AS fileType,
+               r.download_count AS downloadCount,
+               r.create_time AS createTime,
+               u.real_name   AS publisherName
+        FROM community_resource r
+        LEFT JOIN sys_user u ON u.id = r.publisher_user_id
+        <where>
+            AND r.status = 1
+            <if test="keyword != null and keyword != ''">
+                AND (r.title LIKE CONCAT('%',#{keyword},'%'))
+            </if>
+            <if test="fileType != null and fileType != ''">
+                <choose>
+                    <when test="fileType == 'document'">
+                        AND r.file_type IN ('pdf','doc','docx','ppt','pptx')
+                    </when>
+                    <when test="fileType == 'video'">
+                        AND r.file_type IN ('mp4','mov','avi','mkv','flv','wmv')
+                    </when>
+                    <otherwise>
+                        AND r.file_type = #{fileType}
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+        ORDER BY r.id DESC
+    </select>
+
+    <update id="incrementResourceDownload">
+        UPDATE community_resource SET download_count = download_count + 1, update_time = NOW() WHERE id = #{id}
+    </update>
+
+</mapper>
+
+

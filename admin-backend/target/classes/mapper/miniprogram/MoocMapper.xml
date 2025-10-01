@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.mooc.mapper.MoocMapper">
+
+    <resultMap id="MoocGroupMap" type="com.education.admin.modules.mooc.entity.MoocGroup">
+        <id column="id" property="id"/>
+        <result column="group_name" property="groupName"/>
+        <result column="qrcode_url" property="qrcodeUrl"/>
+        <result column="dispatch_teachers" property="dispatchTeachers"/>
+        <result column="creator_user_id" property="creatorUserId"/>
+        <result column="schedule_time" property="scheduleTime"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="MoocApplicationMap" type="com.education.admin.modules.mooc.entity.MoocApplication">
+        <id column="id" property="id"/>
+        <result column="teacher_id" property="teacherId"/>
+        <result column="status" property="status"/>
+        <result column="group_id" property="groupId"/>
+        <result column="audit_user_id" property="auditUserId"/>
+        <result column="audit_reason" property="auditReason"/>
+        <result column="apply_time" property="applyTime"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <resultMap id="MoocNotificationMap" type="com.education.admin.modules.mooc.entity.MoocNotification">
+        <id column="id" property="id"/>
+        <result column="teacher_id" property="teacherId"/>
+        <result column="type" property="type"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="related_id" property="relatedId"/>
+        <result column="is_read" property="isRead"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="qrcode_url" property="qrcodeUrl"/>
+        <result column="group_name" property="groupName"/>
+    </resultMap>
+
+    <!-- group -->
+    <insert id="insertGroup" parameterType="com.education.admin.modules.mooc.entity.MoocGroup" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO mooc_group(group_name,qrcode_url,dispatch_teachers,creator_user_id,schedule_time,remark,create_time,update_time)
+        VALUES(#{groupName},#{qrcodeUrl},#{dispatchTeachers},#{creatorUserId},#{scheduleTime},#{remark},NOW(),NOW())
+    </insert>
+
+    <update id="updateGroup" parameterType="com.education.admin.modules.mooc.entity.MoocGroup">
+        UPDATE mooc_group
+        SET group_name=#{groupName}, qrcode_url=#{qrcodeUrl}, dispatch_teachers=#{dispatchTeachers}, schedule_time=#{scheduleTime}, remark=#{remark}, update_time=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <select id="findGroupById" resultMap="MoocGroupMap">
+        SELECT * FROM mooc_group WHERE id=#{id}
+    </select>
+
+    <select id="listGroups" resultMap="MoocGroupMap">
+        SELECT * FROM mooc_group ORDER BY create_time DESC
+    </select>
+
+    <!-- application -->
+    <insert id="insertApplication" parameterType="com.education.admin.modules.mooc.entity.MoocApplication" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO mooc_application(teacher_id,status,group_id,audit_user_id,audit_reason,apply_time,remark)
+        VALUES(#{teacherId},#{status},#{groupId},#{auditUserId},#{auditReason},NOW(),#{remark})
+    </insert>
+
+    <update id="updateApplication" parameterType="com.education.admin.modules.mooc.entity.MoocApplication">
+        UPDATE mooc_application
+        SET status=#{status}, group_id=#{groupId}, audit_user_id=#{auditUserId}, audit_reason=#{auditReason}, audit_time=NOW(), remark=#{remark}
+        WHERE id=#{id}
+    </update>
+
+    <select id="findApplicationById" resultMap="MoocApplicationMap">
+        SELECT * FROM mooc_application WHERE id=#{id}
+    </select>
+
+    <select id="findApplications" resultMap="MoocApplicationMap">
+        SELECT * FROM mooc_application
+        <where>
+            <if test="teacherId != null">AND teacher_id=#{teacherId}</if>
+            <if test="status != null">AND status=#{status}</if>
+        </where>
+        ORDER BY apply_time DESC
+    </select>
+
+    <!-- notification -->
+    <insert id="insertNotification" parameterType="com.education.admin.modules.mooc.entity.MoocNotification" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO mooc_notification(teacher_id,`type`,title,content,related_id,is_read,create_time,update_time)
+        VALUES(#{teacherId},#{type},#{title},#{content},#{relatedId},0,NOW(),NOW())
+    </insert>
+
+    <select id="listNotifications" resultMap="MoocNotificationMap">
+        SELECT n.*, g.qrcode_url, g.group_name
+        FROM mooc_notification n
+        LEFT JOIN mooc_group g ON n.related_id = g.id AND n.type = 'group'
+        WHERE n.teacher_id=#{teacherId}
+        ORDER BY n.create_time DESC
+    </select>
+
+    <update id="markNotificationRead">
+        UPDATE mooc_notification SET is_read=1, update_time=NOW() WHERE id=#{id}
+    </update>
+
+</mapper>
+
+

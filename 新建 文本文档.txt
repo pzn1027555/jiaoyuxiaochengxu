@@ -1,0 +1,26 @@
+                 
+服务器SSH配置
+119.45.53.182:22
+root/s&Gq=$srR66.$NLM
+
+宝塔面板管理后台
+地址: https://119.45.53.182:20405/7ef8e855
+username: v0txxzfh
+password: 1141a5d9
+
+MySql数据库外网地址
+nj-cdb-phxtkejx.sql.tencentcdb.com:28269
+root/oad%S&ssdssd*&D
+
+
+
+后端：/v0/work/backend，替换对应的jar包，执行 ./restart.sh 脚本重启即可，配置文件可以放到/v0/work/backend/config文件夹内进行管理
+前端：/v0/work/front，更新直接替换相应文件或文件夹，无需重启
+
+
+wx078100198a8ca215
+
+
+
+
+

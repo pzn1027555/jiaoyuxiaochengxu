@@ -1,0 +1,71 @@
+<!--pages/teacher/midterm-report-write/midterm-report-write.wxml-->
+<view class="midterm-report-container">
+  <!-- 自定义头部 -->
+  <custom-header 
+    title="中期报告" 
+    show-back="{{true}}"
+    bind:headerReady="onHeaderReady"
+  ></custom-header>
+  
+  <!-- 表单内容 -->
+  <view class="report-form" style="padding-top: {{headerHeight}}px;">
+    <!-- 本期课程内容 -->
+    <view class="form-section">
+      <view class="section-title">本期课程内容</view>
+      <textarea 
+        class="form-textarea"
+        placeholder="请填写到目前为止的教学内容"
+        placeholderClass="textarea-placeholder"
+        value="{{reportData.currentContent}}"
+        bindinput="onCurrentContentInput"
+        maxlength="{{500}}"
+        auto-height="{{true}}"
+        cursor-spacing="{{20}}"
+      ></textarea>
+      <view class="char-count">{{reportData.currentContent.length}}/500</view>
+    </view>
+
+    <!-- 本期课程学生表现 -->
+    <view class="form-section">
+      <view class="section-title">本期课程学生表现</view>
+      <textarea 
+        class="form-textarea"
+        placeholder="请填写该学生到目前为止的上课表现及知识掌握情况"
+        placeholderClass="textarea-placeholder"
+        value="{{reportData.studentPerformance}}"
+        bindinput="onStudentPerformanceInput"
+        maxlength="{{500}}"
+        auto-height="{{true}}"
+        cursor-spacing="{{20}}"
+      ></textarea>
+      <view class="char-count">{{reportData.studentPerformance.length}}/500</view>
+    </view>
+
+    <!-- 后期课程内容及教学计划 -->
+    <view class="form-section">
+      <view class="section-title">后期课程内容及教学计划</view>
+      <textarea 
+        class="form-textarea"
+        placeholder="请填写该学生后期的教学内容及教学计划"
+        placeholderClass="textarea-placeholder"
+        value="{{reportData.futurePlan}}"
+        bindinput="onFuturePlanInput"
+        maxlength="{{500}}"
+        auto-height="{{true}}"
+        cursor-spacing="{{20}}"
+      ></textarea>
+      <view class="char-count">{{reportData.futurePlan.length}}/500</view>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-section">
+    <button 
+      class="submit-btn {{canSubmit ? 'active' : 'disabled'}}"
+      bindtap="submitReport"
+      disabled="{{!canSubmit}}"
+    >
+      提交报告
+    </button>
+  </view>
+</view>

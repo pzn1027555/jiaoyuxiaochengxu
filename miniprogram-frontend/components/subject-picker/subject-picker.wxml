@@ -1,0 +1,37 @@
+<view wx:if="{{show}}" class="subject-picker-mask" bindtap="cancel">
+  <view class="subject-picker-panel" catchtap="stop">
+    <view class="subject-picker-header">
+      <text class="title">{{title}}</text>
+      <text class="close" bindtap="cancel">✕</text>
+    </view>
+    <scroll-view class="subject-picker-content" scroll-y="true">
+      <block wx:for="{{subjectTree}}" wx:key="id">
+        <view class="subject-group">
+          <view class="group-title">{{item.name}}</view>
+          <view class="group-body">
+            <view 
+              wx:for="{{item.children}}"
+              wx:for-item="child"
+              wx:key="id"
+              class="subject-item {{selectedMap[child.id] ? 'selected' : ''}}"
+              data-id="{{child.id}}"
+              data-name="{{child.name}}"
+              data-parent-name="{{item.name}}"
+              bindtap="toggleSubject"
+            >
+              {{child.name}}
+              <text class="check" wx:if="{{selectedMap[child.id]}}">✓</text>
+            </view>
+          </view>
+        </view>
+      </block>
+      <view class="empty" wx:if="{{!subjectTree.length && !loading}}">暂无科目数据</view>
+      <view class="empty" wx:if="{{loading}}">加载中...</view>
+    </scroll-view>
+    <view class="subject-picker-footer">
+      <button class="btn cancel" bindtap="cancel">取消</button>
+      <button class="btn confirm" bindtap="confirm">确定</button>
+    </view>
+  </view>
+</view>
+

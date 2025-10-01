@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.miniprogram.mapper.ResearchPostMapper">
+    <resultMap id="ResearchPostMap" type="com.education.admin.modules.miniprogram.entity.ResearchPost">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="banner_url" property="bannerUrl"/>
+        <result column="publish_time" property="publishTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <select id="listPublished" resultMap="ResearchPostMap">
+        SELECT id, title, description, banner_url, publish_time, status
+        FROM research_post
+        WHERE status = 1
+        ORDER BY publish_time DESC, id DESC
+    </select>
+
+    <select id="listAll" resultMap="ResearchPostMap">
+        SELECT id, title, description, banner_url, publish_time, status
+        FROM research_post
+        ORDER BY publish_time DESC, id DESC
+    </select>
+
+    <select id="findById" resultMap="ResearchPostMap">
+        SELECT id, title, description, banner_url, publish_time, status
+        FROM research_post
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.education.admin.modules.miniprogram.entity.ResearchPost" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO research_post(title, description, banner_url, publish_time, status)
+        VALUES(#{title}, #{description}, #{bannerUrl}, #{publishTime}, #{status})
+    </insert>
+
+    <update id="update" parameterType="com.education.admin.modules.miniprogram.entity.ResearchPost">
+        UPDATE research_post
+        SET title = #{title},
+            description = #{description},
+            banner_url = #{bannerUrl},
+            publish_time = #{publishTime},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM research_post WHERE id = #{id}
+    </delete>
+</mapper>
+
+
+

@@ -1,0 +1,94 @@
+<view class="checkout-page">
+  <view class="header">
+    <image class="cover" src="{{course.coverFullUrl}}" mode="aspectFill"></image>
+    <view class="h-info">
+      <view class="title">{{course.title}}</view>
+      <view class="teacher"><image class="t-avatar" src="{{teacher.avatarFull}}" mode="aspectFill"></image>{{teacher.name}}</view>
+      <view class="price">¥ {{priceDisplay}}</view>
+    </view>
+  </view>
+
+  <!-- 移除初始的家长选择区域，点击支付按钮时再弹窗选择 -->
+
+  <view class="section">
+    <view class="sec-title">支付方式</view>
+    <view class="pay-item active">
+      <image class="wx-icon" src="/images/wx.png" mode="widthFix"></image>
+      <text>微信支付</text>
+      <image class="wx-icon" src="/images/checked.png" mode="widthFix"></image>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="sec-title">支付金额</view>
+    <view class="amount-row">
+      <text>商品金额</text>
+      <text class="amount">¥{{priceDisplay}}</text>
+    </view>
+    <view class="total-row">合计：<text class="total">¥{{priceDisplay}}</text></view>
+  </view>
+
+  <!-- 售后状态 -->
+  <view class="section" wx:if="{{refundStatus && refundStatus.status}}">
+    <view class="sec-title">售后状态</view>
+    <view class="timeline">
+      <view class="tl-item" wx:for="{{refundTimeline}}" wx:key="time">
+        <view class="dot"></view>
+        <view class="tl-text">
+          <view class="tl-time">{{item.time}}</view>
+          <view class="tl-label">{{item.label}}</view>
+        </view>
+      </view>
+    </view>
+    <view class="footer" wx:if="{{refundStatus.status==='applied' || refundStatus.status==='processing'}}">
+      <button class="pay-btn cancel-btn" bindtap="revokeRefund">一键撤回</button>
+    </view>
+  </view>
+
+  <view class="footer" wx:if="{{mode === 'pay' && userType === 'parent'}}">
+    <button class="pay-btn" bindtap="pay">立即支付</button>
+    <button class="pay-btn cancel-btn" bindtap="cancelFromDetail">取消订单</button>
+  </view>
+  
+  <!-- 学生端：家长代付入口 -->
+  <view class="footer" wx:elif="{{mode === 'pay' && userType === 'student'}}">
+    <button class="pay-btn" bindtap="requestParentPay">家长代付</button>
+    <!-- 只有在数据库中有订单且状态为待支付(orderStatus=1)时才显示取消按钮 -->
+    <button class="pay-btn cancel-btn" wx:if="{{order.id && order.orderStatus === 1}}" bindtap="cancelFromDetail">取消</button>
+  </view>
+  
+  <view class="footer" wx:elif="{{mode === 'detail' && userType==='student' && showEvaluateBtn && order.orderStatus===3}}">
+    <button class="pay-btn evaluate-btn" bindtap="goToReview">去评价</button>
+  </view>
+
+  <view class="footer" wx:elif="{{mode === 'detail' && userType==='parent' && (order.orderStatus===2 || order.orderStatus===3) && !hasActiveRefund}}">
+    <button class="pay-btn cancel-btn" bindtap="goRefundApply">申请售后</button>
+  </view>
+
+  <!-- 家长选择器弹窗 -->
+  <view class="parent-picker-mask" wx:if="{{showParentPicker}}" bindtap="hideParentPicker">
+    <view class="parent-picker" catchtap="">
+      <view class="picker-header">
+        <view class="picker-title">选择代付家长</view>
+        <view class="picker-close" bindtap="hideParentPicker">×</view>
+      </view>
+      <view class="parent-list">
+        <view class="parent-item {{selectedParent && selectedParent.parentId === item.parentId ? 'selected' : ''}}" 
+              wx:for="{{parents}}" 
+              wx:key="parentId"
+              bindtap="selectParent"
+              data-parentid="{{item.parentId}}">
+          <image class="parent-avatar" src="{{item.parentAvatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+          <view class="parent-details">
+            <view class="parent-name">{{item.parentName}}</view>
+            <view class="parent-phone">{{item.parentPhone}}</view>
+            <!-- <view class="parent-relation">{{item.relationTypeText}}{{item.isPrimaryText ? ' · ' + item.isPrimaryText : ''}}</view> -->
+          </view>
+          <view class="parent-check" wx:if="{{selectedParent && selectedParent.parentId === item.parentId}}">✓</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+
