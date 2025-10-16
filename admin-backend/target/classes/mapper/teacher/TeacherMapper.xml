@@ -53,6 +53,7 @@
         <result column="is_hidden" property="isHidden" jdbcType="INTEGER"/>
         <result column="is_recommended" property="isRecommended" jdbcType="INTEGER"/>
         <result column="recommend_order" property="recommendOrder" jdbcType="INTEGER"/>
+        <result column="teach_mode_preference" property="teachModePreference" jdbcType="VARCHAR"/>
         <result column="status" property="status" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
@@ -166,6 +167,12 @@
                     WHERE JSON_CONTAINS(CAST(ti.subjects AS JSON), CAST(cc.id AS JSON))
                 )
             </if>
+            <if test="teacherLevel != null and teacherLevel != ''">
+                AND ti.teacher_level = #{teacherLevel}
+            </if>
+            <if test="teachMode != null and teachMode != ''">
+                AND (ti.teach_mode_preference = #{teachMode} OR ti.teach_mode_preference = 'both')
+            </if>
         </where>
         ORDER BY ti.create_time DESC
     </select>
@@ -195,6 +202,12 @@
                     ) cc
                     WHERE JSON_CONTAINS(CAST(ti.subjects AS JSON), CAST(cc.id AS JSON))
                 )
+            </if>
+            <if test="teacherLevel != null and teacherLevel != ''">
+                AND ti.teacher_level = #{teacherLevel}
+            </if>
+            <if test="teachMode != null and teachMode != ''">
+                AND (ti.teach_mode_preference = #{teachMode} OR ti.teach_mode_preference = 'both')
             </if>
         </where>
     </select>
@@ -267,6 +280,7 @@
             <if test="subjects != null">subjects = #{subjects, typeHandler=com.education.admin.config.JsonLongListTypeHandler},</if>
             <if test="teacherTags != null">teacher_tags = #{teacherTags, typeHandler=com.education.admin.config.JsonTypeHandler},</if>
             <if test="teacherLevel != null">teacher_level = #{teacherLevel},</if>
+            <if test="teachModePreference != null">teach_mode_preference = #{teachModePreference},</if>
             update_time = #{updateTime}
         </set>
         WHERE id = #{id}

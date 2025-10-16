@@ -14,6 +14,33 @@ class BadgeManager {
   }
 
   /**
+   * 后端badgeKey到前端key的映射
+   * 
+   * 映射规则说明：
+   * - 学生端：message_center → notifications (消息通知)
+   * - 教师端：booking → booking (课程预约)
+   * - 教师端：certification → certification (教师认证)
+   * - 家长端：message_center → notifications (消息通知)
+   */
+  getBadgeKeyMapping() {
+    return {
+      // 学生/家长的消息通知
+      'message_center': 'notifications',
+      // 教师的课程预约和认证（保持一致）
+      'booking': 'booking',
+      'certification': 'certification'
+    }
+  }
+
+  /**
+   * 将后端badgeKey映射到前端使用的key
+   */
+  mapBadgeKey(backendKey) {
+    const mapping = this.getBadgeKeyMapping()
+    return mapping[backendKey] || backendKey
+  }
+
+  /**
    * 初始化用户红点状态
    */
   async initUserBadges(userId, userType) {
@@ -25,10 +52,14 @@ class BadgeManager {
         const badgeMap = new Map()
         
         response.data.forEach(badge => {
-          badgeMap.set(badge.badgeKey, {
+          // 映射后端key到前端key
+          const frontendKey = this.mapBadgeKey(badge.badgeKey)
+          
+          badgeMap.set(frontendKey, {
             visible: badge.isVisible,
             count: badge.badgeCount,
-            moduleName: badge.moduleName
+            moduleName: badge.moduleName,
+            originalKey: badge.badgeKey // 保存原始key用于反向查找
           })
         })
         
@@ -37,7 +68,7 @@ class BadgeManager {
         // 通知所有监听器
         this.notifyListeners(userId, userType)
         
-        console.log('初始化红点状态成功:', response.data)
+        console.log('初始化红点状态成功 (映射后):', Array.from(badgeMap.entries()))
         return response.data
       }
     } catch (error) {
@@ -79,19 +110,37 @@ class BadgeManager {
   }
 
   /**
+   * 获取原始的后端badgeKey
+   */
+  getOriginalBadgeKey(userId, userType, frontendKey) {
+    const cacheKey = `${userId}_${userType}`
+    const userBadges = this.badgeCache.get(cacheKey)
+    
+    if (userBadges && userBadges.has(frontendKey)) {
+      const badge = userBadges.get(frontendKey)
+      return badge.originalKey || frontendKey
+    }
+    
+    return frontendKey
+  }
+
+  /**
    * 隐藏指定红点
    */
-  async hideBadge(userId, userType, badgeKey) {
+  async hideBadge(userId, userType, frontendKey) {
     try {
-      const response = await BadgeApi.hideBadge(userId, userType, badgeKey)
+      // 获取原始的后端key
+      const backendKey = this.getOriginalBadgeKey(userId, userType, frontendKey)
+      
+      const response = await BadgeApi.hideBadge(userId, userType, backendKey)
       if (response.code === 200) {
-        // 更新缓存
-        this.updateBadgeCache(userId, userType, badgeKey, false, 0)
+        // 更新缓存（使用前端key）
+        this.updateBadgeCache(userId, userType, frontendKey, false, 0)
         
         // 通知监听器
-        this.notifyListeners(userId, userType, badgeKey)
+        this.notifyListeners(userId, userType, frontendKey)
         
-        console.log('隐藏红点成功:', badgeKey)
+        console.log('隐藏红点成功:', frontendKey, '(后端key:', backendKey, ')')
         return true
       }
     } catch (error) {

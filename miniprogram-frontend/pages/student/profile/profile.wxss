@@ -52,7 +52,7 @@
 .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40rpx 20rpx; }
 .function-item, .service-item { display: flex; flex-direction: column; align-items: center; gap: 16rpx; padding: 8rpx; }
 .function-icon, .service-icon { width: 80rpx; height: 80rpx; }
-.service-icon-wrapper { position: relative; display: inline-block; }
+.function-icon-wrapper, .service-icon-wrapper { position: relative; display: inline-block; }
 .function-name, .service-name { font-size: 24rpx; color: #333; text-align: center; line-height: 1.2; }
 
 /* 退出登录 */

@@ -32,6 +32,8 @@ Page({
     }
     
     this.loadCourseInfo()
+    // 若有courseId参数，去查询后端并填充（存在则只读）
+    if (this.data.courseId){ this.tryLoadExistingReport() }
   },
 
   // 自定义导航栏就绪回调
@@ -116,14 +118,17 @@ Page({
         mask: true
       })
 
-      // TODO: 调用API提交报告
-      // await api.submitMidtermReport({
-      //   courseId: this.data.courseId,
-      //   ...this.data.reportData
-      // })
+      // 对接教师排课反馈接口，标记为中期报告
+      const api = require('../../../utils/api')
+      const content = [
+        `【本期内容】${this.data.reportData.currentContent}`,
+        `【学生表现】${this.data.reportData.studentPerformance}`,
+        `【后期计划】${this.data.reportData.futurePlan}`
+      ].join('\n')
+      await api.teacherSchedule.submitFeedback(this.data.courseId, { content, feedbackType: 'midterm' })
 
-      // 模拟提交
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      // 轻微延迟以确保状态一致
+      await new Promise(resolve => setTimeout(resolve, 400))
       
       wx.hideLoading()
       
@@ -187,5 +192,27 @@ Page({
       title: '中期报告填写',
       path: `/pages/teacher/midterm-report-write/midterm-report-write?courseId=${this.data.courseId}`
     }
+  }
+  ,
+  // 若已存在中期报告，填充并只读
+  async tryLoadExistingReport(){
+    try{
+      const api = require('../../../utils/api')
+      const res = await api.teacherSchedule.getFeedback(this.data.courseId)
+      if (res && (res.success || res.code===200) && res.data && res.data.hasFeedback){
+        const content = String(res.data.content||'')
+        // 兼容不同换行符
+        const seg = content.replace(/\r\n/g,'\n').split('\n')
+        const pick = (p)=>{ const row = seg.find(s=> s.startsWith(p))||''; return row.replace(p,'').trim() }
+        const reportData = {
+          currentContent: pick('【本期内容】') || '',
+          studentPerformance: pick('【学生表现】') || '',
+          futurePlan: pick('【后期计划】') || ''
+        }
+        const isMidterm = String(res.data.feedbackType||'').toLowerCase()==='midterm'
+        // midterm -> 只读；非 midterm 也回填，允许编辑与提交
+        this.setData({ reportData, canSubmit: !isMidterm })
+      }
+    }catch(e){}
   }
 })

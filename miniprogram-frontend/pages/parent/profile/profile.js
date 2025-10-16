@@ -48,6 +48,7 @@ Page({
     },
     
     badgeStatus: {},
+    badgeRefreshTimer: null,
     loading: false
   },
 
@@ -68,9 +69,19 @@ Page({
     }
     this.loadData()
     this.initBadgeSystem()
+    this.startBadgeRefreshTimer()
+    
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setSelected(2)
     }
+  },
+  
+  onHide() {
+    this.stopBadgeRefreshTimer()
+  },
+  
+  onUnload() {
+    this.stopBadgeRefreshTimer()
   },
 
   initPage() {
@@ -97,7 +108,8 @@ Page({
   // 加载用户资料（parent_info 专用接口，并显式传 phone）
   async loadUserProfile() {
     try {
-      const storageUser = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || {}
+      const storageUserStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const storageUser = typeof storageUserStr === 'string' ? JSON.parse(storageUserStr) : storageUserStr
       const phone = storageUser.phone || storageUser?.parent_info?.phone || storageUser?.student_info?.phone || storageUser?.teacher_info?.phone
       const response = await profileApi.getParentProfile(phone ? { phone } : {})
       if (response.success) {
@@ -155,8 +167,14 @@ Page({
     }
   },
 
-  onFunctionTap(e) {
+  async onFunctionTap(e) {
     const action = e.currentTarget.dataset.action
+    
+    // 进入消息通知前清除红点
+    if (action === 'notifications') {
+      await this.hideBadgeForModule('notifications')
+    }
+    
     switch (action) {
       case 'personalInfo':
         wx.navigateTo({ url: '/pages/parent/edit-profile/edit-profile' })
@@ -186,7 +204,8 @@ Page({
   // 加载余额数据（占位实现，后端联调时替换为真实API）
   async loadBalance() {
     try {
-      const storageUser = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || {}
+      const storageUserStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const storageUser = typeof storageUserStr === 'string' ? JSON.parse(storageUserStr) : storageUserStr
       const phone = storageUser.phone || storageUser?.parent_info?.phone || storageUser?.student_info?.phone || storageUser?.teacher_info?.phone
       const res = await accountApi.getParentBalanceSummary(phone ? { phone } : {})
       if (res && res.success) {
@@ -240,14 +259,73 @@ Page({
 
   async initBadgeSystem() {
     try {
-      const userInfo = wx.getStorageSync('userInfo') || {}
+      const userInfoStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const userInfo = typeof userInfoStr === 'string' ? JSON.parse(userInfoStr) : userInfoStr
       const userId = userInfo.id
       if (!userId) return
-      await badgeManager.initUserBadges(userId, 'parent')
-      const allBadges = badgeManager.getAllBadgeStatus(userId, 'parent')
+      
+      // 家长端固定使用 'parent' 作为 userType
+      const userType = 'parent'
+      console.log('家长端初始化红点系统，userId:', userId, 'userType:', userType)
+      
+      await badgeManager.initUserBadges(userId, userType)
+      const allBadges = badgeManager.getAllBadgeStatus(userId, userType)
       this.setData({ badgeStatus: allBadges })
-      badgeManager.addListener(userId, 'parent', null, (badgeStatus) => { this.setData({ badgeStatus }) })
+      badgeManager.addListener(userId, userType, null, (badgeStatus) => { this.setData({ badgeStatus }) })
     } catch (error) { console.error('初始化红点系统失败:', error) }
+  },
+  
+  startBadgeRefreshTimer() {
+    this.stopBadgeRefreshTimer()
+    this.data.badgeRefreshTimer = setInterval(() => {
+      console.log('定时刷新红点状态')
+      this.refreshBadgeStatus()
+    }, 30000)
+  },
+  
+  stopBadgeRefreshTimer() {
+    if (this.data.badgeRefreshTimer) {
+      clearInterval(this.data.badgeRefreshTimer)
+      this.setData({ badgeRefreshTimer: null })
+    }
+  },
+  
+  async refreshBadgeStatus() {
+    try {
+      const userInfoStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const userInfo = typeof userInfoStr === 'string' ? JSON.parse(userInfoStr) : userInfoStr
+      const userId = userInfo.id
+      if (!userId) return
+      
+      // 家长端固定使用 'parent' 作为 userType
+      const userType = 'parent'
+      console.log('家长端刷新红点状态，userId:', userId, 'userType:', userType)
+      
+      await badgeManager.initUserBadges(userId, userType)
+      const allBadges = badgeManager.getAllBadgeStatus(userId, userType)
+      this.setData({ badgeStatus: allBadges })
+    } catch (error) {
+      console.error('刷新红点状态失败:', error)
+    }
+  },
+  
+  async hideBadgeForModule(badgeKey) {
+    try {
+      const userInfoStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const userInfo = typeof userInfoStr === 'string' ? JSON.parse(userInfoStr) : userInfoStr
+      const userId = userInfo.id
+      if (!userId) return
+      
+      // 家长端固定使用 'parent' 作为 userType
+      const userType = 'parent'
+      console.log('家长端隐藏红点，userId:', userId, 'userType:', userType, 'badgeKey:', badgeKey)
+      
+      await badgeManager.hideBadge(userId, userType, badgeKey)
+      const allBadges = badgeManager.getAllBadgeStatus(userId, userType)
+      this.setData({ badgeStatus: allBadges })
+    } catch (error) {
+      console.error('清除红点失败:', error)
+    }
   },
 
   onShareAppMessage() { return { title: '新文枢教育 - 家长中心', path: '/pages/parent/profile/profile' } }

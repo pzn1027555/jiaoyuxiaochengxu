@@ -1,5 +1,5 @@
 <!--components/badge-indicator/badge-indicator.wxml-->
-<view class="{{getBadgeClass()}}" wx:if="{{visible}}">
-  <text class="badge-text" wx:if="{{count > 0}}">{{getDisplayText()}}</text>
+<view class="badge-indicator badge-{{size}} {{customClass}}" wx:if="{{visible}}">
+  <text class="badge-text" wx:if="{{count > 0}}">{{count > 99 ? '99+' : count}}</text>
 </view>
 

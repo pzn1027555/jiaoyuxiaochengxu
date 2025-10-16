@@ -21,6 +21,7 @@
         maxlength="{{500}}"
         auto-height="{{true}}"
         cursor-spacing="{{20}}"
+        disabled="{{!canSubmit}}"
       ></textarea>
       <view class="char-count">{{reportData.currentContent.length}}/500</view>
     </view>
@@ -37,6 +38,7 @@
         maxlength="{{500}}"
         auto-height="{{true}}"
         cursor-spacing="{{20}}"
+        disabled="{{!canSubmit}}"
       ></textarea>
       <view class="char-count">{{reportData.studentPerformance.length}}/500</view>
     </view>
@@ -53,13 +55,14 @@
         maxlength="{{500}}"
         auto-height="{{true}}"
         cursor-spacing="{{20}}"
+        disabled="{{!canSubmit}}"
       ></textarea>
       <view class="char-count">{{reportData.futurePlan.length}}/500</view>
     </view>
   </view>
 
   <!-- 提交按钮 -->
-  <view class="submit-section">
+  <view class="submit-section" wx:if="{{canSubmit}}">
     <button 
       class="submit-btn {{canSubmit ? 'active' : 'disabled'}}"
       bindtap="submitReport"

@@ -32,6 +32,10 @@ public class MiniParentServiceImpl implements MiniParentService {
 
     @Autowired
     private TeacherScheduleMapper teacherScheduleMapper;
+    @Autowired
+    private com.education.admin.modules.miniprogram.mapper.TeacherScheduleFeedbackMapper feedbackMapper;
+    @Autowired
+    private com.education.admin.modules.teacher.mapper.TeacherMapper teacherMapper;
 
     @Override
     public List<Map<String, Object>> getBindParents() {
@@ -67,6 +71,52 @@ public class MiniParentServiceImpl implements MiniParentService {
         }
     }
 
+    /** 家长端：按月获取孩子课程反馈/中期报告列表 */
+    @Override
+    public java.util.List<java.util.Map<String,Object>> listStudentFeedbackByMonth(Long studentId, String month, String type){
+        try{
+            if (studentId == null) throw new RuntimeException("studentId必填");
+            if (month == null || month.length()<7) throw new RuntimeException("month格式应为YYYY-MM");
+            java.time.LocalDate first = java.time.LocalDate.parse(month+"-01");
+            java.time.LocalDateTime start = first.atStartOfDay();
+            java.time.LocalDateTime end = first.plusMonths(1).minusDays(1).atTime(java.time.LocalTime.MAX);
+            // 查询该学生当月所有课程
+            java.util.List<com.education.admin.modules.miniprogram.entity.TeacherSchedule> schedules = teacherScheduleMapper.findByStudentAndRange(studentId, start, end);
+            java.util.List<java.util.Map<String,Object>> list = new java.util.ArrayList<>();
+            for (com.education.admin.modules.miniprogram.entity.TeacherSchedule ts : schedules){
+                com.education.admin.modules.miniprogram.entity.TeacherScheduleFeedback fb = feedbackMapper.findByScheduleIdAndRoleType(ts.getId(), "teacher");
+                if (fb == null) continue;
+                String ft = fb.getFeedbackType();
+                if (type != null && !type.isEmpty() && !"all".equalsIgnoreCase(type)){
+                    if (!String.valueOf(type).equalsIgnoreCase(String.valueOf(ft))) continue;
+                }
+                java.util.Map<String,Object> m = new java.util.HashMap<>();
+                m.put("scheduleId", ts.getId());
+                m.put("startTime", ts.getStartTime());
+                m.put("title", ts.getTitle());
+                m.put("feedbackType", ft);
+                m.put("content", fb.getContent());
+                m.put("createTime", fb.getCreateTime());
+                // 教师信息
+                com.education.admin.modules.teacher.entity.Teacher t = teacherMapper.findById(ts.getTeacherId());
+                if (t != null){
+                    m.put("teacherId", t.getId());
+                    m.put("teacherName", t.getTeacherName());
+                    m.put("teacherAvatar", t.getAvatar());
+                }
+                list.add(m);
+            }
+            // 按时间倒序
+            list.sort((a,b)->{
+                java.time.LocalDateTime ta = (java.time.LocalDateTime)a.get("startTime");
+                java.time.LocalDateTime tb = (java.time.LocalDateTime)b.get("startTime");
+                return tb.compareTo(ta);
+            });
+            return list;
+        }catch(Exception e){
+            throw new RuntimeException("查询反馈失败", e);
+        }
+    }
     /**
      * 获取当前学生ID
      */
@@ -123,7 +173,7 @@ public class MiniParentServiceImpl implements MiniParentService {
     }
 
     @Override
-    public Map<String, Object> getParentStudyStats(String period, String phone) {
+    public Map<String, Object> getParentStudyStats(String period, String phone, Long studentId) {
         try {
             // 获取家长手机号（从请求头兜底）
             String p = phone;
@@ -133,11 +183,18 @@ public class MiniParentServiceImpl implements MiniParentService {
                 p = request.getHeader("X-User-Phone");
             }
 
-            // 1) 找到家长 -> 学生ID列表
-            com.education.admin.modules.parent.entity.Parent parent = parentMapper.findByPhone(p);
-            if (parent == null) throw new RuntimeException("家长不存在");
-            java.util.List<Long> studentIds = parentStudentRelationMapper.findStudentIdsByParentId(parent.getId());
-            if (studentIds == null || studentIds.isEmpty()) studentIds = java.util.Collections.emptyList();
+            java.util.List<Long> studentIds;
+            if (studentId != null) {
+                // 指定单个学生
+                studentIds = new java.util.ArrayList<>();
+                studentIds.add(studentId);
+            } else {
+                // 1) 找到家长 -> 学生ID列表
+                com.education.admin.modules.parent.entity.Parent parent = parentMapper.findByPhone(p);
+                if (parent == null) throw new RuntimeException("家长不存在");
+                studentIds = parentStudentRelationMapper.findStudentIdsByParentId(parent.getId());
+                if (studentIds == null || studentIds.isEmpty()) studentIds = java.util.Collections.emptyList();
+            }
 
             // 2) 计算今日/本周/本月课时（每条 teacher_schedule 记录算1）
             java.time.LocalDateTime startToday = java.time.LocalDate.now().atStartOfDay();
@@ -149,18 +206,20 @@ public class MiniParentServiceImpl implements MiniParentService {
             java.time.LocalDateTime startMonth = monthStart.atStartOfDay();
             java.time.LocalDateTime endMonth = startMonth.plusMonths(1).minusNanos(1);
 
-            int today = 0, week = 0, month = 0;
+            int todayMin = 0, weekMin = 0, monthMin = 0;
             for (Long sid : studentIds) {
-                today += teacherScheduleMapper.countLessonsByStudentInRange(sid, startToday, endToday);
-                week += teacherScheduleMapper.countLessonsByStudentInRange(sid, startWeek, endWeek);
-                month += teacherScheduleMapper.countLessonsByStudentInRange(sid, startMonth, endMonth);
+                todayMin += teacherScheduleMapper.sumDurationMinutesByStudentInRange(sid, startToday, endToday);
+                weekMin += teacherScheduleMapper.sumDurationMinutesByStudentInRange(sid, startWeek, endWeek);
+                monthMin += teacherScheduleMapper.sumDurationMinutesByStudentInRange(sid, startMonth, endMonth);
             }
 
             Map<String, Object> data = new java.util.HashMap<>();
             Map<String, Object> duration = new java.util.HashMap<>();
-            duration.put("today", today);
-            duration.put("week", week);
-            duration.put("month", month);
+            // 换算为小时，保留1位小数
+            java.text.DecimalFormat df = new java.text.DecimalFormat("0.0");
+            duration.put("today", Double.parseDouble(df.format(todayMin / 60.0)));
+            duration.put("week", Double.parseDouble(df.format(weekMin / 60.0)));
+            duration.put("month", Double.parseDouble(df.format(monthMin / 60.0)));
             data.put("duration", duration);
 
             // 3) 图表：period=day|week|month
@@ -176,7 +235,7 @@ public class MiniParentServiceImpl implements MiniParentService {
                     java.time.LocalDateTime e = s.plusDays(7).minusNanos(1);
                     int cnt = 0;
                     for (Long sid : studentIds) {
-                        cnt += teacherScheduleMapper.countLessonsByStudentInRange(sid, s, e);
+                        cnt += teacherScheduleMapper.sumDurationMinutesByStudentInRange(sid, s, e);
                     }
                     labels.add(startWeekD.getMonthValue() + "/" + startWeekD.getDayOfMonth());
                     values.add(cnt);
@@ -190,7 +249,7 @@ public class MiniParentServiceImpl implements MiniParentService {
                     java.time.LocalDateTime e = s.plusMonths(1).minusNanos(1);
                     int cnt = 0;
                     for (Long sid : studentIds) {
-                        cnt += teacherScheduleMapper.countLessonsByStudentInRange(sid, s, e);
+                        cnt += teacherScheduleMapper.sumDurationMinutesByStudentInRange(sid, s, e);
                     }
                     labels.add(m.getYear() + "-" + String.format("%02d", m.getMonthValue()));
                     values.add(cnt);
@@ -204,7 +263,7 @@ public class MiniParentServiceImpl implements MiniParentService {
                     java.time.LocalDateTime e = s.plusDays(1).minusNanos(1);
                     int cnt = 0;
                     for (Long sid : studentIds) {
-                        cnt += teacherScheduleMapper.countLessonsByStudentInRange(sid, s, e);
+                        cnt += teacherScheduleMapper.sumDurationMinutesByStudentInRange(sid, s, e);
                     }
                     labels.add(String.valueOf(d.getDayOfMonth()));
                     values.add(cnt);
@@ -212,7 +271,12 @@ public class MiniParentServiceImpl implements MiniParentService {
             }
             Map<String, Object> chart = new java.util.HashMap<>();
             chart.put("labels", labels);
-            chart.put("values", values);
+            // 折线图也换算为“小时”，保留1位小数
+            java.util.List<Double> hourValues = new java.util.ArrayList<>();
+            for (Integer minutes : values) {
+                hourValues.add(Double.parseDouble(df.format((minutes == null ? 0 : minutes) / 60.0)));
+            }
+            chart.put("values", hourValues);
             data.put("chart", chart);
 
             return data;

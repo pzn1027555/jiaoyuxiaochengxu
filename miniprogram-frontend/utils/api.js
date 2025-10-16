@@ -294,6 +294,16 @@ const api = {
     getMonth(params) {
       return request.get('/mini/teacher/schedule/month', params)
     },
+    // 学生查询指定教师的课程安排（按月）
+    getMonthByTeacherId(params) {
+      // params: { teacherId, month }
+      return request.get('/mini/teacher/schedule/month', params)
+    },
+    // 学生查询指定教师某天的课程安排
+    getDayByTeacherId(params) {
+      // params: { teacherId, date }
+      return request.get('/mini/teacher/schedule/day', params)
+    },
     create(data) {
       return request.post('/mini/teacher/schedule/create', data)
     },
@@ -317,6 +327,7 @@ const api = {
       return request.get(`/mini/teacher/schedule/${id}/feedback`)
     },
     submitFeedback(id, data){
+      // data 可包含 { content, feedbackType }
       return request.post(`/mini/teacher/schedule/${id}/feedback`, data)
     }
   },

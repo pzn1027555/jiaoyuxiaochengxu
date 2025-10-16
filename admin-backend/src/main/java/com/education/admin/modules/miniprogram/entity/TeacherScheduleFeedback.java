@@ -13,6 +13,8 @@ public class TeacherScheduleFeedback {
     private String roleType; // teacher / student
     private Integer starRating; // 1-5
     private String content;
+    /** 教师反馈类型：teacher_daily(课堂反馈)/midterm(中期报告) */
+    private String feedbackType;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

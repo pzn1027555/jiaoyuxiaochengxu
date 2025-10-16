@@ -45,6 +45,16 @@ Component({
     // 获取显示的文本
     getDisplayText() {
       const count = this.properties.count
+      const badgeKey = this.properties.badgeKey
+      console.log(`[getDisplayText] ${badgeKey}:`, {
+        count,
+        countType: typeof count,
+        countValue: count,
+        'count > 0': count > 0,
+        'count > 99': count > 99,
+        allProperties: this.properties
+      })
+      
       if (count > 99) {
         return '99+'
       } else if (count > 0) {
@@ -57,7 +67,8 @@ Component({
     getBadgeClass() {
       const { size, customClass } = this.properties
       const sizeClass = `badge-${size}`
-      return `badge-indicator ${sizeClass} ${customClass}`.trim()
+      const className = `badge-indicator ${sizeClass} ${customClass}`.trim()
+      return className
     }
   },
 
@@ -67,6 +78,18 @@ Component({
   lifetimes: {
     attached() {
       // 组件初始化时的逻辑
+      // 仅在需要调试时取消注释
+      // console.log('badge-indicator attached:', this.properties)
+    }
+  },
+
+  /**
+   * 监听属性变化（可选，用于调试）
+   */
+  observers: {
+    'visible, count': function(visible, count) {
+      // 仅在需要调试时取消注释
+      // console.log(`badge-indicator [${this.properties.badgeKey}] 属性变化:`, { visible, count })
     }
   }
 })

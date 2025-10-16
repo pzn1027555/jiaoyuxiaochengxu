@@ -13,10 +13,11 @@ Page({
     days: [],
     selectedDate: '',
     
-    // 教师课程安排数据（用于判断哪些日期有课，哪些时间段有课）
-    teacherSchedule: {},
+    // 教师课程安排数据
+    scheduleMap: {}, // 月度课程日期映射：{ '2025-01-15': true, ... }
+    daySchedule: [], // 当天课程列表
     
-    // 固定的三个时间段
+    // 固定的三个时间段（已废弃，保留用于兼容性）
     fixedTimeSlots: [
       {
         id: 'morning',
@@ -73,10 +74,24 @@ Page({
       const res = await request.get('/mini/parent/bind-list')
       if(res && res.success){
         const parents = res.data || []
+        if(parents.length === 0){
+          wx.showModal({
+            title: '提示',
+            content: '请先到我的-家长绑定中绑定家长',
+            showCancel: false,
+            confirmText: '知道了'
+          })
+          return
+        }
         const primary = parents.find(p=>p.isPrimary===1)
         this.setData({ parents, selectedParent: primary || (parents[0]||null), showParentPicker: true })
       }else{
-        wx.showToast({ title: (res&&res.message)||'未查询到绑定家长', icon:'none' })
+        wx.showModal({
+          title: '提示',
+          content: '请先到我的-家长绑定中绑定家长',
+          showCancel: false,
+          confirmText: '知道了'
+        })
       }
     }catch(e){ wx.showToast({ title:'加载家长失败', icon:'none' }) }
   },
@@ -181,36 +196,89 @@ Page({
     }
   },
 
-  // 加载教师课程安排数据
+  // 加载教师课程安排数据（月度）
   async loadTeacherSchedule() {
     try {
       console.log('Loading teacher schedule for teacher:', this.data.teacherId)
       
-      // 这里应该调用后端接口获取教师的课程安排
-      // 暂时使用模拟数据
-      const teacherSchedule = {
-        // 格式：日期 -> 时间段数组
-        '2025-07-01': ['morning', 'afternoon'], // 有早上和下午的课
-        '2025-07-03': ['evening'], // 有晚上的课
-        '2025-07-05': ['morning'], // 有早上的课
-        '2025-07-10': ['afternoon', 'evening'], // 有下午和晚上的课
-        // 可以继续添加更多日期...
+      if (!this.data.teacherId) {
+        console.warn('Teacher ID not set')
+        return
       }
       
-      this.setData({ teacherSchedule })
+      const { year, month } = this.data
+      const ym = `${year}-${('0' + month).slice(-2)}`
       
-      // 重新构建日历以显示有课日期的标记
-      this.buildMonth(this.data.year, this.data.month)
+      // 调用后端API获取教师该月的课程安排
+      const api = require('../../../utils/api')
+      const res = await api.teacherSchedule.getMonthByTeacherId({ 
+        teacherId: this.data.teacherId, 
+        month: ym 
+      })
       
-      // 更新当前选中日期的可用时间段
-      this.updateAvailableTimeSlots()
+      if (res && res.success && res.data) {
+        // 提取有课程的日期列表
+        const days = Array.isArray(res.data.days) ? res.data.days : 
+          (Array.isArray(res.data) ? res.data : [])
+        
+        // 构建 scheduleMap：{ '2025-01-15': true, ... }
+        const scheduleMap = {}
+        days.forEach(dateStr => {
+          scheduleMap[String(dateStr)] = true
+        })
+        
+        this.setData({ scheduleMap })
+        
+        // 重新构建日历以显示有课日期的标记（绿点）
+        this.buildMonth(year, month)
+        
+        // 加载当天的课程详情
+        if (this.data.selectedDate) {
+          await this.loadDaySchedule(this.data.selectedDate)
+        }
+      }
       
     } catch (error) {
       console.error('Load teacher schedule error:', error)
-      wx.showToast({
-        title: '加载课程安排失败',
-        icon: 'none'
+      // 静默失败，不影响用户预约
+    }
+  },
+
+  // 加载教师某一天的课程详情
+  async loadDaySchedule(dateStr) {
+    try {
+      if (!this.data.teacherId || !dateStr) {
+        return
+      }
+      
+      const api = require('../../../utils/api')
+      const res = await api.teacherSchedule.getDayByTeacherId({
+        teacherId: this.data.teacherId,
+        date: dateStr
       })
+      
+      if (res && res.success && res.data) {
+        const items = Array.isArray(res.data.items) ? res.data.items : 
+          (Array.isArray(res.data) ? res.data : [])
+        
+        // 格式化课程列表，用于在页面上展示
+        const daySchedule = items.map(item => ({
+          id: item.id,
+          title: item.title || '课程',
+          startTime: (item.startTime || '').replace('T', ' ').slice(11, 16),
+          endTime: (item.endTime || '').replace('T', ' ').slice(11, 16),
+          classType: item.classType,
+          studentCount: item.studentCount || 0
+        }))
+        
+        this.setData({ daySchedule })
+      } else {
+        this.setData({ daySchedule: [] })
+      }
+      
+    } catch (error) {
+      console.error('Load day schedule error:', error)
+      this.setData({ daySchedule: [] })
     }
   },
 
@@ -227,6 +295,9 @@ Page({
     const daysInMonth = new Date(year, month, 0).getDate()
     const res = []
     
+    // 从 scheduleMap 中获取该月有课的日期
+    const { scheduleMap = {} } = this.data
+    
     for (let i = 1; i <= daysInMonth; i++) {
       const currentDate = new Date(year, month - 1, i)
       const today = new Date()
@@ -236,15 +307,15 @@ Page({
       // 构建日期字符串
       const dateStr = `${year}-${('0' + month).slice(-2)}-${('0' + i).slice(-2)}`
       
-      // 检查该日期是否有课程安排
-      const hasClass = this.data.teacherSchedule[dateStr] && this.data.teacherSchedule[dateStr].length > 0
+      // 检查该日期是否有课程安排（教师有课的日期显示绿点）
+      const hasClass = scheduleMap[dateStr] === true
       
       res.push({ 
         date: i, 
         isCurrent: true, 
         selected: false, 
         isToday: currentDate.getTime() === today.getTime(),
-        isPast: currentDate.getTime() <= today.getTime(), // 今天和过去都不可选
+        isPast: currentDate.getTime() < today.getTime(), // 过去的日期不可选（今天可选）
         hasClass: hasClass // 是否有课程安排
       })
     }
@@ -267,36 +338,8 @@ Page({
     }))
     this.setData({ days, selectedDate: dateStr })
     
-    // 更新该日期的可用时间段
-    this.updateAvailableTimeSlots()
-  },
-
-  // 更新当前选中日期的可用时间段
-  updateAvailableTimeSlots() {
-    const { selectedDate, teacherSchedule, fixedTimeSlots } = this.data
-    
-    if (!selectedDate) {
-      this.setData({ availableTimeSlots: [] })
-      return
-    }
-    
-    // 获取该日期教师的课程安排
-    const busySlots = teacherSchedule[selectedDate] || []
-    
-    // 过滤出可用的时间段（没有被占用的时间段）
-    const availableTimeSlots = fixedTimeSlots.filter(slot => {
-      return !busySlots.includes(slot.id)
-    }).map(slot => ({
-      ...slot,
-      status: 'available',
-      type: 'trial'
-    }))
-    
-    console.log('Selected date:', selectedDate)
-    console.log('Busy slots:', busySlots)
-    console.log('Available slots:', availableTimeSlots)
-    
-    this.setData({ availableTimeSlots })
+    // 加载该日期教师的课程详情
+    this.loadDaySchedule(dateStr)
   },
 
   prevMonth() {
@@ -308,6 +351,8 @@ Page({
     }
     this.setData({ year, month })
     this.buildMonth(year, month)
+    // 重新加载新月份的教师课程安排
+    this.loadTeacherSchedule()
   },
 
   nextMonth() {
@@ -319,6 +364,8 @@ Page({
     }
     this.setData({ year, month })
     this.buildMonth(year, month)
+    // 重新加载新月份的教师课程安排
+    this.loadTeacherSchedule()
   },
 
   onSelectDay(e) {
@@ -348,27 +395,40 @@ Page({
 
   // 预约试听
   onBookTrial(e) {
-    const slotId = e.currentTarget.dataset.slotid
-    const timeSlot = this.data.availableTimeSlots.find(slot => slot.id === slotId)
-    
-    if (!timeSlot) return
-    
-    if (timeSlot.status !== 'available') {
+    if (!this.data.selectedDate) {
       wx.showToast({
-        title: '该时间段不可预约',
+        title: '请先选择预约日期',
         icon: 'none'
       })
       return
     }
     
-    // 同步限制 time-picker 的 start/end
-    const tpStart = timeSlot.startTime || '08:00'
-    const tpEnd = timeSlot.endTime || '22:00'
+    // 打开预约弹窗，设置为试听课模式
     this.setData({
-      selectedTimeSlot: timeSlot,
+      selectedDuration: 'trial',
       showBookingModal: true,
-      timePickerStart: tpStart,
-      timePickerEnd: tpEnd,
+      timePickerStart: '08:00',
+      timePickerEnd: '22:00',
+      selectedTime: ''
+    })
+  },
+
+  // 预约正式课
+  onBookFormal(e) {
+    if (!this.data.selectedDate) {
+      wx.showToast({
+        title: '请先选择预约日期',
+        icon: 'none'
+      })
+      return
+    }
+    
+    // 打开预约弹窗，设置为正式课模式
+    this.setData({
+      selectedDuration: 'formal',
+      showBookingModal: true,
+      timePickerStart: '08:00',
+      timePickerEnd: '22:00',
       selectedTime: ''
     })
   },

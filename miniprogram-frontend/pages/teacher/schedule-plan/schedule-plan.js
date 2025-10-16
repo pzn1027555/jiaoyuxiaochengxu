@@ -43,7 +43,10 @@ Page({
     subjectTree:[],
     // 标签输入弹窗
     showTagInput:false,
-    tempTag:''
+    tempTag:'',
+    // 课程类别选择
+    classTypeOptions:['1对1', '班课'],
+    classTypeIndex:0
   },
   addTag(){ this.setData({ showTagInput:true, tempTag:'' }) },
   removeTag(e){ const idx=Number(e.currentTarget.dataset.index||-1); if(idx<0) return; const arr=(this.data.form.tags||[]).slice(); arr.splice(idx,1); this.setData({ 'form.tags': arr }) },
@@ -226,6 +229,53 @@ Page({
     this.setData({ 'form.customDates': arr })
   },
   today(){ const d=new Date(); const y=d.getFullYear(); const m=('0'+(d.getMonth()+1)).slice(-2); const da=('0'+d.getDate()).slice(-2); return `${y}-${m}-${da}` },
+  
+  // 课程类别切换
+  onClassTypeChange(e){
+    const idx = Number(e.detail.value)
+    const classType = idx === 0 ? 'one_to_one' : 'group'
+    this.setData({ 
+      classTypeIndex: idx,
+      'form.classType': classType
+    })
+  },
+  
+  // 选择封面图（参考upload页面）
+  selectCoverImage() {
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['original','compressed'],
+      sourceType: ['album','camera'],
+      success: async (res) => {
+        try {
+          const tempPath = res.tempFilePaths[0]
+          wx.showLoading({ title: '上传封面...', mask: true })
+          
+          const up = await api.upload.image(tempPath)
+          
+          wx.hideLoading()
+          if (up && (up.code === 200 || up.success) && up.data && up.data.url) {
+            const url = up.data.url
+            const fullUrl = this.toAbsolute(url)
+            this.setData({ 
+              'form.coverUrl': url, 
+              coverFullUrl: fullUrl 
+            })
+            wx.showToast({ title: '封面已更新', icon: 'success' })
+          } else {
+            const errorMsg = up && up.message ? up.message : '封面上传失败，请检查网络连接'
+            wx.showToast({ title: errorMsg, icon: 'none' })
+          }
+        } catch (e) {
+          wx.hideLoading()
+          const errorMsg = e && e.message ? e.message : '封面上传失败，请重试'
+          wx.showToast({ title: errorMsg, icon: 'none' })
+        }
+      },
+      fail: () => wx.showToast({ title: '选择图片失败', icon: 'none' })
+    })
+  },
+  
   async onSubmit(){
     const p = { ...this.data.form }
     const students = this.data.students || []
@@ -235,11 +285,11 @@ Page({
     if (!p.totalLessons){ wx.showToast({ title:'请填写课时', icon:'none' }); return }
     // 费用按后端统一配置价计算
     if (p.classType === 'one_to_one'){
-      if (students.length === 0){ wx.showToast({ title:'请选择学生', icon:'none' }); return }
+      // 学生可以为空，不再强制校验
       if (students.length > 1){ wx.showToast({ title:'1对1仅能选择1位学生', icon:'none' }); return }
     }
     
-    const studentId = p.classType === 'one_to_one' ? Number(students[0].id) : null
+    const studentId = p.classType === 'one_to_one' && students.length > 0 ? Number(students[0].id) : null
     // 不再校验前端价格
 
     try{

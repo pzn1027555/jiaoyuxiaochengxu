@@ -20,18 +20,26 @@
     </view>
   </scroll-view>
 
-  <!-- 筛选：城市 / 价格 / 性别 -->
-  <view class="filter-bar">
-    <picker mode="multiSelector" range="{{regionPickerRange}}" value="{{regionPickerValue}}" bindchange="onRegionChange" bindcolumnchange="onRegionColumnChange">
-      <view class="filter-item">{{regionText || '城市 ▾'}}<text class="clear-x" wx:if="{{regionText}}" bindtap="clearRegion"> ×</text></view>
-    </picker>
-    <picker mode="selector" range="{{priceOptions}}" value="{{priceIndex}}" bindchange="onPriceChange">
-      <view class="filter-item">{{priceText || '价格 ▾'}}<text class="clear-x" wx:if="{{priceText}}" bindtap="clearPrice"> ×</text></view>
-    </picker>
-    <picker mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
-      <view class="filter-item">{{genderText || '性别 ▾'}}<text class="clear-x" wx:if="{{genderText}}" bindtap="clearGender"> ×</text></view>
-    </picker>
-  </view>
+  <!-- 筛选：教师级别 / 线上线下 / 城市 / 价格 / 性别 -->
+  <scroll-view class="filter-bar" scroll-x="true" show-scrollbar="false">
+    <view class="filter-track">
+      <picker mode="selector" range="{{teacherLevelOptions}}" value="{{teacherLevelIndex}}" bindchange="onTeacherLevelChange">
+        <view class="filter-item">{{teacherLevelText || '级别 ▾'}}<text class="clear-x" wx:if="{{teacherLevelText}}" bindtap="clearTeacherLevel"> ×</text></view>
+      </picker>
+      <picker mode="selector" range="{{teachModeOptions}}" value="{{teachModeIndex}}" bindchange="onTeachModeChange">
+        <view class="filter-item">{{teachModeText || '方式 ▾'}}<text class="clear-x" wx:if="{{teachModeText}}" bindtap="clearTeachMode"> ×</text></view>
+      </picker>
+      <picker wx:if="{{showCityFilter}}" mode="multiSelector" range="{{regionPickerRange}}" value="{{regionPickerValue}}" bindchange="onRegionChange" bindcolumnchange="onRegionColumnChange">
+        <view class="filter-item">{{regionText || '城市 ▾'}}<text class="clear-x" wx:if="{{regionText}}" bindtap="clearRegion"> ×</text></view>
+      </picker>
+      <picker mode="selector" range="{{priceOptions}}" value="{{priceIndex}}" bindchange="onPriceChange">
+        <view class="filter-item">{{priceText || '价格 ▾'}}<text class="clear-x" wx:if="{{priceText}}" bindtap="clearPrice"> ×</text></view>
+      </picker>
+      <picker mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
+        <view class="filter-item">{{genderText || '性别 ▾'}}<text class="clear-x" wx:if="{{genderText}}" bindtap="clearGender"> ×</text></view>
+      </picker>
+    </view>
+  </scroll-view>
 
   <!-- 老师卡片列表 -->
   <view class="teacher-list">
@@ -42,6 +50,7 @@
           <view class="title-row">
             <text class="name">{{item.name}}</text>
             <image class="gender-icon" wx:if="{{item.genderSymbol}}" src="{{item.genderSymbol=='♀' ? '/images/student/female.png' : '/images/student/male.png'}}" mode="widthFix"></image>
+            <text class="teacher-level" wx:if="{{item.teacherLevel}}">{{item.teacherLevel}}</text>
             <text class="district" wx:if="{{item.district}}">{{item.district}}</text>
           </view>
           <view class="tag-row">

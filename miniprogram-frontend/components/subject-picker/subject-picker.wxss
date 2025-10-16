@@ -46,7 +46,12 @@
 .subject-picker-content {
   flex: 1;
   padding: 16rpx 24rpx 24rpx 24rpx;
+  overflow:auto;
 }
+
+/* 隐藏纵向滚动条（各端兼容尽量） */
+.subject-picker-content::-webkit-scrollbar { width: 0; height: 0; display: none; }
+.subject-picker-content { scrollbar-width: none; -ms-overflow-style: none; }
 
 .subject-group {
   margin-bottom: 24rpx;

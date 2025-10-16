@@ -8,7 +8,6 @@ import com.education.admin.modules.miniprogram.mapper.TeacherScheduleMapper;
 import com.education.admin.modules.miniprogram.mapper.TeacherScheduleFeedbackMapper;
 import com.education.admin.modules.miniprogram.mapper.TeacherScheduleStudentMapper;
 import com.education.admin.modules.miniprogram.service.MiniScheduleService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,11 +55,14 @@ public class MiniScheduleServiceImpl implements MiniScheduleService {
     }
 
     @Override
-    public Result<Object> getDaySchedule(String date) {
+    public Result<Object> getDaySchedule(String date, Long teacherId) {
         try {
-            Long teacherId = getCurrentTeacherId();
+            // 如果没有传入teacherId，则使用当前登录教师的ID
             if (teacherId == null) {
-                return Result.error("教师未登录");
+                teacherId = getCurrentTeacherId();
+                if (teacherId == null) {
+                    return Result.error("教师未登录");
+                }
             }
 
             LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -114,10 +116,13 @@ public class MiniScheduleServiceImpl implements MiniScheduleService {
     }
 
     @Override
-    public Result<Object> getMonthSchedule(String month) {
+    public Result<Object> getMonthSchedule(String month, Long teacherId) {
         try {
-            Long teacherId = getCurrentTeacherId();
-            if (teacherId == null) return Result.error("教师未登录");
+            // 如果没有传入teacherId，则使用当前登录教师的ID
+            if (teacherId == null) {
+                teacherId = getCurrentTeacherId();
+                if (teacherId == null) return Result.error("教师未登录");
+            }
 
             LocalDate firstDay = LocalDate.parse(month + "-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             LocalDateTime start = firstDay.atStartOfDay();
@@ -451,6 +456,7 @@ public class MiniScheduleServiceImpl implements MiniScheduleService {
                 result.put("content", feedback.getContent());
                 result.put("starRating", feedback.getStarRating());
                 result.put("roleType", feedback.getRoleType());
+                result.put("feedbackType", feedback.getFeedbackType());
                 result.put("createTime", feedback.getCreateTime());
             } else {
                 result.put("hasFeedback", false);
@@ -465,7 +471,7 @@ public class MiniScheduleServiceImpl implements MiniScheduleService {
 
     @Override
     @Transactional
-    public Result<Object> submitFeedback(Long scheduleId, String content) {
+    public Result<Object> submitFeedback(Long scheduleId, String content, String feedbackType) {
         try {
             Long teacherId = getCurrentTeacherId();
             if (teacherId == null) {
@@ -484,9 +490,18 @@ public class MiniScheduleServiceImpl implements MiniScheduleService {
                 feedback.setTeacherId(teacherId);
                 feedback.setRoleType("teacher");
                 feedback.setContent(content);
+                // 根据入参设置类型，默认课堂反馈
+                String type = (feedbackType==null||feedbackType.isEmpty())? "teacher_daily" : feedbackType;
+                feedback.setFeedbackType(type);
                 feedbackMapper.insert(feedback);
             } else {
                 feedback.setContent(content);
+                // 覆盖为入参类型（若提供）
+                if (feedbackType!=null && !feedbackType.isEmpty()) {
+                    feedback.setFeedbackType(feedbackType);
+                } else if (feedback.getFeedbackType()==null || feedback.getFeedbackType().isEmpty()){
+                    feedback.setFeedbackType("teacher_daily");
+                }
                 feedbackMapper.update(feedback);
             }
 

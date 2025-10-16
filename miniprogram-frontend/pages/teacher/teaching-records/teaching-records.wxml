@@ -88,13 +88,12 @@
           <!-- 中期报告按钮 -->
           <button 
             class="action-btn report-btn" 
-            wx:if="{{item.canWriteReport}}"
+            wx:if="{{item.canWriteReport && !item.hasReport}}"
             bindtap="writeMidtermReport"
             data-course-id="{{item.id}}"
           >
             中期报告
           </button>
-          
           <!-- 查看中期报告按钮 -->
           <button 
             class="action-btn view-report-btn" 

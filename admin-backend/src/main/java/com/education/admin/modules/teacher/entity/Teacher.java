@@ -113,6 +113,8 @@ public class Teacher {
     
     private Integer recommendOrder;     // 推荐排序
     
+    private String teachModePreference; // 授课方式偏好：online-线上，offline-线下，both-线上线下都可
+    
     private Integer status;             // 状态：1-启用 0-禁用
     
     private String registerSource;      // 注册来源

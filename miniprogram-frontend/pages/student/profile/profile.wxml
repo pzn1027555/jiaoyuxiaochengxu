@@ -51,7 +51,17 @@
     
     <view class="functions-grid">
       <view class="function-item" wx:for="{{myFunctions}}" wx:key="id" bindtap="onFunctionTap" data-action="{{item.action}}">
-        <image class="function-icon" src="{{item.iconSrc}}" mode="aspectFit"></image>
+        <view class="function-icon-wrapper">
+          <image class="function-icon" src="{{item.iconSrc}}" mode="aspectFit"></image>
+          <!-- 消息通知红点 -->
+          <badge-indicator 
+            wx:if="{{item.action === 'notifications'}}"
+            badge-key="{{item.action}}"
+            visible="{{badgeStatus[item.action] && badgeStatus[item.action].visible}}"
+            count="{{badgeStatus[item.action] ? badgeStatus[item.action].count : 0}}"
+            size="small">
+          </badge-indicator>
+        </view>
         <text class="function-name">{{item.name}}</text>
       </view>
     </view>

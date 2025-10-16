@@ -30,6 +30,9 @@ Page({
       total: '0.00'
     },
     
+    // 定时器ID
+    badgeRefreshTimer: null,
+    
     // 我的功能
     myFunctions: [
       {
@@ -133,10 +136,22 @@ Page({
     
     this.loadData()
     this.initBadgeSystem()
+    this.startBadgeRefreshTimer()
+    
     // 设置TabBar选中状态（我的是第2个）
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setSelected(2)
     }
+  },
+  
+  onHide() {
+    // 页面隐藏时清除定时器
+    this.stopBadgeRefreshTimer()
+  },
+  
+  onUnload() {
+    // 页面卸载时清除定时器
+    this.stopBadgeRefreshTimer()
   },
 
   // 初始化页面
@@ -406,8 +421,13 @@ Page({
   },
 
   // 老师服务点击
-  onServiceTap(e) {
+  async onServiceTap(e) {
     const action = e.currentTarget.dataset.action
+    
+    // 进入页面前清除对应的红点
+    if (action === 'booking' || action === 'certification') {
+      await this.hideBadgeForModule(action)
+    }
     
     switch (action) {
       case 'schedule':
@@ -510,7 +530,8 @@ Page({
   // 初始化红点系统
   async initBadgeSystem() {
     try {
-      const userInfo = wx.getStorageSync('userInfo') || {}
+      const userInfoStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const userInfo = typeof userInfoStr === 'string' ? JSON.parse(userInfoStr) : userInfoStr
       const userId = userInfo.id
       
       if (!userId) {
@@ -518,17 +539,23 @@ Page({
         return
       }
 
+      // 教师端固定使用 'teacher' 作为 userType
+      const userType = 'teacher'
+      console.log('教师端初始化红点系统，userId:', userId, 'userType:', userType)
+
       // 初始化红点状态
-      await badgeManager.initUserBadges(userId, 'teacher')
+      await badgeManager.initUserBadges(userId, userType)
       
       // 获取所有红点状态
-      const allBadges = badgeManager.getAllBadgeStatus(userId, 'teacher')
+      const allBadges = badgeManager.getAllBadgeStatus(userId, userType)
+      console.log("allBadges1",JSON.stringify(allBadges));
       this.setData({
         badgeStatus: allBadges
       })
 
       // 添加全局监听器，当红点状态变化时自动更新
-      badgeManager.addListener(userId, 'teacher', null, (badgeStatus) => {
+      badgeManager.addListener(userId, userType, null, (badgeStatus) => {
+        console.log("allBadges2",allBadges);
         this.setData({
           badgeStatus: badgeStatus
         })
@@ -539,20 +566,91 @@ Page({
       console.error('初始化红点系统失败:', error)
     }
   },
+  
+  // 启动红点刷新定时器（每30秒刷新一次）
+  startBadgeRefreshTimer() {
+    // 先清除已有的定时器
+    this.stopBadgeRefreshTimer()
+    
+    // 设置30秒刷新一次
+    this.data.badgeRefreshTimer = setInterval(() => {
+      console.log('定时刷新红点状态')
+      this.refreshBadgeStatus()
+    }, 30000)
+  },
+  
+  // 停止红点刷新定时器
+  stopBadgeRefreshTimer() {
+    if (this.data.badgeRefreshTimer) {
+      clearInterval(this.data.badgeRefreshTimer)
+      this.setData({ badgeRefreshTimer: null })
+    }
+  },
+  
+  // 刷新红点状态
+  async refreshBadgeStatus() {
+    try {
+      const userInfoStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const userInfo = typeof userInfoStr === 'string' ? JSON.parse(userInfoStr) : userInfoStr
+      const userId = userInfo.id
+      
+      if (!userId) {
+        return
+      }
+      
+      // 教师端固定使用 'teacher' 作为 userType
+      const userType = 'teacher'
+      console.log('教师端刷新红点状态，userId:', userId, 'userType:', userType)
+      
+      // 重新拉取红点状态
+      await badgeManager.initUserBadges(userId, userType)
+      const allBadges = badgeManager.getAllBadgeStatus(userId, userType)
+      console.log("allBadges3",allBadges);
+      this.setData({
+        badgeStatus: allBadges
+      })
+    } catch (error) {
+      console.error('刷新红点状态失败:', error)
+    }
+  },
 
-  // 获取指定模块的红点状态
+  // 获取指定模块的红点状态（供WXML使用）
   getBadgeForModule(badgeKey) {
     const badge = this.data.badgeStatus[badgeKey]
+    console.log(`getBadgeForModule(${badgeKey}):`, badge)
     return badge || { visible: false, count: 0 }
+  },
+  
+  // WXS辅助函数：获取红点可见性
+  getBadgeVisible(badgeKey) {
+    const status = this.data.badgeStatus
+    if (!status || !status[badgeKey]) {
+      return false
+    }
+    return status[badgeKey].visible === true
+  },
+  
+  // WXS辅助函数：获取红点数量
+  getBadgeCount(badgeKey) {
+    const status = this.data.badgeStatus
+    if (!status || !status[badgeKey]) {
+      return 0
+    }
+    return status[badgeKey].count || 0
   },
 
   // 隐藏指定模块的红点
   async hideBadgeForModule(badgeKey) {
-    const userInfo = wx.getStorageSync('userInfo') || {}
+    const userInfoStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+    const userInfo = typeof userInfoStr === 'string' ? JSON.parse(userInfoStr) : userInfoStr
     const userId = userInfo.id
     
+    // 教师端固定使用 'teacher' 作为 userType
+    const userType = 'teacher'
+    
     if (userId) {
-      await badgeManager.hideBadge(userId, 'teacher', badgeKey)
+      console.log('教师端隐藏红点，userId:', userId, 'userType:', userType, 'badgeKey:', badgeKey)
+      await badgeManager.hideBadge(userId, userType, badgeKey)
     }
   },
 

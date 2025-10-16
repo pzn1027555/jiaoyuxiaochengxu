@@ -196,10 +196,24 @@ Page({
       const res = await request.get('/mini/parent/bind-list')
       if(res && res.success){
         const parents = res.data || []
+        if(parents.length === 0){
+          wx.showModal({
+            title: '提示',
+            content: '请先到我的-家长绑定中绑定家长',
+            showCancel: false,
+            confirmText: '知道了'
+          })
+          return
+        }
         const primary = parents.find(p=>p.isPrimary===1)
         this.setData({ parents, selectedParent: primary || (parents[0]||null), showParentPicker: true })
       } else {
-        wx.showToast({ title:(res&&res.message)||'未绑定家长', icon:'none' })
+        wx.showModal({
+          title: '提示',
+          content: '请先到我的-家长绑定中绑定家长',
+          showCancel: false,
+          confirmText: '知道了'
+        })
       }
     }catch(e){ wx.showToast({ title:'加载家长失败', icon:'none' }) }
   },

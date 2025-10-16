@@ -145,13 +145,23 @@ Page({
       const fb = await Promise.all(list.map(x=> api.teacherSchedule.getFeedback(x.id).catch(()=>null)))
       fb.forEach((r, i)=>{
         const has = r && (r.success || r.code===200) && r.data && r.data.hasFeedback
-        list[i].hasFeedback = !!has
         list[i].feedbackContent = has ? r.data.content : ''
+        const feedbackType = (r && r.data && r.data.feedbackType) || ''
+        const hasTeacherDaily = feedbackType === 'teacher_daily'
+        const hasMidterm = feedbackType === 'midterm'
+        list[i].hasTeacherDaily = hasTeacherDaily
+        // 保持旧字段以兼容模板：hasFeedback 等于是否有课堂反馈
+        list[i].hasFeedback = hasTeacherDaily
         // 结束后才可填写
         const endIso = arr[i] && arr[i].endTime
         let canWrite = false
         try{ const [d,t] = String(endIso||'').split('T'); if(t){ const [h,m]=t.split(':'); const e=new Date(d.replace(/-/g,'/')+' '+h+':'+m+':00'); canWrite = Date.now()>e.getTime() } }catch(err){ canWrite=false }
-        list[i].canWriteFeedback = canWrite && !list[i].hasFeedback
+        list[i].canWriteFeedback = canWrite && !hasTeacherDaily
+        list[i].isCompleted = canWrite
+        // 中期报告显示逻辑：当第n(lessonNumber)节结束，且 n==ceil(totalLessons/2)
+        const half = Math.ceil((list[i].totalLessons || 1) / 2)
+        list[i].hasReport = !!hasMidterm
+        list[i].canWriteReport = list[i].totalLessons != 1&&( list[i].isCompleted && (Number(list[i].currentLesson||list[i].lessonNo||list[i].lessonNumber||0) === half) && !hasMidterm)
       })
       this.setData({ courseList: list })
       
@@ -196,7 +206,7 @@ Page({
     console.log('查看中期报告:', courseId)
     
     wx.navigateTo({
-      url: `/pages/teacher/midterm-report-view/midterm-report-view?courseId=${courseId}`
+      url: `/pages/teacher/midterm-report-write/midterm-report-write?courseId=${courseId}`
     })
   },
 
@@ -244,7 +254,8 @@ Page({
           mask: true
         })
 
-        await api.teacherSchedule.submitFeedback(this.data.currentCourseId, { content: this.data.tempFeedbackContent })
+        // 若是课堂反馈按钮入口，默认 teacher_daily；中期报告在专页中填写
+        await api.teacherSchedule.submitFeedback(this.data.currentCourseId, { content: this.data.tempFeedbackContent, feedbackType: 'teacher_daily' })
 
         // 模拟提交延迟
         await new Promise(resolve => setTimeout(resolve, 1500))

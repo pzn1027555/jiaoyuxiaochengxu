@@ -104,6 +104,11 @@ public class UserProfileRequest {
      */
     private Integer teachingExperience;
     
+    /**
+     * 授课方式偏好（教师专用）：online-线上，offline-线下，both-线上线下都可
+     */
+    private String teachModePreference;
+    
     // 学生特有字段
     /**
      * 年级（学生专用）

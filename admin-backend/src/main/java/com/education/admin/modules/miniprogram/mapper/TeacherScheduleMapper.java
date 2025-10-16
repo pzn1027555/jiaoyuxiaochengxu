@@ -43,6 +43,11 @@ public interface TeacherScheduleMapper {
                                      @Param("start") LocalDateTime start,
                                      @Param("end") LocalDateTime end);
 
+    /** 汇总某学生在时间范围内的总学习时长（分钟），基于 teacher_schedule.duration_minutes */
+    int sumDurationMinutesByStudentInRange(@Param("studentId") Long studentId,
+                                           @Param("start") LocalDateTime start,
+                                           @Param("end") LocalDateTime end);
+
     /** 按学习计划编号查询所有排课 */
     List<TeacherSchedule> findByPlanId(@Param("planId") String planId);
 

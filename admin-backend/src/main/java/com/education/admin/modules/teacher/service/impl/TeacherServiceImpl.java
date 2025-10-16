@@ -27,15 +27,15 @@ public class TeacherServiceImpl implements TeacherService {
     public PageInfo<Teacher> getTeacherList(int pageNum, int pageSize, String name, Integer status, Integer risk) {
         PageHelper.startPage(pageNum, pageSize);
         List<Teacher> teachers = teacherMapper.findByPage(
-            (pageNum - 1) * pageSize,
-            pageSize,
             name,
             status,
             risk,
             null,   // subjectId（管理端列表此处不筛选）
             null,   // province
             null,   // city
-            null    // district
+            null,   // district
+            null,   // teacherLevel
+            null    // teachMode
         );
 
         // 将课时费按照教师等级映射为配置金额（如配置存在则覆盖）

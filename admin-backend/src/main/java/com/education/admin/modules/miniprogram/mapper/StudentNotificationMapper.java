@@ -26,6 +26,12 @@ public interface StudentNotificationMapper {
                @Param("title") String title,
                @Param("content") String content,
                @Param("relatedId") Long relatedId);
+    
+    /**
+     * 统计未读通知数量
+     */
+    int countUnread(@Param("studentId") Long studentId,
+                    @Param("userType") String userType);
 }
 
 

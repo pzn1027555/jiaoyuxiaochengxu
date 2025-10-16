@@ -22,7 +22,8 @@ Page({
       phone: '',
       subjects: [],
       teacherTags: [],
-      introduction: ''
+      introduction: '',
+      teachModePreference: 'both' // online/offline/both
     },
     
     // 地区显示文本
@@ -41,6 +42,7 @@ Page({
     
     // 选择器选项
     genderOptions: ['男', '女'],
+    teachModeOptions: ['线上', '线下', '线上线下都可'],
     
     // 中国省市区数据
     regionData: [
@@ -582,6 +584,11 @@ Page({
           ? profile.subjects.map(s => ({ id: s.id, name: s.name }))
           : subjectIds.map(id => ({ id, name: String(id) }))
 
+        // 转换授课方式偏好为中文
+        const teachModePrefMap = { 'online': '线上', 'offline': '线下', 'both': '线上线下都可' }
+        const teachModePreference = teachModePrefMap[profile.teachModePreference] || '线上线下都可'
+        const teachModeIndex = this.data.teachModeOptions.indexOf(teachModePreference)
+        
         const userProfile = {
           avatar: profile.avatar || '',
           name: profile.name || '',
@@ -593,7 +600,8 @@ Page({
           phone: profile.phone || '',
           subjects: subjectIds || [],
           teacherTags: profile.teacherTags || [],
-          introduction: profile.introduction || ''
+          introduction: profile.introduction || '',
+          teachModePreference: teachModePreference
         }
         
         // 构建地区显示文本
@@ -602,6 +610,7 @@ Page({
         this.setData({
           userProfile: userProfile,
           regionText: regionText,
+          teachModeIndex: teachModeIndex >= 0 ? teachModeIndex : 2, // 默认"线上线下都可"
           // 直接用后端返回的对象数组作为展示初值
           displaySubjects: subjectDisplayList
         })
@@ -703,6 +712,16 @@ Page({
     const gender = this.data.genderOptions[index]
     this.setData({
       'userProfile.gender': gender
+    })
+  },
+
+  // 选择授课方式偏好
+  onTeachModeChange(e) {
+    const index = e.detail.value
+    const teachMode = this.data.teachModeOptions[index]
+    this.setData({
+      'userProfile.teachModePreference': teachMode,
+      teachModeIndex: index
     })
   },
 
@@ -999,6 +1018,7 @@ Page({
       wx.showLoading({ title: '保存中...' })
       
       // 转换数据格式以适配后端
+      const teachModeMap = { '线上': 'online', '线下': 'offline', '线上线下都可': 'both' }
       const requestData = {
         name: userProfile.name,
         avatar: userProfile.avatar,
@@ -1010,7 +1030,8 @@ Page({
         phone: userProfile.phone,
         subjects: userProfile.subjects,
         teacherTags: userProfile.teacherTags,
-        introduction: userProfile.introduction
+        introduction: userProfile.introduction,
+        teachModePreference: teachModeMap[userProfile.teachModePreference] || userProfile.teachModePreference
       }
       
       const response = await profileApi.updateUserProfile(requestData)

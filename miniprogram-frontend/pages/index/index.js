@@ -25,6 +25,17 @@ Page({
     genderText: '',
     filterPriceRange: null, // [min,max]，max为空表示无限
     filterGender: '',
+    // 教师级别筛选
+    teacherLevelOptions: ['初级','中级','高级','专家'],
+    teacherLevelIndex: 0,
+    teacherLevelText: '',
+    filterTeacherLevel: '', // junior/intermediate/senior/expert
+    // 线上/线下筛选
+    teachModeOptions: ['线上','线下'],
+    teachModeIndex: 0,
+    teachModeText: '',
+    filterTeachMode: '', // online/offline
+    showCityFilter: false, // 是否显示城市筛选（线下时显示，线上时隐藏，默认隐藏）
     // 地区选择器数据（参考 teacher/edit-profile）
     regionData: [],
     regionPickerRange: [[], [], []],
@@ -72,10 +83,21 @@ Page({
     this.setData({ loading:true })
     try{
       // 约定：q 可是老师名或课程名，后端统一返回老师列表
-      const { page, size, keyword, filterProvince, filterCity, filterDistrict, activeSubject } = this.data
+      const { page, size, keyword, filterProvince, filterCity, filterDistrict, activeSubject, filterTeacherLevel, filterTeachMode } = this.data
       const subjectId = (activeSubject && activeSubject !== '全部') ? (this.data.subjectMap && this.data.subjectMap[activeSubject]) : undefined
-      const params = { q: keyword, page, size, province: filterProvince, city: filterCity, district: filterDistrict }
+      const params = { q: keyword, page, size }
+      
+      // 线上教师不需要地区筛选
+      if (filterTeachMode !== 'online') {
+        if (filterProvince) params.province = filterProvince
+        if (filterCity) params.city = filterCity
+        if (filterDistrict) params.district = filterDistrict
+      }
+      
       if (subjectId != null) params.subjectId = subjectId
+      if (filterTeacherLevel) params.teacherLevel = filterTeacherLevel
+      if (filterTeachMode) params.teachMode = filterTeachMode
+      
       const res = await api.search.teachers(params)
       if (res && res.success){
         // 改为不分页：若后端已分页则也直接用当前页数据即可
@@ -103,6 +125,9 @@ Page({
     const subjectNames = subjectsArr.map(s=> (typeof s === 'number' || /^\d+$/.test(String(s))) ? (idName[String(s)] || idName[Number(s)] || s) : s)
     const location = [t.province, t.city, t.district].filter(Boolean).join('')
     const genderSymbol = t.gender === 1 ? '♂' : (t.gender === 2 ? '♀' : '')
+    // 教师级别中文显示
+    const levelMap = { junior: '初级', intermediate: '中级', senior: '高级', expert: '专家' }
+    const teacherLevelText = levelMap[t.teacherLevel] || ''
     return {
       raw: t,
       id: t.id,
@@ -115,7 +140,8 @@ Page({
       genderSymbol,
       subjects: subjectNames,
       subjectsText: subjectNames.join(' | '),
-      intro: t.introduction || ''
+      intro: t.introduction || '',
+      teacherLevel: teacherLevelText
     }
   },
   applyFilters(list){
@@ -237,6 +263,50 @@ Page({
     this.setData({ genderIndex: idx, genderText: txt, filterGender: txt, page:1, teachers:[] }, ()=> this.search())
   },
   clearGender(){ this.setData({ genderText:'', filterGender:'', page:1, teachers:[] }, ()=> this.search()) },
+
+  // 教师级别筛选
+  onTeacherLevelChange(e){
+    const idx = Number(e.detail.value)
+    const txt = this.data.teacherLevelOptions[idx]
+    const levelMap = { '初级': 'junior', '中级': 'intermediate', '高级': 'senior', '专家': 'expert' }
+    const level = levelMap[txt]
+    this.setData({ teacherLevelIndex: idx, teacherLevelText: txt, filterTeacherLevel: level, page:1, teachers:[] }, ()=> this.search())
+  },
+  clearTeacherLevel(){ this.setData({ teacherLevelText:'', filterTeacherLevel:'', page:1, teachers:[] }, ()=> this.search()) },
+
+  // 线上/线下筛选
+  onTeachModeChange(e){
+    const idx = Number(e.detail.value)
+    const txt = this.data.teachModeOptions[idx]
+    const modeMap = { '线上': 'online', '线下': 'offline' }
+    const mode = modeMap[txt]
+    const showCityFilter = mode === 'offline' // 只有选择线下时才显示城市筛选
+    // 如果选择线上，清除城市筛选
+    const updates = { 
+      teachModeIndex: idx, 
+      teachModeText: txt, 
+      filterTeachMode: mode, 
+      showCityFilter: showCityFilter,
+      page:1, 
+      teachers:[] 
+    }
+    if (mode === 'online') {
+      updates.filterProvince = ''
+      updates.filterCity = ''
+      updates.filterDistrict = ''
+      updates.regionText = ''
+    }
+    this.setData(updates, ()=> this.search())
+  },
+  clearTeachMode(){ 
+    this.setData({ 
+      teachModeText:'', 
+      filterTeachMode:'', 
+      showCityFilter: false, // 清除筛选后隐藏城市筛选
+      page:1, 
+      teachers:[] 
+    }, ()=> this.search()) 
+  },
 
   // 检查登录状态
   checkLoginStatus() {

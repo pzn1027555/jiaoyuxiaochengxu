@@ -26,23 +26,18 @@ public class MiniParentController {
     @GetMapping("/bind-list")
     public Map<String, Object> getBindParents() {
         log.info("Getting bind parents list");
-        
         try {
             List<Map<String, Object>> parents = miniParentService.getBindParents();
-            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", parents);
             response.put("message", "获取绑定家长列表成功");
-            
             return response;
         } catch (Exception e) {
             log.error("Error getting bind parents list", e);
-            
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", e.getMessage());
-            
             return response;
         }
     }
@@ -51,10 +46,11 @@ public class MiniParentController {
     @GetMapping("/stats")
     public Map<String, Object> getParentStudyStats(
             @RequestParam(value = "period", required = false) String period,
-            @RequestParam(value = "phone", required = false) String phone
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "studentId", required = false) Long studentId
     ){
         try {
-            Map<String, Object> data = miniParentService.getParentStudyStats(period, phone);
+            Map<String, Object> data = miniParentService.getParentStudyStats(period, phone, studentId);
             Map<String, Object> res = new HashMap<>();
             res.put("success", true);
             res.put("data", data);
@@ -73,6 +69,26 @@ public class MiniParentController {
         Map<String,Object> resp = new HashMap<>();
         try{
             java.util.List<java.util.Map<String,Object>> list = ((com.education.admin.modules.miniprogram.service.impl.MiniParentServiceImpl)miniParentService).getStudentsOfCurrentParent();
+            resp.put("success", true);
+            resp.put("data", list);
+        }catch(Exception e){
+            resp.put("success", false);
+            resp.put("message", e.getMessage());
+        }
+        return resp;
+    }
+
+    /** 家长端：按月获取孩子课程反馈/中期报告列表 */
+    @GetMapping("/feedback/list")
+    public Map<String,Object> getChildFeedback(
+            @RequestParam("studentId") Long studentId,
+            @RequestParam("month") String month, // YYYY-MM
+            @RequestParam(value = "type", required = false) String type // teacher_daily | midterm | all
+    ){
+        Map<String,Object> resp = new HashMap<>();
+        try{
+            java.util.List<java.util.Map<String,Object>> list = ((com.education.admin.modules.miniprogram.service.impl.MiniParentServiceImpl)miniParentService)
+                    .listStudentFeedbackByMonth(studentId, month, type);
             resp.put("success", true);
             resp.put("data", list);
         }catch(Exception e){

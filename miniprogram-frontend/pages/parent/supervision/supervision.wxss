@@ -7,58 +7,14 @@
   padding-bottom: 180rpx;
 }
 
-/* 孩子选择器 */
-.child-selector {
-  /* background: white; */
-  border-radius: 20rpx;
-  margin-bottom: 30rpx;
-  padding: 30rpx;
-  margin: 0 24rpx;
-  /* box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1); */
-}
-
-.picker-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.selected-child {
-  display: flex;
-  align-items: center;
-  flex: 1;
-}
-
-.child-avatar {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  margin-right: 20rpx;
-}
-
-.child-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.child-name-row{ display:flex; align-items:center; gap: 12rpx; }
-.gender-icon{ width: 28rpx; height: 28rpx; }
-
-.child-name {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8rpx;
-}
-
-.child-detail {
-  font-size: 26rpx;
-  color: #666;
-}
-
-.switch-group{ display:flex; align-items:center; gap: 12rpx; }
-.switch-text{ font-size: 26rpx; color: rgba(152, 152, 166, 1); }
-.picker-next{ width: 28rpx; height: 28rpx; }
+/* 顶部子女横向选择（与 study-plan 风格一致） */
+.children-bar { margin: 12rpx 24rpx 8rpx; white-space: nowrap; }
+.children-track { display: inline-flex; gap: 20rpx; }
+.children-track .child { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; padding: 8rpx 8rpx; }
+.children-track .child .avatar { width: 80rpx; height: 80rpx; border-radius: 50%; border: 2rpx solid transparent; }
+.children-track .child .name { margin-top: 6rpx; font-size: 24rpx; color: #666; }
+.children-track .child.active .avatar { border-color: #4CAF50; }
+.children-track .child.active .name { color: #2f6b3b; font-weight: 600; }
 
 /* 学习时长统计卡片 */
 .study-duration-card{ position: relative; margin: 24rpx; border-radius: 24rpx; overflow: hidden; background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%); color:#fff; }

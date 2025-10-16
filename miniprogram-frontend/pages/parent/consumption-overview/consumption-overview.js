@@ -60,7 +60,8 @@ Page({
   async loadData(){
     try{
       this.setData({ loading:true })
-      const storageUser = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || {}
+      const storageUserStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const storageUser = typeof storageUserStr === 'string' ? JSON.parse(storageUserStr) : storageUserStr
       const phone = storageUser.phone || storageUser?.parent_info?.phone || storageUser?.student_info?.phone || storageUser?.teacher_info?.phone
       const ym = this.data.selectedYearMonth
       // 汇总

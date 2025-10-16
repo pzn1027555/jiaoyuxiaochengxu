@@ -10,32 +10,33 @@
     <result column="role_type" property="roleType" />
     <result column="star_rating" property="starRating" />
     <result column="content" property="content" />
+    <result column="feedback_type" property="feedbackType" />
     <result column="create_time" property="createTime" />
     <result column="update_time" property="updateTime" />
   </resultMap>
 
   <select id="findByScheduleId" parameterType="long" resultMap="BaseMap">
-    SELECT id, schedule_id, teacher_id, student_id, role_type, star_rating, content, create_time, update_time
+    SELECT id, schedule_id, teacher_id, student_id, role_type, star_rating, content, feedback_type, create_time, update_time
     FROM teacher_schedule_feedback
     WHERE schedule_id = #{scheduleId}
     LIMIT 1
   </select>
 
   <select id="findByScheduleIdAndRoleType" parameterType="map" resultMap="BaseMap">
-    SELECT id, schedule_id, teacher_id, student_id, role_type, star_rating, content, create_time, update_time
+    SELECT id, schedule_id, teacher_id, student_id, role_type, star_rating, content, feedback_type, create_time, update_time
     FROM teacher_schedule_feedback
     WHERE schedule_id = #{scheduleId} AND role_type = #{roleType}
     LIMIT 1
   </select>
 
   <insert id="insert" parameterType="com.education.admin.modules.miniprogram.entity.TeacherScheduleFeedback" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO teacher_schedule_feedback(schedule_id, teacher_id, student_id, role_type, star_rating, content, create_time, update_time)
-    VALUES(#{scheduleId}, #{teacherId}, #{studentId}, #{roleType}, #{starRating}, #{content}, NOW(), NOW())
+    INSERT INTO teacher_schedule_feedback(schedule_id, teacher_id, student_id, role_type, star_rating, content, feedback_type, create_time, update_time)
+    VALUES(#{scheduleId}, #{teacherId}, #{studentId}, #{roleType}, #{starRating}, #{content}, COALESCE(#{feedbackType}, 'teacher_daily'), NOW(), NOW())
   </insert>
 
   <update id="update" parameterType="com.education.admin.modules.miniprogram.entity.TeacherScheduleFeedback">
     UPDATE teacher_schedule_feedback
-    SET star_rating = #{starRating}, content = #{content}, update_time = NOW()
+    SET star_rating = #{starRating}, content = #{content}, feedback_type = COALESCE(#{feedbackType}, feedback_type), update_time = NOW()
     WHERE id = #{id}
   </update>
 

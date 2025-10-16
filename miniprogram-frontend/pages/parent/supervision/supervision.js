@@ -1,13 +1,12 @@
 // pages/parent/supervision/supervision.js
+const api = require('../../../utils/api')
 const parentApi = require('../../../api/parent')
 
 Page({
   data: {
-    // 孩子列表
-    children: [],
-
-    // 当前选中的孩子
-    selectedChild: null,
+    // 子女列表（与 study-plan 对齐）
+    students: [],
+    currentStudentId: null,
 
     // 学习时长统计
     duration: { today: 0, week: 0, month: 0 },
@@ -16,6 +15,7 @@ Page({
     chartPeriod: 'day',
     chartData: { labels: [], values: [] },
     chart: null,
+    showChart: true,
 
     // 胶囊分段滑块位置
     segLeft: '0%',
@@ -38,11 +38,16 @@ Page({
   },
 
   onShow() {
-    this.loadData()
+    // 先隐藏图表，避免页面切换残留闪烁，再延时渲染
+    this.setData({ showChart:false }, ()=>{
+      setTimeout(()=>{ this.setData({ showChart:true }, ()=> this.loadData()) }, 0)
+    })
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setSelected(2)
     }
   },
+
+  goStudyPlan(){ wx.navigateTo({ url:'/pages/parent/study-plan/study-plan' }) },
 
   onPullDownRefresh() {
     this.loadData(true).finally(() => {
@@ -53,7 +58,7 @@ Page({
   // 初始化页面
   initPage() {
     this.checkUserRole()
-    this.loadChildren()
+    this.loadStudents()
   },
 
   // 检查用户角色
@@ -73,56 +78,41 @@ Page({
     }
   },
 
-  // 加载孩子列表
-  async loadChildren() {
+  // 加载子女列表（与 study-plan 逻辑保持一致）
+  async loadStudents() {
     try {
-      // 模拟数据，实际应从API获取
-      const children = [
-        {
-          id: 1,
-          name: '小明',
-          grade: '高一',
-          gender: 'female',
-          avatar: '/images/wx.png',
-          school: '实验中学'
-        },
-        {
-          id: 2,
-          name: '小红',
-          grade: '初三',
-          gender: 'male',
-          avatar: '/images/wx.png',
-          school: '育才中学'
+      const res = await api.parent.getChildren()
+      const rawList = (res && res.success && Array.isArray(res.data)) ? res.data : []
+      const list = rawList.map(item => {
+        const studentId = item.studentId !== undefined ? item.studentId : (item.id !== undefined ? item.id : item.childId)
+        return {
+          ...item,
+          studentId,
+          studentName: item.studentName || item.name || item.childName || '',
+          studentAvatar: item.studentAvatar || item.avatar || item.avatarFull || ''
         }
-      ]
-
-      this.setData({
-        children: children,
-        selectedChild: children[0] || null
-      })
-
-      if (children.length > 0) {
+      }).filter(it => it.studentId !== undefined && it.studentId !== null)
+      const firstId = list.length ? list[0].studentId : null
+      this.setData({ students: list, currentStudentId: firstId })
+      if (firstId) {
         this.loadData()
       }
     } catch (error) {
-      console.error('加载孩子列表失败:', error)
+      console.error('加载子女列表失败:', error)
+      this.setData({ students: [], currentStudentId: null })
     }
   },
 
-  // 头像加载失败兜底
-  onAvatarError() {
-    const fallback = '/images/wx.png'
-    const selected = this.data.selectedChild || {}
-    if (selected && selected.avatar !== fallback) {
-      selected.avatar = fallback
-      const children = (this.data.children || []).map(c => c.id === selected.id ? { ...c, avatar: fallback } : c)
-      this.setData({ selectedChild: selected, children })
-    }
+  // 顶部子女点击切换
+  onPickStudent(e){
+    const id = e.currentTarget.dataset.id
+    if(!id || id===this.data.currentStudentId) return
+    this.setData({ currentStudentId: id }, () => this.loadData())
   },
 
-  // 加载数据（仅学习时长统计）
+  // 加载数据（学习时长统计 + 报告占位）
   async loadData() {
-    if (!this.data.selectedChild) return
+    if (!this.data.currentStudentId) return
     try {
       await this.loadLearningOverview()
       await this.loadReports()
@@ -142,7 +132,7 @@ Page({
   // 渲染折线图（wx-echarts）
   renderChart(){
     try{
-      const query = wx.createSelectorQuery()
+      const query = wx.createSelectorQuery().in(this)
       query.select('#studyChart').fields({ node: true, size: true }).exec(res => {
         const result = res && res[0]
         if (!result || !result.node) return
@@ -220,6 +210,11 @@ Page({
     }catch(e){ console.error('渲染图表失败', e) }
   },
 
+  onHide(){
+    // 页面隐藏时，销毁画布显示，避免路由切换残留
+    this.setData({ showChart: false })
+  },
+
   // 报告：切换页签
   switchTab(e){
     const key = e.currentTarget.dataset.key
@@ -237,37 +232,47 @@ Page({
   async loadReports(){
     try{
       const month = this.data.selectedMonth
-      // 模拟两条课程反馈
-      const feedback = [
-        { id: 1, teacherName: '霍清妍', teacherAvatar: '/images/wx.png', time: `${month}-06 18:30`, content: '反馈内容，反馈内容。大江东去，浪淘尽，千古风流人物。故垒西边，人在否？三国周郎赤壁。' },
-        { id: 2, teacherName: '霍清妍', teacherAvatar: '/images/wx.png', time: `${month}-01 09:20`, content: '学习态度认真，建议每日坚持单词复习与错题回顾。' }
-      ]
-      const midterm = [
-        { id: 101, teacherName: '霍清妍', courseName: '数学提高班', teacherAvatar: '/images/wx.png', time: `${month}-10 14:20`, content: '本阶段掌握良好，函数与方程提高明显。' },
-        { id: 102, teacherName: '霍清妍', courseName: '英语阅读课', teacherAvatar: '/images/wx.png', time: `${month}-02 10:10`, content: '阅读理解正确率提升，但词汇量仍需加强。' }
-      ]
+      const studentId = this.data.currentStudentId
+      if (!studentId || !month){ this.setData({ feedbackList:[], midtermList:[] }); return }
+      const request = require('../../../utils/request.js')
+      // 课堂反馈
+      const fbRes = await request.get('/mini/parent/feedback/list', { studentId, month, type:'teacher_daily' })
+      const mdRes = await request.get('/mini/parent/feedback/list', { studentId, month, type:'midterm' })
+      const normFb = (arr)=> (Array.isArray(arr)?arr:[]).map(it=>({
+        id: it.scheduleId,
+        teacherName: it.teacherName||'',
+        teacherAvatar: it.teacherAvatar||'/images/default-avatar.png',
+        time: String(it.startTime||'').replace('T',' ').slice(0,16),
+        content: it.content||'',
+        courseName: it.title||''
+      }))
+      const normMd = (arr)=> (Array.isArray(arr)?arr:[]).map(it=>({
+        id: it.scheduleId,
+        teacherName: it.teacherName||'',
+        teacherAvatar: it.teacherAvatar||'/images/default-avatar.png',
+        courseName: it.title||'',
+        time: String(it.startTime||'').replace('T',' ').slice(0,16),
+        content: it.content||''
+      }))
+      const feedback = (fbRes && fbRes.success) ? normFb(fbRes.data) : []
+      const midterm = (mdRes && mdRes.success) ? normMd(mdRes.data) : []
       this.setData({ feedbackList: feedback, midtermList: midterm })
-    }catch(err){ console.error('加载报告失败', err) }
+    }catch(err){ console.error('加载报告失败', err); this.setData({ feedbackList:[], midtermList:[] }) }
   },
 
-  // 切换孩子
-  onChildChange(e) {
-    const index = e.detail.value
-    const selectedChild = this.data.children[index]
-    this.setData({ selectedChild })
-    this.loadData()
-  },
+  // 下方报告仍使用模拟数据
 
-  // 加载学习概况（课时统计 + 图表数据）
+  // 加载学习概况（真实：按所选学生汇总分钟数 -> 小时）
   async loadLearningOverview() {
     try {
-      const storageUser = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || {}
+      const storageUserStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const storageUser = typeof storageUserStr === 'string' ? JSON.parse(storageUserStr) : storageUserStr
       const phone = storageUser.phone || storageUser?.parent_info?.phone || storageUser?.student_info?.phone || storageUser?.teacher_info?.phone
       let duration = { today: 0, week: 0, month: 0 }
       let labels = []
       let values = []
       try {
-        const params = this.data.chartPeriod ? { period: this.data.chartPeriod, ...(phone?{ phone }: {}) } : (phone?{ phone }: {})
+        const params = this.data.chartPeriod ? { period: this.data.chartPeriod, studentId: this.data.currentStudentId, ...(phone?{ phone }: {}) } : { studentId: this.data.currentStudentId, ...(phone?{ phone }: {}) }
         const res = await parentApi.getStudyStats(params)
         if (res && res.success) {
           const d = res.data || {}
@@ -278,27 +283,81 @@ Page({
         }
       } catch(e) { /* ignore backend error */ }
 
+      // 前端兜底：严格按所选学生逐日统计本周学习时长，避免后端聚合口径差异
+      const weekAgg = await this.computeWeekMinutes(this.data.currentStudentId)
+      if (weekAgg && Number.isFinite(weekAgg.totalMinutes)) {
+        const weekHours = Number((weekAgg.totalMinutes / 60).toFixed(1))
+        duration = { ...duration, week: weekHours }
+        // 周视图趋势：使用本周每日小时数
+        if (this.data.chartPeriod === 'week') {
+          labels = weekAgg.labels
+          values = weekAgg.dailyMinutes.map(m => Number(((m||0)/60).toFixed(1)))
+        }
+      }
+
       if (!labels.length || !values.length) {
         if (this.data.chartPeriod === 'day') {
           labels = ['00','04','08','12','16','20']
-          values = [0.5, 1.2, 0.8, 1.5, 1.0, 0.6]
+          values = [0, 0, 0, 0, 0, 0]
         } else if (this.data.chartPeriod === 'week') {
           labels = ['周一','周二','周三','周四','周五','周六','周日']
-          values = [1.2, 1.0, 1.8, 0.9, 2.2, 1.6, 1.1]
+          values = [0, 0, 0, 0, 0, 0, 0]
         } else {
           labels = ['1周','2周','3周','4周']
-          values = [6.5, 7.2, 5.8, 8.0]
+          values = [0, 0, 0, 0]
         }
-        duration = {
-          today: Number(values[values.length-1] || 0).toFixed(1),
-          week: this.data.chartPeriod==='week' ? values.reduce((a,b)=>a+b,0).toFixed(1) : 9.7,
-          month: this.data.chartPeriod==='month' ? values.reduce((a,b)=>a+b,0).toFixed(1) : 32.4
-        }
+        duration = { today: 0, week: 0, month: 0 }
       }
 
       this.setData({ duration, chartData: { labels, values } }, ()=> this.renderChart())
     } catch (error) {
       console.error('加载学习概况失败:', error)
     }
+  },
+
+  // 计算本周（周一至周日）逐日分钟数与总分钟数
+  async computeWeekMinutes(studentId){
+    try{
+      if(!studentId) return { totalMinutes: 0, dailyMinutes: [0,0,0,0,0,0,0], labels: ['周一','周二','周三','周四','周五','周六','周日'] }
+      // 计算本周周一
+      const now = new Date()
+      const day = now.getDay() || 7 // 周日为0，转换为7
+      const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (day - 1))
+      const days = [...Array(7)].map((_,i)=>{
+        const d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate()+i)
+        const y = d.getFullYear(); const m = ('0'+(d.getMonth()+1)).slice(-2); const da=('0'+d.getDate()).slice(-2)
+        return `${y}-${m}-${da}`
+      })
+      const labels = ['周一','周二','周三','周四','周五','周六','周日']
+      const results = await Promise.all(days.map(ds => api.studentSchedule.getDay({ studentId, date: ds }).catch(()=>null)))
+      const dailyMinutes = results.map((res)=>{
+        try{
+          const items = res && res.data && Array.isArray(res.data.items) ? res.data.items : []
+          let sum = 0
+          items.forEach(it => {
+            const dm = Number(it.durationMinutes)
+            if (Number.isFinite(dm) && dm>0) { sum += dm; return }
+            const st = parseDateTime(it.startTime || it.start_time)
+            const et = parseDateTime(it.endTime || it.end_time)
+            if (st && et) {
+              const diff = Math.max(0, et - st)
+              sum += Math.round(diff / 60000)
+            }
+          })
+          return sum
+        }catch(e){ return 0 }
+      })
+      const totalMinutes = dailyMinutes.reduce((a,b)=>a+b,0)
+      return { totalMinutes, dailyMinutes, labels }
+    }catch(e){
+      return { totalMinutes: 0, dailyMinutes: [0,0,0,0,0,0,0], labels: ['周一','周二','周三','周四','周五','周六','周日'] }
+    }
   }
 })
+
+function parseDateTime(str){
+  if(!str) return null
+  const s = String(str).replace('T',' ').replace(/-/g,'/')
+  const d = new Date(s)
+  return isNaN(d.getTime()) ? null : d
+}

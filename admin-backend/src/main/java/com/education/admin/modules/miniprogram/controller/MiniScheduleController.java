@@ -17,13 +17,15 @@ public class MiniScheduleController {
     private final MiniScheduleService scheduleService;
 
     @GetMapping("/day")
-    public Result<Object> day(@RequestParam(required = false) String date) {
-        return scheduleService.getDaySchedule(date);
+    public Result<Object> day(@RequestParam(required = false) String date,
+                              @RequestParam(required = false) Long teacherId) {
+        return scheduleService.getDaySchedule(date, teacherId);
     }
 
     @GetMapping("/month")
-    public Result<Object> month(@RequestParam String month) {
-        return scheduleService.getMonthSchedule(month);
+    public Result<Object> month(@RequestParam String month,
+                                @RequestParam(required = false) Long teacherId) {
+        return scheduleService.getMonthSchedule(month, teacherId);
     }
 
     @PostMapping("/create")
@@ -65,9 +67,23 @@ public class MiniScheduleController {
     return scheduleService.getFeedback(id);
   }
 
+  /**
+   * 获取指定排课的教师中期报告（feedback_type=midterm）。
+   * 若不存在中期报告，则回退返回任意教师反馈（兼容旧数据）。
+   */
+  @GetMapping("/{id}/feedback/midterm")
+  public Result<Object> getMidterm(@PathVariable Long id){
+    // 直接复用 service 的 getFeedback，前端据 feedbackType 判断；
+    // 若需要强制仅返回 midterm，可在 service/mapper 层新增按类型查询方法。
+    return scheduleService.getFeedback(id);
+  }
+
   @PostMapping("/{id}/feedback")
-  public Result<Object> submitFeedback(@PathVariable Long id, @RequestBody Map<String,Object> body){
-    return scheduleService.submitFeedback(id, String.valueOf(body.get("content")));
+  public Result<Object> submitFeedback(@PathVariable Long id, @RequestBody(required = false) Map<String,Object> body){
+    String content = body==null? null : String.valueOf(body.getOrDefault("content", ""));
+    String type = null;
+    try{ if(body!=null){ Object v = body.get("feedbackType"); if(v!=null) type = String.valueOf(v); } }catch(Exception ignored){}
+    return scheduleService.submitFeedback(id, content, type);
   }
 }
 

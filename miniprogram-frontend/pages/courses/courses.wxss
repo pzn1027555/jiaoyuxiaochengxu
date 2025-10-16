@@ -4,11 +4,11 @@
 .search-input{ display:flex; align-items:center; background:#fff; border-radius:28rpx; padding:18rpx 22rpx; border: 1rpx solid #54B247;}
 .search-input .icon-img{ width:32rpx; height:32rpx; margin-right:12rpx }
 .search-input input{ flex:1; font-size:28rpx }
-.hero-banner{ position:relative; height:220rpx; margin:0 24rpx 24rpx; border-radius:20rpx; overflow:hidden }
+.hero-banner{ position:relative; height:380rpx; margin:0 24rpx 24rpx; border-radius:20rpx; overflow:hidden }
 .hero-swiper, .hero-swiper swiper-item{ height:100% }
 .hero-bg{ position:absolute; inset:0; width:100%; height:100% }
 .quick-row{ display:flex; gap:20rpx; padding:0 24rpx; margin-bottom:16rpx }
-.quick-card{ position:relative; flex:1; border-radius:20rpx; padding:26rpx 24rpx; color:#fff; height:150rpx; display:flex; flex-direction:column; justify-content:center; overflow:hidden }
+.quick-card{ position:relative; flex:1; border-radius:20rpx; padding:26rpx 24rpx; color:#fff; height:100rpx; display:flex; flex-direction:column; justify-content:center; overflow:hidden }
 .qc-bg{ position:absolute; inset:0; width:100%; height:100% }
 .quick-card.topic{ background:#6a7bff }
 .quick-card.material{ background:#8066ff }
@@ -28,7 +28,7 @@
 .t-track{ display:flex; gap:16rpx;  }
 .t-card{     width: 300rpx;
   flex: 0 0 300rpx;
-  height: 330rpx;
+  height: 300rpx;
   background: #F3F3FB;
   border-radius: 16rpx;
   box-shadow: 0 8rpx 18rpx rgba(0,0,0,0.04);

@@ -189,14 +189,22 @@ Page({
     const fbRes = await Promise.all(fbPromises)
     fbRes.forEach((r, i)=>{
       const has = r && (r.success || r.code===200) && r.data && r.data.hasFeedback
-      list[i].hasFeedback = !!has
       list[i].feedbackContent = has ? r.data.content : ''
+      const feedbackType = (r && r.data && r.data.feedbackType) || ''
+      const hasTeacherDaily = feedbackType === 'teacher_daily'
+      const hasMidterm = feedbackType === 'midterm'
+      list[i].hasTeacherDaily = hasTeacherDaily
       // 结束后才可填写
       const now = Date.now()
       const endIso = list[i] && list[i].rawEndTime
       let canWrite = false
       try{ const [d,t] = String(endIso||'').split('T'); if(t){ const [h,m]=t.split(':'); const e=new Date(d.replace(/-/g,'/')+' '+h+':'+m+':00'); canWrite = now>e.getTime() } }catch(err){ canWrite=false }
-      list[i].canWriteFeedback = canWrite && !list[i].hasFeedback
+      list[i].canWriteFeedback = canWrite && !hasTeacherDaily
+      // 中期报告按钮：完成且到达一半课次
+      const half = Math.ceil((list[i].totalLessons || 1) / 2)
+      const cur = Number(list[i].lessonNumber || 0)
+      list[i].hasReport = hasMidterm
+      list[i].canWriteReport = canWrite && (cur === half) && !hasMidterm
     })
     this.setData({ todayClasses: list })
   },
@@ -346,6 +354,18 @@ Page({
   writeFeedback(e) {
     const classId = e.currentTarget.dataset.id
     this.setData({ showFeedbackModal:true, fbView:false, fbCourseId: classId, fbContent:'' })
+  },
+
+  // 去写中期报告
+  goWriteMidterm(e){
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({ url: `/pages/teacher/midterm-report-write/midterm-report-write?courseId=${id}` })
+  },
+
+  // 查看中期报告
+  goViewMidterm(e){
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({ url: `/pages/teacher/midterm-report-write/midterm-report-write?courseId=${id}` })
   },
 
   // 查看反馈

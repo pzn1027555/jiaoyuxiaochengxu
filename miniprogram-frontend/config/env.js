@@ -34,7 +34,7 @@ const env = {
 }
 
 // 当前环境变量（修改这里来切换环境）
-const CURRENT_ENV = 'development' // development | testing | production
+const CURRENT_ENV = 'production' // development | testing | production
 
 // 获取当前环境配置
 function getCurrentEnv() {
@@ -106,3 +106,4 @@ module.exports = {
   isDevelopment,
   isProduction,
   getFullUrl
+}

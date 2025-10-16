@@ -28,36 +28,69 @@
   <!-- 选择的日期 -->
   <view class="date-title">{{selectedDate}}</view>
 
-  <!-- 可预约时间段 -->
-  <view class="time-slots-section">
-    <view class="loading" wx:if="{{loading}}">
-      <view class="loading-text">加载中...</view>
+  <!-- 教师当天课程安排 -->
+  <view class="teacher-schedule-section" wx:if="{{daySchedule && daySchedule.length > 0}}">
+    <view class="schedule-header">
+      <text class="schedule-title">教师当天课程安排</text>
+      <text class="schedule-hint">以下时间段不可预约</text>
     </view>
-    
-    <view class="time-slot" wx:for="{{availableTimeSlots}}" wx:key="id">
+    <view class="schedule-list">
+      <view class="schedule-item" wx:for="{{daySchedule}}" wx:key="id">
+        <view class="schedule-time">
+          <text class="time-dot">●</text>
+          <text class="time-text">{{item.startTime}} ~ {{item.endTime}}</text>
+        </view>
+        <view class="schedule-info">
+          <text class="course-title">{{item.title}}</text>
+          <text class="course-type">{{item.classType === 'one_to_one' ? '1对1' : item.classType === 'big_class' ? '班课' : '课程'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预约操作区 -->
+  <view class="time-slots-section">
+    <!-- 试听课预约 -->
+    <view class="time-slot">
       <view class="time-info">
         <view class="time-range">
           <text class="time-dot">●</text>
-          <text class="time-text">{{item.name}} {{item.startTime}} ~ {{item.endTime}}</text>
+          <text class="time-text">预约试听课</text>
         </view>
-        <view class="time-status">空闲</view>
+        <view class="time-status">¥{{trialPrice}}</view>
       </view>
       
       <view class="booking-action">
         <button 
-          class="trial-btn {{item.status === 'available' ? '' : 'disabled'}}" 
-          bindtap="onBookTrial"
-          data-slotid="{{item.id}}"
-          disabled="{{item.status !== 'available'}}">
-          <text style="color: red;">¥{{trialPrice}}</text> 预约试听
+          class="trial-btn" 
+          bindtap="onBookTrial">
+          立即预约
         </button>
       </view>
     </view>
 
-    <!-- 空状态 -->
-    <view class="empty-slots" wx:if="{{!loading && availableTimeSlots.length === 0}}">
-      <view class="empty-text">该日期暂无可预约时间段</view>
-      <view class="empty-desc">请选择其他日期或该教师当天已排满课程</view>
+    <!-- 正式课预约 -->
+    <view class="time-slot">
+      <view class="time-info">
+        <view class="time-range">
+          <text class="time-dot">●</text>
+          <text class="time-text">预约正式课</text>
+        </view>
+        <!-- <view class="time-status">按课时收费</view> -->
+      </view>
+      
+      <view class="booking-action">
+        <button 
+          class="trial-btn" 
+          bindtap="onBookFormal">
+          立即预约
+        </button>
+      </view>
+    </view>
+
+    <!-- 提示信息 -->
+    <view class="booking-tips">
+      <text class="tip-text">请避开教师已有课程的时间段进行预约</text>
     </view>
   </view>
 

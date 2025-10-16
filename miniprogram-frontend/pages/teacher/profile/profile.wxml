@@ -112,11 +112,12 @@
       <view class="service-item" wx:for="{{teacherServices}}" wx:key="id" bindtap="onServiceTap" data-action="{{item.action}}">
         <view class="service-icon-wrapper">
           <image class="service-icon" src="{{item.iconSrc}}" mode="aspectFit"></image>
-          <!-- 通用红点组件 -->
+          <!-- 红点组件 -->
           <badge-indicator 
+            wx:if="{{badgeStatus[item.action]}}"
             badge-key="{{item.action}}"
-            visible="{{badgeStatus[item.action] && badgeStatus[item.action].visible}}"
-            count="{{badgeStatus[item.action] ? badgeStatus[item.action].count : 0}}"
+            visible="{{badgeStatus[item.action].visible}}"
+            count="{{badgeStatus[item.action].count}}"
             size="medium">
           </badge-indicator>
         </view>

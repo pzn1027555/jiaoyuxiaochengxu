@@ -1,5 +1,6 @@
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\controller\MiniSurveyController.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\impl\MiniTeacherResourceServiceImpl.java
+D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\system\service\SubjectLessonPriceService.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\dashboard\controller\DashboardController.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\controller\MiniTeacherController.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\controller\MiniUploadController.java
@@ -56,8 +57,10 @@ D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\mi
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\student\entity\StudentReview.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\teacher\dto\TeacherCertificationResponse.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\MiniStudentFavoriteService.java
+D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\system\service\impl\SubjectLessonPriceServiceImpl.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\AdminPostService.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\MiniInviteService.java
+D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\system\mapper\SubjectLessonPriceMapper.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\impl\MiniAccountServiceImpl.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\MiniParentService.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\mapper\ResearchApplicationMapper.java
@@ -74,11 +77,13 @@ D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\mi
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\impl\AdminPostServiceImpl.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\competition\controller\ScheduleController.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\AdminBackendApplication.java
+D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\system\entity\SubjectLessonPrice.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\entity\ResearchPost.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\impl\MiniTeacherServiceImpl.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\system\controller\AdminHeadTeacherController.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\controller\MiniRefundController.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\order\entity\OrderInfo.java
+D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\system\controller\SubjectLessonPriceController.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\orderreview\mapper\OrderReviewMapper.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\course\entity\CourseCategory.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\MiniCourseEnrollService.java
@@ -99,6 +104,7 @@ D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\mi
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\impl\MiniInviteServiceImpl.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\config\JsonTypeHandler.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\MiniTeacherResourceService.java
+D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\impl\StudentNotificationServiceImpl.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\impl\StudyPlanServiceImpl.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\controller\AdminEmploymentPostController.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\parent\mapper\ParentMapper.java
@@ -114,6 +120,7 @@ D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\mi
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\entity\MiniUser.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\security\JwtAuthenticationEntryPoint.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\order\service\OrderService.java
+D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\controller\StudentNotificationController.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\mapper\ParentAccountMapper.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\system\service\LearningSystemConfigService.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\course\controller\CourseCategoryController.java
@@ -195,6 +202,7 @@ D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\mi
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\dto\SelectRoleRequest.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\entity\ResearchApplication.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\teacher\mapper\TeacherNotificationMapper.java
+D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\service\StudentNotificationService.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\badge\service\UserBadgeNotificationService.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\entity\TeacherScheduleFeedback.java
 D:\project\教育小程序\admin-backend\src\main\java\com\education\admin\modules\miniprogram\mapper\InvitationRecordMapper.java

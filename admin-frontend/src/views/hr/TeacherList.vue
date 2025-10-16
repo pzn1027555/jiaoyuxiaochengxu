@@ -294,6 +294,13 @@
       <el-form-item label="课时费(¥)">
         <el-input v-model.number="editForm.hourlyRate" type="number" min="0" placeholder="请输入课时费" />
       </el-form-item>
+      <el-form-item label="授课方式偏好">
+        <el-select v-model="editForm.teachModePreference" placeholder="请选择授课方式">
+          <el-option label="线上" value="online" />
+          <el-option label="线下" value="offline" />
+          <el-option label="线上线下都可" value="both" />
+        </el-select>
+      </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="editDialogVisible=false">取消</el-button>
@@ -379,7 +386,8 @@ export default {
         teacherName: '',
         phone: '',
         teacherLevel: 'junior',
-        hourlyRate: null
+        hourlyRate: null,
+        teachModePreference: 'both'
       }
     }
   },
@@ -598,14 +606,15 @@ export default {
         teacherName: row.teacherName || '',
         phone: row.phone || '',
         teacherLevel: row.teacherLevel || 'junior',
-        hourlyRate: row.hourlyRate || null
+        hourlyRate: row.hourlyRate || null,
+        teachModePreference: row.teachModePreference || 'both'
       }
       this.editDialogVisible = true
     },
     async submitEdit() {
       try {
-        const { id, teacherName, phone, teacherLevel, hourlyRate } = this.editForm
-        await updateTeacher(id, { teacherName, phone, teacherLevel, hourlyRate })
+        const { id, teacherName, phone, teacherLevel, hourlyRate, teachModePreference } = this.editForm
+        await updateTeacher(id, { teacherName, phone, teacherLevel, hourlyRate, teachModePreference })
         this.$message.success('保存成功')
         this.editDialogVisible = false
         this.loadTeacherList()

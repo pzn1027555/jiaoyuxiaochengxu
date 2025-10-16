@@ -24,16 +24,17 @@ public interface TeacherMapper {
     
     /**
      * 分页查询教师列表
+     * 注意：分页由PageHelper自动处理，不需要传递offset和limit参数
      */
-    List<Teacher> findByPage(@Param("offset") Integer offset, 
-                           @Param("limit") Integer limit,
-                           @Param("name") String name,
+    List<Teacher> findByPage(@Param("name") String name,
                            @Param("status") Integer status,
                            @Param("risk") Integer risk,
                            @Param("subjectId") Long subjectId,
                            @Param("province") String province,
                            @Param("city") String city,
-                           @Param("district") String district);
+                           @Param("district") String district,
+                           @Param("teacherLevel") String teacherLevel,
+                           @Param("teachMode") String teachMode);
     
     /**
      * 查询教师总数
@@ -42,7 +43,9 @@ public interface TeacherMapper {
                    @Param("subjectId") Long subjectId,
                    @Param("province") String province,
                    @Param("city") String city,
-                   @Param("district") String district);
+                   @Param("district") String district,
+                   @Param("teacherLevel") String teacherLevel,
+                   @Param("teachMode") String teachMode);
     
     /**
      * 查询所有教师

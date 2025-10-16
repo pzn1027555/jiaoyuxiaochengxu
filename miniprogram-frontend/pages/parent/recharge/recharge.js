@@ -31,7 +31,8 @@ Page({
     this.setData({ submitting: true })
     try{
       // 模拟支付：调用后端模拟充值接口，后端写入充值流水并更新余额
-      const storageUser = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || {}
+      const storageUserStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const storageUser = typeof storageUserStr === 'string' ? JSON.parse(storageUserStr) : storageUserStr
       const phone = storageUser.phone || storageUser?.parent_info?.phone || storageUser?.student_info?.phone || storageUser?.teacher_info?.phone
       const res = await accountApi.parentRechargeSimulate({ amount: amountNum, ...(phone?{ phone }: {}) })
       if (res && res.success){

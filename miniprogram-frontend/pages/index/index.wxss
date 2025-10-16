@@ -16,8 +16,9 @@
 .tab { color:#5f8f5d; padding: 8rpx 16rpx; font-size:28rpx; border-radius:999px; background:#eef7ee }
 .tab.active { font-weight:700; background:#54B247; color:#fff }
 
-.filter-bar { display:flex; gap: 16rpx; padding: 16rpx 24rpx; color:#183314; }
-.filter-item { background:#fff; border-radius: 30rpx; padding: 14rpx 22rpx; box-shadow: 0 6rpx 14rpx rgba(0,0,0,0.04); font-size: 26rpx; }
+.filter-bar { white-space: nowrap; padding: 16rpx 0; }
+.filter-track { display: inline-flex; gap: 16rpx; padding: 0 24rpx; }
+.filter-item { background:#fff; border-radius: 30rpx; padding: 14rpx 22rpx; box-shadow: 0 6rpx 14rpx rgba(0,0,0,0.04); font-size: 26rpx; color:#183314; white-space: nowrap; }
 .clear-x{ margin-left:10rpx; color:#9aa89a }
 
 .teacher-list { padding: 0 24rpx; }
@@ -28,6 +29,7 @@
 .title-row { display:flex; align-items:center; gap: 12rpx; }
 .name { font-size: 36rpx; font-weight: 700; color:#183314 }
 .gender-icon{ width: 26rpx; height: 26rpx; margin-left: 6rpx; }
+.teacher-level { background:#f0f9ff; color:#1890ff; padding: 4rpx 12rpx; border-radius: 16rpx; font-size: 22rpx; margin-left: 6rpx; }
 .district{ margin-left:auto; color:#597259; font-size:24rpx }
 .tag-row { display:flex; gap: 10rpx; margin-top: 6rpx }
 .badge { background:#e6f6e6; color:#2f8b3c; padding: 6rpx 12rpx; border-radius: 20rpx; font-size: 22rpx }

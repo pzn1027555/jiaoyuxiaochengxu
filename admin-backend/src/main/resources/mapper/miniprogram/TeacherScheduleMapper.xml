@@ -151,6 +151,17 @@
       AND ts.plan_id IS NOT NULL
   </select>
 
+  <!-- 汇总某学生在时间范围内的总学习时长（分钟） -->
+  <select id="sumDurationMinutesByStudentInRange" parameterType="map" resultType="int">
+    SELECT COALESCE(SUM(ts.duration_minutes), 0)
+    FROM teacher_schedule ts
+    INNER JOIN teacher_schedule_student tss ON tss.schedule_id = ts.id
+    WHERE tss.student_id = #{studentId}
+      AND ts.start_time &gt;= #{start}
+      AND ts.end_time &lt;= #{end}
+      AND ts.status = 1
+  </select>
+
 </mapper>
 
 

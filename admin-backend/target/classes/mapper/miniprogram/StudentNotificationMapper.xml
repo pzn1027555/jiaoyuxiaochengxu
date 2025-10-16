@@ -59,5 +59,13 @@
     VALUES(#{studentId}, #{userType}, #{type}, #{title}, #{content}, #{relatedId}, 0, NOW(), NOW())
   </insert>
 
+  <select id="countUnread" parameterType="map" resultType="int">
+    SELECT COUNT(*)
+    FROM student_notification
+    WHERE student_id = #{studentId}
+      AND user_type = #{userType}
+      AND is_read = 0
+  </select>
+
 </mapper>
 

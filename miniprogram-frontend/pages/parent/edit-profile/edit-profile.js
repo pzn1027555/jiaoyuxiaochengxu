@@ -39,7 +39,8 @@ Page({
 
   async loadParentProfile(){
     try{
-      const storageUser = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || {}
+      const storageUserStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const storageUser = typeof storageUserStr === 'string' ? JSON.parse(storageUserStr) : storageUserStr
       const phone = storageUser.phone || storageUser?.parent_info?.phone
       const res = await profileApi.getParentProfile(phone ? { phone } : {})
       if(res && res.success){

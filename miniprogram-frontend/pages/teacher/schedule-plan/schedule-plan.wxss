@@ -68,3 +68,11 @@
 .subject-child{background:#f5f6f7;color:#666;padding:16rpx 24rpx;border-radius:24rpx;font-size:26rpx;border:1rpx solid transparent}
 .subject-child.selected{background:#e8f5e8;color:#4CAF50;border-color:#4CAF50}
 
+/* 班课封面上传样式（参考upload页面） */
+.cover-section{margin:24rpx 0}
+.cover-upload-area{min-height:280rpx;background:#f5f6f7;border-radius:12rpx;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2rpx dashed #d0d0d0}
+.upload-icon{font-size:72rpx;color:#999;margin-bottom:8rpx}
+.upload-text{font-size:26rpx;color:#666;margin-bottom:4rpx}
+.upload-hint{font-size:22rpx;color:#999}
+.cover-preview{width:100%;height:280rpx;border-radius:12rpx;object-fit:cover}
+

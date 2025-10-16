@@ -216,6 +216,7 @@ public class MiniProfileServiceImpl implements MiniProfileService {
         profile.put("major", teacher.getCertMajor());
         profile.put("graduationSchool", teacher.getCertGraduateSchool());
         profile.put("teachingExperience", teacher.getTeachingExperience());
+        profile.put("teachModePreference", teacher.getTeachModePreference());
         return profile;
     }
 
@@ -295,6 +296,11 @@ public class MiniProfileServiceImpl implements MiniProfileService {
         }
         // 教育信息由认证表维护，这里不再写入 teacher_info
         teacher.setTeachingExperience(request.getTeachingExperience());
+        
+        // 更新授课方式偏好
+        if (request.getTeachModePreference() != null) {
+            teacher.setTeachModePreference(request.getTeachModePreference());
+        }
         
         teacher.setUpdateTime(LocalDateTime.now());
         

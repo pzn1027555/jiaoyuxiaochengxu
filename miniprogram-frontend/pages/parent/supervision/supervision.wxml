@@ -1,30 +1,17 @@
 <!--pages/parent/supervision/supervision.wxml-->
 <view class="container">
-  <!-- 孩子选择器 -->
-  <view class="child-selector">
-    <picker bindchange="onChildChange" range="{{children}}" range-key="name">
-      <view class="picker-content">
-        <view wx:if="{{selectedChild}}" class="selected-child">
-          <image class="child-avatar" src="{{selectedChild.avatar}}" mode="aspectFill" binderror="onAvatarError"></image>
-          <view class="child-info">
-            <view class="child-name-row">
-              <text class="child-name">{{selectedChild.name}}</text>
-              <image wx:if="{{selectedChild.gender==='male'}}" class="gender-icon" src="/images/student/male.png" mode="widthFix"></image>
-              <image wx:if="{{selectedChild.gender==='female'}}" class="gender-icon" src="/images/student/female.png" mode="widthFix"></image>
-            </view>
-            <text class="child-detail">{{selectedChild.grade}}</text>
-          </view>
-        </view>
-        <view class="switch-group">
-          <text class="switch-text">切换子女</text>
-          <image class="picker-next" src="/images/workspace/next.png" mode="widthFix"></image>
-        </view>
+  <!-- 顶部孩子横向选择（与 study-plan 对齐） -->
+  <scroll-view class="children-bar" scroll-x="true" show-scrollbar="false">
+    <view class="children-track">
+      <view class="child {{currentStudentId===item.studentId?'active':''}}" wx:for="{{students}}" wx:key="studentId" data-id="{{item.studentId}}" bindtap="onPickStudent">
+        <image class="avatar" src="{{item.studentAvatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+        <text class="name">{{item.studentName}}</text>
       </view>
-    </picker>
-  </view>
+    </view>
+  </scroll-view>
 
   <!-- 学习时长统计卡片（切图占位） -->
-  <view class="study-duration-card">
+  <view class="study-duration-card" bindtap="goStudyPlan">
     <image class="card-bg" src="/images/profile/moneyBg.png" mode="scaleToFill"></image>
     <view class="card-title">学习时长（小时）</view>
     <view class="duration-metrics center">
@@ -47,7 +34,9 @@
         <view class="seg-item {{chartPeriod==='month'?'active':''}}" data-key="month" bindtap="switchPeriod">月</view>
       </view>
     </view>
-    <canvas type="2d" id="studyChart" canvas-id="studyChartCanvas" class="chart-canvas"></canvas>
+    <view wx:if="{{showChart}}">
+      <canvas type="2d" id="studyChart" canvas-id="studyChartCanvas" class="chart-canvas"></canvas>
+    </view>
   </view>
 
   <!-- 报告 tabs 与月份选择 -->
@@ -68,7 +57,7 @@
         <view class="report-item">
           <image class="avatar" src="{{item.teacherAvatar}}" mode="aspectFill"></image>
           <view class="content">
-            <view class="line1"><text class="strong">{{item.teacherName}}</text><text class="normal"> 给您的孩子写了反馈</text></view>
+            <view class="line1"><text class="strong">{{item.teacherName}}</text><text class="normal"> 给您的孩子写了 </text><text class="strong">{{item.courseName}}</text><text class="normal"> 的课程反馈</text></view>
             <view class="line2">{{item.time}}</view>
             <view class="bubble">{{item.content}}</view>
           </view>

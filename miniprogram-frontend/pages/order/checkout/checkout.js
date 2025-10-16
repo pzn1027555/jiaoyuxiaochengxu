@@ -19,7 +19,15 @@ Page({
   async requestParentPay(){
     try{
       await this.loadBindParents()
-      if((this.data.parents||[]).length===0){ wx.showToast({ title:'未绑定家长', icon:'none' }); return }
+      if((this.data.parents||[]).length===0){ 
+        wx.showModal({
+          title: '提示',
+          content: '请先到我的-家长绑定中绑定家长',
+          showCancel: false,
+          confirmText: '知道了'
+        })
+        return 
+      }
       this.setData({ showParentPicker:true, showParentSelector:true })
     }catch(e){ wx.showToast({ title:'加载家长失败', icon:'none' }) }
   },
@@ -63,7 +71,9 @@ Page({
       }
       // 保存来源用户类型（影响是否显示支付按钮）
       const app = getApp()
-      const role = (app && app.globalData && app.globalData.userRole) ? app.globalData.userRole : (wx.getStorageSync('userInfo')||{}).role
+      const userInfoStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const userInfo = typeof userInfoStr === 'string' ? JSON.parse(userInfoStr) : userInfoStr
+      const role = (app && app.globalData && app.globalData.userRole) ? app.globalData.userRole : userInfo.role
       this.setData({ userType: role || 'student' })
     }catch(e){ 
       console.error('Parse data error:', e)

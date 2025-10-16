@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.admin.modules.system.mapper.SubjectLessonPriceMapper">
+    
+    <resultMap id="BaseResultMap" type="com.education.admin.modules.system.entity.SubjectLessonPrice">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="subject_id" property="subjectId" jdbcType="BIGINT"/>
+        <result column="subject_name" property="subjectName" jdbcType="VARCHAR"/>
+        <result column="price" property="price" jdbcType="DECIMAL"/>
+        <result column="currency" property="currency" jdbcType="VARCHAR"/>
+        <result column="is_enabled" property="isEnabled" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, subject_id, subject_name, price, currency, is_enabled, remark, create_time, update_time
+    </sql>
+    
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM subject_lesson_price
+        WHERE id = #{id}
+    </select>
+    
+    <select id="selectBySubjectId" resultMap="BaseResultMap">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM subject_lesson_price
+        WHERE subject_id = #{subjectId}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM subject_lesson_price
+        ORDER BY subject_id ASC
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO subject_lesson_price
+        (subject_id, subject_name, price, currency, is_enabled, remark, create_time, update_time)
+        VALUES
+        (#{subjectId}, #{subjectName}, #{price}, #{currency}, #{isEnabled}, #{remark}, NOW(), NOW())
+    </insert>
+    
+    <update id="updateById">
+        UPDATE subject_lesson_price
+        <set>
+            <if test="subjectId != null">subject_id = #{subjectId},</if>
+            <if test="subjectName != null">subject_name = #{subjectName},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="currency != null">currency = #{currency},</if>
+            <if test="isEnabled != null">is_enabled = #{isEnabled},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        DELETE FROM subject_lesson_price WHERE id = #{id}
+    </delete>
+    
+</mapper>
+

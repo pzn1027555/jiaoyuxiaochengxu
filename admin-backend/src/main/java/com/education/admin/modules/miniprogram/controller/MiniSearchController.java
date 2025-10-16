@@ -27,8 +27,10 @@ public class MiniSearchController {
                                          @RequestParam(value = "subjectId", required = false) Long subjectId,
                                          @RequestParam(value = "province", required = false) String province,
                                          @RequestParam(value = "city", required = false) String city,
-                                         @RequestParam(value = "district", required = false) String district) {
-        return searchService.searchTeachers(keyword, page, size, subjectId, province, city, district);
+                                         @RequestParam(value = "district", required = false) String district,
+                                         @RequestParam(value = "teacherLevel", required = false) String teacherLevel,
+                                         @RequestParam(value = "teachMode", required = false) String teachMode) {
+        return searchService.searchTeachers(keyword, page, size, subjectId, province, city, district, teacherLevel, teachMode);
     }
 }
 

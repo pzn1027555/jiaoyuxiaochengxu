@@ -62,10 +62,21 @@
             <text class="grade-reason" wx:if="{{gradeInfo.gradeReason}}">评级说明：{{gradeInfo.gradeReason}}</text>
           </view>
         </view>
-        <!-- 合同签署按钮：当后台已发送合同且未签署时显示 -->
-        <view class="contract-section" wx:if="{{contractStatus === 1}}">
-          <button class="contract-btn" bindtap="onOpenContract">查看合同</button>
-          <button class="contract-btn primary" style="margin-left: 12rpx;" bindtap="onSignContract">签署合同</button>
+        <!-- 合同查看：当后台已发送合同时显示 -->
+        <view class="contract-section" wx:if="{{contractStatus >= 1}}">
+          <view class="contract-card" bindtap="onOpenContract">
+            <view class="contract-icon">
+              <image class="icon-img" src="/images/profile/renzheng.png" mode="aspectFit"></image>
+            </view>
+            <view class="contract-info">
+              <text class="contract-title">教师兼职合同</text>
+              <text class="contract-status">{{contractStatus === 1 ? '待签署' : contractStatus === 2 ? '已签署' : ''}}</text>
+            </view>
+            <view class="contract-action">
+              <text class="action-text">查看详情</text>
+              <image class="arrow-icon" src="/images/workspace/next.png" mode="aspectFit"></image>
+            </view>
+          </view>
         </view>
         <text class="status-desc" wx:if="{{!isEditable}}">当前状态不可编辑</text>
         <text class="status-desc" wx:else>您可以编辑认证信息</text>

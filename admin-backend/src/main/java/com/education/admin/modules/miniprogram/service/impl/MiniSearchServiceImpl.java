@@ -4,6 +4,7 @@ import com.education.admin.common.Result;
 import com.education.admin.modules.miniprogram.service.MiniSearchService;
 import com.education.admin.modules.teacher.entity.Teacher;
 import com.education.admin.modules.teacher.mapper.TeacherMapper;
+import com.github.pagehelper.PageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,14 +22,14 @@ public class MiniSearchServiceImpl implements MiniSearchService {
     private final com.education.admin.modules.course.mapper.CourseCategoryMapper courseCategoryMapper;
 
     @Override
-    public Result<Object> searchTeachers(String keyword, Integer page, Integer size, Long subjectId, String province, String city, String district) {
+    public Result<Object> searchTeachers(String keyword, Integer page, Integer size, Long subjectId, String province, String city, String district, String teacherLevel, String teachMode) {
         try{
             int pageNum = page == null || page < 1 ? 1 : page;
             int pageSize = size == null || size < 1 ? 10 : size;
-            int offset = (pageNum - 1) * pageSize;
-            // 支持按一级科目联动二级 + 地区筛选
-            List<Teacher> list = teacherMapper.findByPage(offset, pageSize, keyword, null, null, subjectId, province, city, district);
-            int total = teacherMapper.countTotal(keyword, null, null, subjectId, province, city, district);
+            // 支持按一级科目联动二级 + 地区筛选 + 教师级别筛选 + 线上/线下筛选
+            PageHelper.startPage(pageNum, pageSize);
+            List<Teacher> list = teacherMapper.findByPage(keyword, null, null, subjectId, province, city, district, teacherLevel, teachMode);
+            int total = teacherMapper.countTotal(keyword, null, null, subjectId, province, city, district, teacherLevel, teachMode);
             Map<String,Object> resp = new HashMap<>();
             resp.put("page", pageNum);
             resp.put("size", pageSize);

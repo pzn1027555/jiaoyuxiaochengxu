@@ -31,7 +31,8 @@ Page({
 
   getRole(){
     try{
-      const storageUser = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || {}
+      const storageUserStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const storageUser = typeof storageUserStr === 'string' ? JSON.parse(storageUserStr) : storageUserStr
       return storageUser.role || storageUser?.student_info?.role || storageUser?.parent_info?.role || storageUser?.teacher_info?.role || ''
     }catch(e){
       return ''
@@ -39,8 +40,8 @@ Page({
   },
   getCurrentStudentId(){
     try{
-      let storageUser = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || {};
-      storageUser =!!storageUser? JSON.parse(storageUser):{}
+      const storageUserStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const storageUser = typeof storageUserStr === 'string' ? JSON.parse(storageUserStr) : storageUserStr
       if(storageUser.role === 'student'){
         return storageUser.id || storageUser.userId || storageUser.studentId || (storageUser.student_info && (storageUser.student_info.id || storageUser.student_info.studentId))
       }

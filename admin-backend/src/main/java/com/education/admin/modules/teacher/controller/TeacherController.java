@@ -6,6 +6,7 @@ import com.education.admin.modules.badge.service.UserBadgeNotificationService;
 import com.education.admin.modules.teacher.service.TeacherService;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -13,6 +14,7 @@ import java.util.*;
 /**
  * 教师管理控制器
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/teacher")
 @RequiredArgsConstructor
@@ -245,14 +247,29 @@ public class TeacherController {
     @PostMapping("/{id}/send-contract")
     public Result<Void> sendContract(@PathVariable Long id) {
         try {
-            // 这里只做示例：更新teacher_info合同状态为1（已发送待签）
-            teacherService.markContractSent(id, "/uploads/2025/08/新文枢教师兼职合同.doc");
+            // 更新teacher_info合同状态为1（已发送待签）
+            boolean updated = teacherService.markContractSent(id, "/uploads/2025/08/新文枢教师兼职合同.doc");
+            if (!updated) {
+                return Result.error("更新合同状态失败");
+            }
+            
+            log.info("发送合同成功，教师ID: {}", id);
+            
+            // 显示教师认证红点（小程序"教师认证"页）- 使用count=1表示有1个新通知
             try {
-                // 显示教师认证红点（小程序“教师认证”页）
-                badgeService.showBadge(id, "teacher", "certification", 0);
-            } catch (Exception ignored) {}
+                Result<Void> badgeResult = badgeService.showBadge(id, "teacher", "certification", 1);
+                if (badgeResult.getCode() == 200) {
+                    log.info("教师认证红点显示成功，教师ID: {}", id);
+                } else {
+                    log.warn("教师认证红点显示失败，教师ID: {}, 原因: {}", id, badgeResult.getMessage());
+                }
+            } catch (Exception e) {
+                log.error("显示教师认证红点异常，教师ID: {}", id, e);
+            }
+            
             return Result.success();
         } catch (Exception e) {
+            log.error("发送合同失败，教师ID: {}", id, e);
             return Result.error("发送合同失败：" + e.getMessage());
         }
     }

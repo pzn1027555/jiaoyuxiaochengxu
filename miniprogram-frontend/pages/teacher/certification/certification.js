@@ -946,7 +946,8 @@ Page({
   // 加载通知
   async loadNotifications() {
     try {
-      const userInfo = wx.getStorageSync('userInfo')
+      const userInfoStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+      const userInfo = typeof userInfoStr === 'string' ? JSON.parse(userInfoStr) : userInfoStr
       if (!userInfo || !userInfo.id) {
         return
       }
@@ -1003,7 +1004,8 @@ Page({
   // 标记通知为已读
   async markNotificationAsRead(e) {
     const { notificationId } = e.currentTarget.dataset
-    const userInfo = wx.getStorageSync('userInfo')
+    const userInfoStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+    const userInfo = typeof userInfoStr === 'string' ? JSON.parse(userInfoStr) : userInfoStr
     
     try {
       const res = await this.markAsRead(notificationId, userInfo.id)
@@ -1018,7 +1020,8 @@ Page({
 
   // 标记所有通知为已读
   async markAllAsRead() {
-    const userInfo = wx.getStorageSync('userInfo')
+    const userInfoStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+    const userInfo = typeof userInfoStr === 'string' ? JSON.parse(userInfoStr) : userInfoStr
     
     try {
       const res = await this.markAllAsReadAPI(userInfo.id)
@@ -1036,7 +1039,8 @@ Page({
 
   // 进入页面时自动标记所有通知为已读（静默执行）
   async markAllNotificationsAsReadOnEnter() {
-    const userInfo = wx.getStorageSync('userInfo')
+    const userInfoStr = wx.getStorageSync('user_info') || wx.getStorageSync('userInfo') || '{}'
+    const userInfo = typeof userInfoStr === 'string' ? JSON.parse(userInfoStr) : userInfoStr
     
     if (!userInfo || !userInfo.id) {
       return

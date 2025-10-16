@@ -15,8 +15,13 @@ public interface MiniParentService {
     List<Map<String, Object>> getBindParents();
 
     /**
-     * 家长学习统计（聚合所绑定学生的学习时长等）
-     * data: { duration:{today,week,month}, chart:{ labels:[], values:[] } }
+     * 家长学习统计（当传入 studentId 时统计该学生；否则聚合所绑定学生）
+     * 返回：data: { duration:{today,week,month}, chart:{ labels:[], values:[] } }
      */
-    Map<String, Object> getParentStudyStats(String period, String phone);
+    Map<String, Object> getParentStudyStats(String period, String phone, Long studentId);
+
+    /** 家长端：按月获取孩子课程反馈/中期报告列表 */
+    default java.util.List<java.util.Map<String,Object>> listStudentFeedbackByMonth(Long studentId, String month, String type){
+        throw new UnsupportedOperationException("Not implemented");
+    }
 }
